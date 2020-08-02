@@ -11,11 +11,15 @@
     <button @click="showKeys = !showKeys"> show keys </button>
 
     <div class="piano-container">
-        <div v-for="(note, index) in notes" v-if="displayNote(notes[index])" :key="index" class="white-note"
-         :class="[pressed[index] ? 'white-pressed' : '']" @mousedown="playNote(index)" @mouseup="removePressedKey(index)">
+        <div v-for="(note, index) in notes" v-if="displayNote(notes[index])" :key="index"
+          class="white-note" :class="[pressed[index] ? 'white-pressed' : '']" 
+          @mouseleave="removePressedKey(index)" @mousedown="playNote(index); isMousePressed=true"
+          @mouseup="removePressedKey(index); isMousePressed=false" @mouseover="playNoteHover(index)">
 
-          <div v-if="index < notes.length - 1 && !['B','E'].includes(notes[index][0])" class="black-note"
-           :class="[pressed[index + 1] ? 'black-pressed' : '']" @mousedown.stop="playNote(index + 1)" @mouseup.stop="removePressedKey(index + 1)">
+          <div v-if="index < notes.length - 1 && !['B','E'].includes(notes[index][0])" 
+            class="black-note" :class="[pressed[index + 1] ? 'black-pressed' : '']" 
+            @mouseleave.stop="removePressedKey(index + 1)" @mousedown.stop="playNote(index + 1); isMousePressed=true"
+            @mouseup.stop="removePressedKey(index + 1); isMousePressed=false" @mouseover.stop="playNoteHover(index + 1)">
 
             <div style="margin-top: 7vh">
               <template v-if="showKeys">
@@ -59,6 +63,7 @@ export default {
       editKeys : false,
       showKeys : false,
       showNotes: false,
+      isMousePressed: false,
       
       notes: [
             "C3", "C#3", "D3", "D#3", "E3", "F3", "F#3", "G3", "G#3", "A3", "A#3", "B3",
@@ -105,6 +110,8 @@ export default {
       baseUrl: SAMPLE_BASE_URL
     }).toDestination();
 
+
+    //TODO, add this window events to be more specific for piano component
     window.addEventListener("keydown", e => {
       const index = this.keys.indexOf(e.key);
       if(index != -1){
@@ -118,6 +125,15 @@ export default {
         this.removePressedKey(index);
       }
     });
+
+    window.onmouseup = () => {
+      this.isMousePressed = false;
+    }
+
+    // window.onmousedown = () => {
+    //   this.isMousePressed = true;
+    // }
+
   },
 
   destroyed() {
@@ -130,6 +146,12 @@ export default {
       if(!this.editKeys){
         this.addPressedKey(index);
         this.sampler.triggerAttackRelease(this.notes[index], "2n");
+      }
+    },
+
+     playNoteHover(index) {
+      if(this.isMousePressed){
+        this.playNote(index);
       }
     },
 
@@ -211,5 +233,11 @@ export default {
   background: inherit;
   border: none;
   color: inherit;
+}
+
+* {
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10+ and Edge */
+  user-select: none; /* Standard syntax */
 }
 </style>
