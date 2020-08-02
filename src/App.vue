@@ -1,20 +1,22 @@
 <template>
   <div id="app">
 
-    <div class="piano-container">
-        <div  v-for="note in notes" :key="note"  class="white-note" @click="playNote(note)">
-        
-          <div v-if="note[0] !== 'E' && note[0] !== 'B'" class="black-note" @click.stop="playNote(convertToBlackNote(note))">
+    <button @click="editKeys = !editKeys"> edit keys </button>
+
+    <div class="piano-container"> 
+        <div v-for="(note, index) in notes" v-if="displayNote(notes[index])" :key="index" class="white-note" @click="playNote(notes[index])">
+          
+          <div v-if="index < notes.length - 1 && !['B','E'].includes(notes[index][0])" class="black-note" @click.stop="playNote(notes[index + 1])">
             <div style="margin-top: 7vh">
-            {{convertToBlackNote(note)}}
+              <input :disabled="editKeys !== true" v-model="keys[index + 1]" class="key-input"/>
             </div>
-          </div>
+          </div>  
 
           <div style="margin-top: 17vh">
-            {{note}}
+            <input :disabled="editKeys !== true" v-model="keys[index]" class="key-input"/> 
           </div>
         </div>
-    </div>
+    </div> 
 
   </div>
 </template>
@@ -28,11 +30,25 @@ export default {
 
   data: () => {
     return {
-      sampler: Object,
+      sampler: {
+        type: Sampler,
+        default: {},
+      },
+
+      editKeys : false,
       
-      notes: ["C3", "D3", "E3", "F3", "G3", "A3", "B3",
-                   "C4", "D4", "E4", "F4", "G4", "A5", "B5",
-                   "C5", "D5", "E5", "F5", "G5", "A6", "B6"],
+      notes: [
+            "C3", "C#3", "D3", "D#3", "E3", "F3", "F#3", "G3", "G#3", "A3", "A#3", "B3",
+            "C4", "C#4", "D4", "D#4", "E4", "F4", "F#4", "G4", "G#4", "A4", "A#4", "B4",
+            "C5", "C#5", "D5", "D#5", "E5", "F5", "F#5", "G5", "G#5", "A5", "A#5", "B5"
+      ],
+
+      keys: [
+            "a", "s", "d", "f", "g", "h", "j", "k", "l", ";", "'", "z",
+            "x", "c", "v", "b", "n", "m", ",", ".", "/", "q", "w", "e",
+            "r", "t", "y", "u", "i", "o", "p", "[", "]", "1", "2", "3"
+      ],
+
 
       samples: [
           ["A0", "A#0", "B0", "C1", "C#1", "D1", "D#1", "E1", "F1", "F#1"],
@@ -59,15 +75,40 @@ export default {
       onload : () => {},
       baseUrl: SAMPLE_BASE_URL
     }).toDestination();
+
+
+    // document.addEventListener('keydown ', e => {
+    //   console.log(e);
+    // });
+
+    window.addEventListener("keydown", e => {
+      const index = this.keys.indexOf(e.key);
+      if(index != -1)
+        this.playNote(this.notes[index]);
+    });
+
+    // window.addEventListener("keyup", e => {
+		//   console.log(String.fromCharCode(e.keyCode));
+		//   console.log(e.keyCode);
+    // });
+  },
+
+  destroyed() {
+	  window.removeEventListener('keydown', () => {});
   },
 
   methods: {
     playNote(note) {
-      this.sampler.triggerAttackRelease(note, "2n");
+      if(!this.editKeys)
+        this.sampler.triggerAttackRelease(note, "2n");
     },
 
     convertToBlackNote(note){
       return note[0] + "#" + note[1]; 
+    },
+
+    displayNote(note){
+      return note[1] !== '#';
     }
   }
 }
@@ -99,6 +140,7 @@ export default {
   background: white;
   overflow: visible;
   border-right: 1px solid black;
+  color: black;
 }
 
 .black-note {
@@ -108,6 +150,23 @@ export default {
   left: 68%;
   z-index: 1;
   background: #777;
+  color: white;
 }
+
+.key-input {
+  /* border: none; */
+  text-align: center;
+  width: 25px;
+  background: inherit;
+  border: 1px solid black;
+  color: inherit;
+}
+
+.key-input:disabled{
+  background: inherit;
+  border: none;
+  color: inherit;
+}
+
 
 </style>
