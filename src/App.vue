@@ -1,54 +1,75 @@
 <template>
   <div id="app">
-    
+
     <div class="piano-container">
-        <div class="white-note" v-for="nota in whiteNotes" :key="nota" @click="ataca(nota)">
-          <div style="margin-top: 40px;">
-            {{nota}}
+        <div  v-for="note in notes" :key="note"  class="white-note" @click="playNote(note)">
+        
+          <div v-if="note[0] !== 'E' && note[0] !== 'B'" class="black-note" @click.stop="playNote(convertToBlackNote(note))">
+            <div style="margin-top: 7vh">
+            {{convertToBlackNote(note)}}
+            </div>
+          </div>
+
+          <div style="margin-top: 17vh">
+            {{note}}
           </div>
         </div>
     </div>
-    
+
   </div>
 </template>
 
 <script>
-
-
 import { Sampler } from "tone";
+
+const SAMPLE_BASE_URL = "./samples/1/";
 
 export default {
 
   data: () => {
     return {
       sampler: Object,
-
-      whiteNotes: ["C3", "D3", "E3", "F3", "G3", "A3", "B3",
+      
+      notes: ["C3", "D3", "E3", "F3", "G3", "A3", "B3",
                    "C4", "D4", "E4", "F4", "G4", "A5", "B5",
-                   "C5", "D5", "E5", "F5", "G5", "A6"],
+                   "C5", "D5", "E5", "F5", "G5", "A6", "B6"],
 
-      blackNotes: ["C#3", "D#3", "F#3", "G#3", "A#3",
-                   "C#4", "D#4", "F#4", "G#4", "A#4",
-                   "C#5", "D#5", "F#5", "G#5", "A#5"]
+      samples: [
+          ["A0", "A#0", "B0", "C1", "C#1", "D1", "D#1", "E1", "F1", "F#1"],
+          ["G1", "G#1", "A1", "A#1", "B1", "C2", "C#2", "D2", "D#2", "E2"],
+          ["F2", "F#2", "G2", "G#2", "A2", "A#2", "B2", "C3", "C#3", "D3"],
+          ["D#3", "E3", "F3", "F#3", "G3", "G#3", "A3", "A#3", "B3", "C4"],
+          ["D4", "D#4", "E4", "F4", "F#4", "G4", "G#4", "A4", "A#4", "B4"],
+          ["C5", "C#5", "D5", "D#5", "E5", "F5", "F#5", "G5", "G#5", "A5"],
+          ["A#5", "B5", "C6", "C#6", "D6", "D#6", "E6", "F6", "F#6", "G6"],
+          ["G#6", "A6", "A#6", "B6"]
+      ]
+
     };
   },
 
   created() {
+    const SAMPLE_MAP = this.notes.flat().reduce((acc, val) => {
+      acc[val] = `${val.replace("#", "s")}.mp3`;
+      return acc;
+    }, {});
+
     this.sampler = new Sampler({
-        urls: {
-          A0:"A0.mp3", A1: "A1.mp3", A2: "A2.mp3", A3: "A3.mp3", A4: "A4.mp3", A5: "A5.mp3", A6: "A6.mp3", A7: "A7.mp3",
-          C1: "C1.mp3", C2: "C2.mp3", C3: "C3.mp3", C4: "C4.mp3", C5: "C5.mp3", C6: "C6.mp3", C7: "C7.mp3",
-        },
-        baseUrl: "https://tonejs.github.io/audio/salamander/",
+      urls: SAMPLE_MAP,
+      onload : () => {},
+      baseUrl: SAMPLE_BASE_URL
     }).toDestination();
   },
 
   methods: {
-    ataca(nota) {
-      this.sampler.triggerAttackRelease(nota, 2.5);
+    playNote(note) {
+      this.sampler.triggerAttackRelease(note, "2n");
+    },
+
+    convertToBlackNote(note){
+      return note[0] + "#" + note[1]; 
     }
   }
-
 }
 </script>
 
@@ -62,25 +83,31 @@ export default {
 }
 
 .piano-container {
-  margin-left: 30%;
-  margin-top: 20%;
-  display: flex;
-  background: gray;
-  border: 1px solid black;
-  height: 100px;
-  width: 700px;
-  display:flex;
-  /* justify-content: space-between; */
+  position: absolute;
+  top: 300px;
+  left: calc(50% - 600px);
+  border: 5px solid black;
+  height: 205px;
   overflow: hidden;
-  position: relative;
 }
 
 .white-note {
- background: white;
- border: 2px solid black;
- overflow: hidden;
- text-align: center;
- flex:1 0;
+  height: 100%;
+  width: 60px;
+  float: left;
+  position: relative;
+  background: white;
+  overflow: visible;
+  border-right: 1px solid black;
+}
+
+.black-note {
+  position: absolute;
+  height: 65%;
+  width: 65%;
+  left: 68%;
+  z-index: 1;
+  background: #777;
 }
 
 </style>
