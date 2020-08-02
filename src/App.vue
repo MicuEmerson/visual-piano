@@ -1,19 +1,40 @@
 <template>
   <div id="app">
 
-    <button @click="editKeys = !editKeys"> edit keys </button>
+    <button @click="editKeys = !editKeys; showKeys = true"> 
+        <template v-if="!editKeys"> edit keys </template>
+        <template v-else> save keys </template>
+    </button>
 
-    <div class="piano-container"> 
-        <div v-for="(note, index) in notes" v-if="displayNote(notes[index])" :key="index" class="white-note" @click="playNote(notes[index])">
-          
-          <div v-if="index < notes.length - 1 && !['B','E'].includes(notes[index][0])" class="black-note" @click.stop="playNote(notes[index + 1])">
+    <button @click="showNotes = !showNotes"> show notes </button>
+
+    <button @click="showKeys = !showKeys"> show keys </button>
+
+    <div class="piano-container">
+        <div v-for="(note, index) in notes" v-if="displayNote(notes[index])" :key="index" class="white-note"
+         :class="[pressed[index] ? 'white-pressed' : '']" @mousedown="playNote(index)" @mouseup="removePressedKey(index)">
+
+          <div v-if="index < notes.length - 1 && !['B','E'].includes(notes[index][0])" class="black-note"
+           :class="[pressed[index + 1] ? 'black-pressed' : '']" @mousedown.stop="playNote(index + 1)" @mouseup.stop="removePressedKey(index + 1)">
+
             <div style="margin-top: 7vh">
-              <input :disabled="editKeys !== true" v-model="keys[index + 1]" class="key-input"/>
+              <template v-if="showKeys">
+                <input :disabled="editKeys !== true" v-model="keys[index + 1]" class="key-input"/>
+              </template>
+              <template v-if="showNotes">
+                {{notes[index + 1]}}
+              </template>
             </div>
-          </div>  
+
+          </div>
 
           <div style="margin-top: 17vh">
-            <input :disabled="editKeys !== true" v-model="keys[index]" class="key-input"/> 
+            <template v-if="showKeys">
+              <input :disabled="editKeys !== true" v-model="keys[index]" class="key-input"/>
+            </template>
+            <template v-if="showNotes">
+              {{notes[index]}}
+            </template>
           </div>
         </div>
     </div> 
@@ -36,6 +57,8 @@ export default {
       },
 
       editKeys : false,
+      showKeys : false,
+      showNotes: false,
       
       notes: [
             "C3", "C#3", "D3", "D#3", "E3", "F3", "F#3", "G3", "G#3", "A3", "A#3", "B3",
@@ -47,6 +70,12 @@ export default {
             "a", "s", "d", "f", "g", "h", "j", "k", "l", ";", "'", "z",
             "x", "c", "v", "b", "n", "m", ",", ".", "/", "q", "w", "e",
             "r", "t", "y", "u", "i", "o", "p", "[", "]", "1", "2", "3"
+      ],
+
+      pressed: [
+        false, false, false, false, false, false, false, false, false, false, false, false,
+        false, false, false, false, false, false, false, false, false, false, false, false,
+        false, false, false, false, false, false, false, false, false, false, false, false,
       ],
 
 
@@ -76,39 +105,48 @@ export default {
       baseUrl: SAMPLE_BASE_URL
     }).toDestination();
 
-
-    // document.addEventListener('keydown ', e => {
-    //   console.log(e);
-    // });
-
     window.addEventListener("keydown", e => {
       const index = this.keys.indexOf(e.key);
-      if(index != -1)
-        this.playNote(this.notes[index]);
+      if(index != -1){
+        this.playNote(index);
+      }
     });
 
-    // window.addEventListener("keyup", e => {
-		//   console.log(String.fromCharCode(e.keyCode));
-		//   console.log(e.keyCode);
-    // });
+    window.addEventListener("keyup", e => {
+      const index = this.keys.indexOf(e.key);
+      if(index != -1){
+        this.removePressedKey(index);
+      }
+    });
   },
 
   destroyed() {
-	  window.removeEventListener('keydown', () => {});
+    window.removeEventListener('keydown', () => {});
+    window.removeEventListener('keyup', () => {});
   },
 
   methods: {
-    playNote(note) {
-      if(!this.editKeys)
-        this.sampler.triggerAttackRelease(note, "2n");
+    playNote(index) {
+      if(!this.editKeys){
+        this.addPressedKey(index);
+        this.sampler.triggerAttackRelease(this.notes[index], "2n");
+      }
     },
 
-    convertToBlackNote(note){
+    convertToBlackNote(note) {
       return note[0] + "#" + note[1]; 
     },
 
-    displayNote(note){
+    displayNote(note) {
       return note[1] !== '#';
+    },
+
+    addPressedKey(index){
+      this.$set(this.pressed, index, true);
+    },
+
+    removePressedKey(index){
+      this.$set(this.pressed, index, false);
     }
   }
 }
@@ -140,7 +178,11 @@ export default {
   background: white;
   overflow: visible;
   border-right: 1px solid black;
-  color: black;
+  color: #000000;
+}
+
+.white-pressed{
+  background: lightgray !important;
 }
 
 .black-note {
@@ -153,8 +195,11 @@ export default {
   color: white;
 }
 
+.black-pressed {
+  background: black;
+}
+
 .key-input {
-  /* border: none; */
   text-align: center;
   width: 25px;
   background: inherit;
@@ -167,6 +212,4 @@ export default {
   border: none;
   color: inherit;
 }
-
-
 </style>
