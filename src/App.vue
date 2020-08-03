@@ -139,11 +139,12 @@ export default {
   destroyed() {
     window.removeEventListener('keydown', () => {});
     window.removeEventListener('keyup', () => {});
+    window.removeEventListener('onmouseup', () => {});
   },
 
   methods: {
     playNote(index) {
-      if(!this.editKeys){
+      if(!this.editKeys && this.pressed[index] != true){
         this.addPressedKey(index);
         this.sampler.triggerAttackRelease(this.notes[index], "2n");
       }
