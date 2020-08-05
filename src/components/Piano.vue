@@ -192,6 +192,7 @@ export default {
 }
 
 .white-note {
+  
   float: left;
   position: relative;
   color: black;
