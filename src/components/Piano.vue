@@ -207,6 +207,7 @@ export default {
 
 .white-note-pressed {
   /* border-top:1px solid #777; */
+  
   border-left:1px solid #999;
   border-bottom:1px solid #999;
   border-right: 1px solid #777;
