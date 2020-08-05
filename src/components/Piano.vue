@@ -1,16 +1,18 @@
 <template>
-<div id="piano">
+<div id="piano-container">
 
-    <button @click="editKeys = !editKeys; showKeys = true"> 
-      <template v-if="!editKeys"> edit keys </template>
-      <template v-else> save keys </template>
-    </button>
+    <div class='piano-dashboard'>
+      <button @click="editKeys = !editKeys; showKeys = true"> 
+        <template v-if="!editKeys"> edit keys </template>
+        <template v-else> save keys </template>
+      </button>
 
-    <button @click="showNotes = !showNotes"> show notes </button>
+      <button @click="showNotes = !showNotes"> show notes </button>
 
-    <button @click="showKeys = !showKeys"> show keys </button>
+      <button @click="showKeys = !showKeys"> show keys </button>
+    </div>
 
-    <div class="piano-container">
+    <div class="piano-keyboard">
         <div v-for="(note, index) in notes" v-if="displayNote(notes[index])" :key="index"
           class="white-note" :class="[pressed[index] ? 'white-note-pressed' : '']" 
           @mouseleave="removePressedKey(index)" @mousedown="playNote(index); isMousePressed=true"
@@ -122,7 +124,7 @@ export default {
 
     window.addEventListener("keydown", e => {
       const index = this.keys.indexOf(e.key.toLowerCase());
-      if(e.key == 'Shift'){
+      if(e.key === 'Shift'){
         this.isShiftPressed = true;
       }
       if(index != -1){
@@ -132,7 +134,7 @@ export default {
 
     window.addEventListener("keyup", e => {
       const index = this.keys.indexOf(e.key.toLowerCase());
-      if(e.key == 'Shift'){
+      if(e.key === 'Shift'){
         this.isShiftPressed = false;
       }
       if(index != -1){
@@ -182,7 +184,7 @@ export default {
 </script>
 
 <style>
-.piano-container {
+.piano-keyboard {
   position: absolute;
   height: 40%;
   width: 100%;
