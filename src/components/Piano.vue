@@ -23,23 +23,27 @@
             @mouseleave.stop="removePressedKey(index + 1)" @mousedown.stop="playNote(index + 1); isMousePressed=true"
             @mouseup.stop="removePressedKey(index + 1); isMousePressed=false" @mouseover.stop="playNoteHover(index + 1)">
 
-            <div style="margin-top: 7vh">
+            <div class="key-group">
               <template v-if="showKeys">
-                <input :disabled="editKeys !== true" v-model="keys[index + 1]" class="key-input"/>
+                <input :disabled="editKeys !== true" v-model="keys[index + 1]" class="key-input key-input-on-black-note"/>
               </template>
-              <template v-if="showNotes">
-                {{notes[index + 1]}}
+              <template v-if="showNotes" >
+                <div class="key-text">
+                  {{notes[index + 1]}}
+                </div>
               </template>
             </div>
 
           </div>
 
-          <div style="margin-top: 17vh">
+          <div class="key-group">
             <template v-if="showKeys">
               <input :disabled="editKeys !== true" v-model="keys[index]" class="key-input"/>
             </template>
-            <template v-if="showNotes">
-              {{notes[index]}}
+            <template v-if="showNotes" >
+              <div class="key-text">
+                {{notes[index]}}
+              </div>
             </template>
           </div>
         </div>
@@ -64,7 +68,7 @@ export default {
 
       editKeys : false,
       showKeys : false,
-      showNotes: false,
+      showNotes: true,
       isMousePressed: false,
       isShiftPressed: false,
 
@@ -184,14 +188,31 @@ export default {
 </script>
 
 <style>
-.piano-keyboard {
-  position: absolute;
-  height: 40%;
-  width: 100%;
+
+#piano-container {
+ 
+}
+
+.piano-dashboard{
+  width: 98vw;
+  margin:0 1vw;
   background-color: #111;
 }
 
+.piano-keyboard {
+  position: absolute;
+  height: 40%;
+  width: 98vw;
+  margin:0 1vw;
+  background-color: #111;
+  border-left: 1vw solid #111;
+  border-right: 1vw solid #111;
+  border-radius: 0 0 10px 10px;
+}
+
 .white-note {
+  display: flex;
+  justify-content: center;
   float: left;
   position: relative;
   color: black;
@@ -216,6 +237,9 @@ export default {
 }
 
 .black-note {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
   position: absolute;
   height: 65%;
   width: 65%;
@@ -233,12 +257,27 @@ export default {
   background:linear-gradient(to right,#444 0%,#222 100%)
 }
 
+.key-group {
+  align-self: flex-end;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 5px; /* to change in ram */
+  font-size:1.2vw;
+}
+
+.key-text {
+  margin-top: 5px; /* to change in ram */
+}
+
 .key-input {
   text-align: center;
-  width: 25px;
-  background: inherit;
-  border: 1px solid black;
+  width: 2em;
+  background-color: #eeeeee;
+  border: 1px solid #aaaaaa;
   color: inherit;
+  border-radius: 5px;
+  font-size:1vw;
 }
 
 .key-input:disabled{
@@ -246,4 +285,10 @@ export default {
   border: none;
   color: inherit;
 }
+
+.key-input-on-black-note {
+  background-color: #666;
+  border: 1px solid #222;
+}
+
 </style>
