@@ -13,21 +13,37 @@
     </div>
 
     <div class="piano-keyboard">
+        <div v-for="(note, index) in notes" v-if="displayNote(notes[index])" :key="index"
+          class="white-note" :class="[pressed[index] ? 'white-note-pressed' : '']" 
+          @mouseleave="removePressedKey(index)" @mousedown="playNote(index); isMousePressed=true"
+          @mouseup="removePressedKey(index); isMousePressed=false" @mouseover="playNoteHover(index)">
 
-        <div v-for="(noteObject, index) in notes" :key="index"
-          class="white-note" :class="[noteObject.pressed ? 'white-note-pressed' : '']" 
-          @mousedown="playNoteMouse(noteObject)" @mouseup="removePressedKey(noteObject)"
-          @mouseleave="removePressedKey(noteObject)" @mouseover="playNoteHover(noteObject)">
-           
-          <div v-if=(noteObject.blackNote) 
-            class="black-note" :class="[noteObject.blackNote.pressed ? 'black-note-pressed' : '']" 
-            @mousedown.stop="playNoteMouse(noteObject.blackNote)" @mouseup.stop="removePressedKey(noteObject.blackNote)"
-            @mouseleave.stop="removePressedKey(noteObject.blackNote)" @mouseover.stop="playNoteHover(noteObject.blackNote)">
+          <div v-if="index < notes.length - 1 && !['B','E'].includes(notes[index][0])" 
+            class="black-note" :class="[pressed[index + 1] ? 'black-note-pressed' : '']" 
+            @mouseleave.stop="removePressedKey(index + 1)" @mousedown.stop="playNote(index + 1); isMousePressed=true"
+            @mouseup.stop="removePressedKey(index + 1); isMousePressed=false" @mouseover.stop="playNoteHover(index + 1)">
 
-          </div> 
+            <div style="margin-top: 7vh">
+              <template v-if="showKeys">
+                <input :disabled="editKeys !== true" v-model="keys[index + 1]" class="key-input"/>
+              </template>
+              <template v-if="showNotes">
+                {{notes[index + 1]}}
+              </template>
+            </div>
 
-         
+          </div>
+
+          <div style="margin-top: 17vh">
+            <template v-if="showKeys">
+              <input :disabled="editKeys !== true" v-model="keys[index]" class="key-input"/>
+            </template>
+            <template v-if="showNotes">
+              {{notes[index]}}
+            </template>
+          </div>
         </div>
+   
     </div>
 </div>
 </template>
@@ -54,56 +70,24 @@ export default {
       isMousePressed: false,
       isShiftPressed: false,
 
-      notesIndexesByKey: {
-          "a" : 0,
-          "s" : 0,
-          "d" : 1,
-          "f" : 1,
-          "g" : 2,
-          "h" : 3,
-          "j" : 3,
-      },
-
-      notes : [
-        {
-          note: "C3",
-          key: "a",
-          pressed : false,
-          blackNote: {
-            note: "C#3",
-            key: "s",
-            pressed : false
-          }
-        },
-
-        {
-          note: "D3",
-          key: "d",
-          pressed : false,
-          blackNote: {
-            note: "D#3",
-            key: "f",
-            pressed : false
-          }
-        },
-
-        {
-          note: "E3",
-          pressed : false,
-          key: "g",
-        },
-
-        {
-          note: "F3",
-          pressed : false,
-          key: "h",
-          blackNote: {
-            note: "F#3",
-            key: "j",
-            pressed : false,
-          }
-        },
+      notes: [
+            "C3", "C#3", "D3", "D#3", "E3", "F3", "F#3", "G3", "G#3", "A3", "A#3", "B3",
+            "C4", "C#4", "D4", "D#4", "E4", "F4", "F#4", "G4", "G#4", "A4", "A#4", "B4",
+            "C5", "C#5", "D5", "D#5", "E5", "F5", "F#5", "G5", "G#5", "A5", "A#5", "B5"
       ],
+
+      keys: [
+            "a", "s", "d", "f", "g", "h", "j", "k", "l", ";", "'", "z",
+            "x", "c", "v", "b", "n", "m", ",", ".", "/", "q", "w", "e",
+            "r", "t", "y", "u", "i", "o", "p", "[", "]", "1", "2", "3"
+      ],
+
+      pressed: [
+        false, false, false, false, false, false, false, false, false, false, false, false,
+        false, false, false, false, false, false, false, false, false, false, false, false,
+        false, false, false, false, false, false, false, false, false, false, false, false,
+      ],
+
 
       samples: [
           ["A0", "A#0", "B0", "C1", "C#1", "D1", "D#1", "E1", "F1", "F#1"],
@@ -128,8 +112,7 @@ export default {
   },
 
   created() {
-
-   const SAMPLE_MAP = this.samples.flat().reduce((acc, val) => {
+    const SAMPLE_MAP = this.notes.flat().reduce((acc, val) => {
       acc[val] = `${val.replace("#", "s")}.mp3`;
       return acc;
     }, {});
@@ -142,25 +125,23 @@ export default {
 
 
     window.addEventListener("keydown", e => {
-      const key = e.key.toLowerCase();
-      const index = this.notesIndexesByKey[key];
-
-      if(index != undefined){
-        const noteObject = this.notes[index].key === key ? this.notes[index] : this.notes[index].blackNote;
-        this.playNote(noteObject);
+      const index = this.keys.indexOf(e.key.toLowerCase());
+      if(e.key === 'Shift'){
+        this.isShiftPressed = true;
+      }
+      if(index != -1){
+        this.playNote(index);
       }
     });
 
-    //TODO: extras intr-o functie codul comun
     window.addEventListener("keyup", e => {
-      const key = e.key.toLowerCase();
-      const index = this.notesIndexesByKey[key];
-
-      if(index != undefined){
-        const noteObject = this.notes[index].key === key ? this.notes[index] : this.notes[index].blackNote;
-        noteObject.pressed = false;
+      const index = this.keys.indexOf(e.key.toLowerCase());
+      if(e.key === 'Shift'){
+        this.isShiftPressed = false;
       }
-
+      if(index != -1){
+        this.removePressedKey(index);
+      }
     });
 
     window.onmouseup = () => {
@@ -176,27 +157,30 @@ export default {
   },
 
   methods: {
-    playNote(noteObject) {
-        if(!noteObject.pressed && !this.editKeys){
-          this.sampler.triggerAttackRelease(noteObject.note, "2n");
-          noteObject.pressed = true;
-        }
-    },
-
-    playNoteMouse(noteObject) {
-      this.isMousePressed = true;
-      this.playNote(noteObject);
-    },
-
-    playNoteHover(noteObject) {
-      if(this.isMousePressed){
-        this.playNote(noteObject);
+    playNote(index) {
+      if(!this.editKeys && this.pressed[index] != true){
+        this.addPressedKey(index);
+        this.sampler.triggerAttackRelease(this.notes[index], "2n");
       }
     },
 
-    removePressedKey(noteObject) {
-      noteObject.pressed = false;
+     playNoteHover(index) {
+      if(this.isMousePressed){
+        this.playNote(index);
+      }
     },
+
+    displayNote(note) {
+      return note[1] !== '#';
+    },
+
+    addPressedKey(index){
+      this.$set(this.pressed, index, true);
+    },
+
+    removePressedKey(index){
+      this.$set(this.pressed, index, false);
+    }
   }
 }
 </script>
@@ -225,6 +209,7 @@ export default {
 
 .white-note-pressed {
   /* border-top:1px solid #777; */
+  
   border-left:1px solid #999;
   border-bottom:1px solid #999;
   border-right: 1px solid #777;
