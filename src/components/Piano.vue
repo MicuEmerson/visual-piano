@@ -15,17 +15,30 @@
     <div class="piano-keyboard">
 
         <div v-for="(noteObject, index) in notes" :key="index"
-          class="white-note" :class="[noteObject.pressed ? 'white-note-pressed' : '']" 
-          @mousedown="playNoteMouse(noteObject)" @mouseup="removePressedKey(noteObject)"
+          class="white-note" :class="[noteObject.pressed ? 'white-note-pressed' : '']"
+          :style="{'width': whiteNoteWidthSize + '%'}" 
+          @mousedown="playNoteMouse(noteObject)" @mouseup="removePressedKey(noteObject); isMousePressed=false"
           @mouseleave="removePressedKey(noteObject)" @mouseover="playNoteHover(noteObject)">
            
           <div v-if=(noteObject.blackNote) 
             class="black-note" :class="[noteObject.blackNote.pressed ? 'black-note-pressed' : '']" 
-            @mousedown.stop="playNoteMouse(noteObject.blackNote)" @mouseup.stop="removePressedKey(noteObject.blackNote)"
+            @mousedown.stop="playNoteMouse(noteObject.blackNote)" @mouseup.stop="removePressedKey(noteObject.blackNote); isMousePressed=false"
             @mouseleave.stop="removePressedKey(noteObject.blackNote)" @mouseover.stop="playNoteHover(noteObject.blackNote)">
 
+            <div style="margin-top: 15vh">
+             <template v-if="showKeys">
+                <input :disabled="editKeys !== true" v-model="noteObject.blackNote.key" class="key-input"/>
+              </template>
+            </div>
           </div> 
 
+          <div style="margin-top: 32vh"> 
+            <template v-if="showKeys" >
+              <input :disabled="editKeys !== true" class="key-input"
+                :value="noteObject.key"
+                @input="changeInput($event.target.value, noteObject, index)"/>
+            </template>
+          </div>
          
         </div>
     </div>
@@ -39,8 +52,25 @@ const SAMPLE_BASE_URL = "./samples/1/";
 
 export default {
   
-  props: ["snapShotData", "incrementedData", "options", "ctrl"],
-
+  props: {
+ 		startOctave: {
+        type: Number,
+ 		    required: true
+		},
+		endOctave: {
+        type: Number,
+ 		    required: true
+    },
+    startNote: {
+        type: String,
+ 		    required: true
+    },
+    endNote: {
+        type: String,
+ 		    required: true
+		},
+  },
+  
   data: () => {
     return {
       sampler: {
@@ -53,57 +83,10 @@ export default {
       showNotes: false,
       isMousePressed: false,
       isShiftPressed: false,
+      whiteNoteWidthSize: 3,
 
-      notesIndexesByKey: {
-          "a" : 0,
-          "s" : 0,
-          "d" : 1,
-          "f" : 1,
-          "g" : 2,
-          "h" : 3,
-          "j" : 3,
-      },
-
-      notes : [
-        {
-          note: "C3",
-          key: "a",
-          pressed : false,
-          blackNote: {
-            note: "C#3",
-            key: "s",
-            pressed : false
-          }
-        },
-
-        {
-          note: "D3",
-          key: "d",
-          pressed : false,
-          blackNote: {
-            note: "D#3",
-            key: "f",
-            pressed : false
-          }
-        },
-
-        {
-          note: "E3",
-          pressed : false,
-          key: "g",
-        },
-
-        {
-          note: "F3",
-          pressed : false,
-          key: "h",
-          blackNote: {
-            note: "F#3",
-            key: "j",
-            pressed : false,
-          }
-        },
-      ],
+      notesIndexesByKey: {},
+      notes : [],
 
       samples: [
           ["A0", "A#0", "B0", "C1", "C#1", "D1", "D#1", "E1", "F1", "F#1"],
@@ -122,16 +105,20 @@ export default {
         'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\\',
         'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';',
         'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.'
-      ]
+      ],
 
+      allNotes:['A', 'B', 'C', 'D', 'E', 'F', 'G']
     };
   },
 
   created() {
 
-   const SAMPLE_MAP = this.samples.flat().reduce((acc, val) => {
-      acc[val] = `${val.replace("#", "s")}.mp3`;
-      return acc;
+    this.generateNotes();
+    this.generateNotesIndexesByKey();
+
+    const SAMPLE_MAP = this.samples.flat().reduce((acc, val) => {
+        acc[val] = `${val.replace("#", "s")}.mp3`;
+        return acc;
     }, {});
 
     this.sampler = new Sampler({
@@ -142,7 +129,7 @@ export default {
 
 
     window.addEventListener("keydown", e => {
-      const key = e.key.toLowerCase();
+      const key = e.key;
       const index = this.notesIndexesByKey[key];
 
       if(index != undefined){
@@ -153,7 +140,7 @@ export default {
 
     //TODO: extras intr-o functie codul comun
     window.addEventListener("keyup", e => {
-      const key = e.key.toLowerCase();
+      const key = e.key;
       const index = this.notesIndexesByKey[key];
 
       if(index != undefined){
@@ -197,6 +184,62 @@ export default {
     removePressedKey(noteObject) {
       noteObject.pressed = false;
     },
+
+    generateNotes(){
+      let keyIndex = 0;
+      let noteIndex = this.allNotes.indexOf(this.startNote);
+    
+      for(let octave = this.startOctave; octave <= this.endOctave; octave++) {
+
+          while(noteIndex < this.allNotes.length) {
+            const currentNote = this.allNotes[noteIndex];
+
+            let newNote = {
+              note: currentNote + octave,
+              key: this.allKeys[keyIndex++],
+              pressed: false,
+            }
+
+            if(currentNote != 'B' && currentNote!= 'E') {
+              let blackNote = {
+                note: currentNote + "#" + octave,
+                key: this.allKeys[keyIndex++],
+                pressed: false,
+              }
+
+              newNote["blackNote"] = blackNote;
+            }
+
+            this.notes.push(newNote);
+
+            if(octave === this.endOctave && currentNote === this.endNote){
+              break;
+            }
+
+            noteIndex++;
+          }
+
+          noteIndex = 0;
+      }
+
+      this. whiteNoteWidthSize = 100 / this.notes.length;
+    },
+
+    generateNotesIndexesByKey(){
+      for(let i = 0; i < this.notes.length; i++){
+        this.notesIndexesByKey[this.notes[i].key] = i;
+
+        if(this.notes[i].blackNote != undefined){
+          this.notesIndexesByKey[this.notes[i].blackNote.key] = i;
+        } 
+      }
+    },
+    
+    changeInput(value, noteObject, index) {
+      delete this.notesIndexesByKey[noteObject.key];
+      noteObject.key = value;
+      this.notesIndexesByKey[noteObject.key] = index;      
+    }
   }
 }
 </script>
@@ -214,7 +257,7 @@ export default {
   position: relative;
   color: black;
   height:95%;
-  width:4.761%;
+  /* width:4.761%; */
   border-left:1px solid #bbb;
   border-bottom:1px solid #bbb;
   border-right: 1px solid #333;
