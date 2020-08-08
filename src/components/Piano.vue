@@ -2,14 +2,14 @@
 <div id="piano-container">
 
     <div class='piano-dashboard'>
-      <button @click="editKeys = !editKeys; showKeys = true"> 
+      <button class='piano-dashboard-button' @click="editKeys = !editKeys; showKeys = true"> 
         <template v-if="!editKeys"> edit keys </template>
         <template v-else> save keys </template>
       </button>
 
-      <button @click="showNotes = !showNotes"> show notes </button>
+      <button class='piano-dashboard-button' @click="showNotes = !showNotes"> show notes </button>
 
-      <button @click="showKeys = !showKeys"> show keys </button>
+      <button class='piano-dashboard-button' @click="showKeys = !showKeys"> show keys </button>
     </div>
 
     <div class="piano-keyboard">
@@ -190,24 +190,27 @@ export default {
 <style>
 
 #piano-container {
- 
+  height: 31vw;
+  width: 100vw;
+  background-color: black;
+  border-radius: 10px;
+  box-shadow: 
+    0.6vw 0.6vw 0.8vw 0 rgba(255, 255, 255, 0.2) inset,
+    -0.4vw -0.4vw 0.6vw 0 rgba(0, 0, 0, .25) inset;
 }
 
 .piano-dashboard{
-  width: 98vw;
-  margin:0 1vw;
-  background-color: #111;
+  height: 6vw;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
 }
 
 .piano-keyboard {
   position: absolute;
-  height: 40%;
+  height: 25vw;
   width: 98vw;
-  margin:0 1vw;
-  background-color: #111;
-  border-left: 1vw solid #111;
-  border-right: 1vw solid #111;
-  border-radius: 0 0 10px 10px;
+  margin: 0 1vw;
 }
 
 .white-note {
@@ -216,7 +219,7 @@ export default {
   float: left;
   position: relative;
   color: black;
-  height:95%;
+  height:98%;
   width:4.761%;
   border-left:1px solid #bbb;
   border-bottom:1px solid #bbb;
@@ -227,8 +230,6 @@ export default {
 }
 
 .white-note-pressed {
-  /* border-top:1px solid #777; */
-  
   border-left:1px solid #999;
   border-bottom:1px solid #999;
   border-right: 1px solid #777;
@@ -262,7 +263,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 5px; /* to change in ram */
+  margin-bottom: 8px; /* to change in ram */
   font-size:1.2vw;
 }
 
@@ -276,7 +277,6 @@ export default {
   background-color: #eeeeee;
   border: 1px solid #aaaaaa;
   color: inherit;
-  border-radius: 5px;
   font-size:1vw;
 }
 
@@ -286,9 +286,27 @@ export default {
   color: inherit;
 }
 
+.key-input:focus{
+  outline: 0;
+}
+
 .key-input-on-black-note {
   background-color: #666;
   border: 1px solid #222;
+}
+
+.piano-dashboard-button{
+  background-color: #444;
+  border: none;
+  border-radius: 5px;
+  box-shadow: inset 0 0 1vw 0.5vw #666;
+  font-size:1vw;
+  width: 6em;
+  min-height: 2em; /* relative to font size */
+}
+
+.piano-dashboard-button:focus{
+  outline: 0;
 }
 
 </style>

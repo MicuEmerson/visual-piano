@@ -36,4 +36,9 @@ body {
   margin:0;
   text-align: center;
 }
+
+#app{
+  /* margin-top: 20px;
+  margin-left: 100px; */
+}
 </style>
