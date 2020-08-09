@@ -190,8 +190,7 @@ export default {
 <style>
 
 #piano-container {
-  height: 31vw;
-  width: 100vw;
+  width: 100%; 
   background-color: black;
   border-radius: 10px;
   box-shadow: 
@@ -200,17 +199,17 @@ export default {
 }
 
 .piano-dashboard{
-  height: 6vw;
+  height: 6vw; /* set height according to width size */
   display: flex;
   justify-content: space-evenly;
   align-items: center;
 }
 
 .piano-keyboard {
-  position: absolute;
-  height: 25vw;
-  width: 98vw;
-  margin: 0 1vw;
+  position: relative;
+  height: 20vw; /* set height according to width size */
+  width: 98%;
+  margin: 0 1%;
 }
 
 .white-note {
@@ -219,22 +218,25 @@ export default {
   float: left;
   position: relative;
   color: black;
-  height:98%;
-  width:4.761%;
-  border-left:1px solid #bbb;
-  border-bottom:1px solid #bbb;
+  height: 98%;
+  width: 4.761%;
+  border-left: 1px solid #bbb;
+  border-bottom: 1px solid #bbb;
   border-right: 1px solid #333;
-  border-radius:0 0 5px 5px;
-  box-shadow:-1px 0 0 rgba(255,255,255,0.8) inset,0 0 5px #ccc inset,0 0 3px rgba(0,0,0,0.2);
-  background:linear-gradient(to bottom,#eee 0%,#fff 100%)
+  border-radius: 0 0 5px 5px;
+  box-shadow: -1px 0 0 rgba(255,255,255,0.8) inset
+    0 0 5px #ccc inset,0 0 3px rgba(0,0,0,0.2);
+  background: linear-gradient(to bottom,#eee 0%,#fff 100%)
 }
 
 .white-note-pressed {
-  border-left:1px solid #999;
-  border-bottom:1px solid #999;
+  border-left: 1px solid #999;
+  border-bottom: 1px solid #999;
   border-right: 1px solid #777;
-  box-shadow:2px 0 3px rgba(0,0,0,0.1) inset,-5px 5px 20px rgba(0,0,0,0.2) inset,0 0 3px rgba(0,0,0,0.2);
-  background:linear-gradient(to bottom,#fff 0%,#e9e9e9 100%)
+  box-shadow: 2px 0 3px rgba(0,0,0,0.1) inset,
+    -5px 5px 20px rgba(0,0,0,0.2) inset,
+    0 0 3px rgba(0,0,0,0.2);
+  background: linear-gradient(to bottom,#fff 0%,#e9e9e9 100%)
 }
 
 .black-note {
@@ -247,15 +249,19 @@ export default {
   left: 68%;
   z-index: 1;
   color: white;
-  border:1px solid #000;
-  border-radius:0 0 3px 3px;
-  box-shadow:-1px -1px 2px rgba(255,255,255,0.2) inset,0 -5px 2px 3px rgba(0,0,0,0.6) inset,0 2px 4px rgba(0,0,0,0.5);
-  background:linear-gradient(45deg,#222 0%,#555 100%)
+  border: 1px solid #000;
+  border-radius: 0 0 3px 3px;
+  box-shadow: -1px -1px 2px rgba(255,255,255,0.2) inset,
+    0 -5px 2px 3px rgba(0,0,0,0.6) inset,
+    0 2px 4px rgba(0,0,0,0.5);
+  background: linear-gradient(45deg,#222 0%,#555 100%)
 }
 
 .black-note-pressed {
-  box-shadow:-1px -1px 2px rgba(255,255,255,0.2) inset,0 -2px 2px 3px rgba(0,0,0,0.6) inset,0 1px 2px rgba(0,0,0,0.5);
-  background:linear-gradient(to right,#444 0%,#222 100%)
+  box-shadow: -1px -1px 2px rgba(255,255,255,0.2) inset,
+    0 -2px 2px 3px rgba(0,0,0,0.6) inset,
+    0 1px 2px rgba(0,0,0,0.5);
+  background: linear-gradient(to right,#444 0%,#222 100%)
 }
 
 .key-group {
@@ -263,12 +269,12 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 8px; /* to change in ram */
-  font-size:1.2vw;
+  margin-bottom: 8px; 
+  font-size: 1.2vw;
 }
 
 .key-text {
-  margin-top: 5px; /* to change in ram */
+  margin-top: 5px;
 }
 
 .key-input {
@@ -277,10 +283,10 @@ export default {
   background-color: #eeeeee;
   border: 1px solid #aaaaaa;
   color: inherit;
-  font-size:1vw;
+  font-size: 1vw;
 }
 
-.key-input:disabled{
+.key-input:disabled {
   background: inherit;
   border: none;
   color: inherit;
@@ -300,12 +306,12 @@ export default {
   border: none;
   border-radius: 5px;
   box-shadow: inset 0 0 1vw 0.5vw #666;
-  font-size:1vw;
+  font-size: 1vw;
   width: 6em;
   min-height: 2em; /* relative to font size */
 }
 
-.piano-dashboard-button:focus{
+.piano-dashboard-button:focus {
   outline: 0;
 }
 
