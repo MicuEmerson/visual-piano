@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <piano :startOctave="5" :endOctave="6" :startNote="'A'" :endNote="'B'">  </piano>
+    <piano>  </piano>
   </div>
 </template>
 
@@ -11,10 +11,7 @@ export default {
   components : { Piano },
   data: () => {
     return {
-      startOctave: 3,
-      endOctave: 5,
-      startNote: "C",
-      endNote: "G",
+     
     }
   },
 }

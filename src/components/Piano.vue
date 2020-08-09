@@ -10,6 +10,43 @@
       <button @click="showNotes = !showNotes"> show notes </button>
 
       <button @click="showKeys = !showKeys"> show keys </button>
+
+      <div>
+        <label> Start Octave: </label>
+        <select v-model="config.startOctave">
+          <option v-for="option in startOctavesSelect" :value="option" :key="option">
+            {{ option }}
+          </option>
+        </select>
+      </div>
+
+      <div>
+        <label> End Octave: </label>
+        <select v-model="config.endOctave">
+          <option v-for="option in endOctavesSelect" :value="option" :key="option">
+            {{ option }}
+          </option>
+        </select>
+      </div>
+
+      <div>
+        <label> Start Note: </label>
+        <select v-model="config.startNote">
+          <option v-for="option in allNotes" :value="option" :key="option">
+            {{ option }}
+          </option>
+        </select>
+      </div>
+
+      <div>
+        <label> End Note: </label>
+        <select v-model="config.endNote">
+          <option v-for="option in allNotes" :value="option" :key="option">
+            {{ option }}
+          </option>
+        </select>
+      </div>
+
     </div>
 
     <div class="piano-keyboard">
@@ -17,18 +54,19 @@
         <div v-for="(noteObject, index) in notes" :key="index"
           class="white-note" :class="[noteObject.pressed ? 'white-note-pressed' : '']"
           :style="{'width': whiteNoteWidthSize + '%'}" 
-          @mousedown="playNoteMouse(noteObject)" @mouseup="removePressedKey(noteObject); isMousePressed=false"
+          @mousedown="playNoteMouse(noteObject)" @mouseup="removePressedKeyMouse(noteObject)"
           @mouseleave="removePressedKey(noteObject)" @mouseover="playNoteHover(noteObject)">
            
           <div v-if=(noteObject.blackNote) 
             class="black-note" :class="[noteObject.blackNote.pressed ? 'black-note-pressed' : '']" 
-            @mousedown.stop="playNoteMouse(noteObject.blackNote)" @mouseup.stop="removePressedKey(noteObject.blackNote); isMousePressed=false"
+            @mousedown.stop="playNoteMouse(noteObject.blackNote)" @mouseup.stop="removePressedKeyMouse(noteObject.blackNote)"
             @mouseleave.stop="removePressedKey(noteObject.blackNote)" @mouseover.stop="playNoteHover(noteObject.blackNote)">
 
             <div style="margin-top: 15vh">
              <template v-if="showKeys">
                 <input :disabled="editKeys !== true" v-model="noteObject.blackNote.key" class="key-input"/>
               </template>
+              {{noteObject.blackNote.note}}
             </div>
           </div> 
 
@@ -38,6 +76,7 @@
                 :value="noteObject.key"
                 @input="changeInput($event.target.value, noteObject, index)"/>
             </template>
+            {{noteObject.note}}
           </div>
          
         </div>
@@ -51,42 +90,31 @@ import { Sampler } from "tone";
 const SAMPLE_BASE_URL = "./samples/1/";
 
 export default {
-  
-  props: {
- 		startOctave: {
-        type: Number,
- 		    required: true
-		},
-		endOctave: {
-        type: Number,
- 		    required: true
-    },
-    startNote: {
-        type: String,
- 		    required: true
-    },
-    endNote: {
-        type: String,
- 		    required: true
-		},
-  },
-  
+    
   data: () => {
     return {
-      sampler: {
-        type: Sampler,
-        default: {},
-      },
-
+      sampler: {  type: Sampler, default: {} },
+       
       editKeys : false,
       showKeys : false,
       showNotes: false,
       isMousePressed: false,
       isShiftPressed: false,
-      whiteNoteWidthSize: 3,
+      whiteNoteWidthSize: 0,
+
+      config: {
+        startOctave: 3,
+        endOctave: 5,
+        startNote: "C",
+        endNote: "B",
+      },
 
       notesIndexesByKey: {},
       notes : [],
+
+      allOctavesSelect: [],
+
+      allNotesSelect: [],
 
       samples: [
           ["A0", "A#0", "B0", "C1", "C#1", "D1", "D#1", "E1", "F1", "F#1"],
@@ -107,7 +135,8 @@ export default {
         'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.'
       ],
 
-      allNotes:['A', 'B', 'C', 'D', 'E', 'F', 'G']
+      allNotes:['A', 'B', 'C', 'D', 'E', 'F', 'G'],
+      allOctaves:[0, 1, 2, 3, 4, 5, 6]
     };
   },
 
@@ -138,7 +167,6 @@ export default {
       }
     });
 
-    //TODO: extras intr-o functie codul comun
     window.addEventListener("keyup", e => {
       const key = e.key;
       const index = this.notesIndexesByKey[key];
@@ -153,13 +181,22 @@ export default {
     window.onmouseup = () => {
       this.isMousePressed = false;
     }
-
   },
 
   destroyed() {
     window.removeEventListener('keydown', () => {});
     window.removeEventListener('keyup', () => {});
     window.removeEventListener('onmouseup', () => {});
+  },
+
+  watch: {
+    config:{
+      handler: function () {
+            this.generateNotes();
+            this.generateNotesIndexesByKey();
+      },
+      deep: true,
+    }
   },
 
   methods: {
@@ -185,11 +222,17 @@ export default {
       noteObject.pressed = false;
     },
 
+    removePressedKeyMouse(noteObject) {
+      this.isMousePressed = false
+      this.removePressedKey(noteObject);
+    },
+
     generateNotes(){
+      this.notes.length = 0; // we clear the array but the reference remains the same
       let keyIndex = 0;
-      let noteIndex = this.allNotes.indexOf(this.startNote);
+      let noteIndex = this.allNotes.indexOf(this.config.startNote);
     
-      for(let octave = this.startOctave; octave <= this.endOctave; octave++) {
+      for(let octave = this.config.startOctave; octave <= this.config.endOctave; octave++) {
 
           while(noteIndex < this.allNotes.length) {
             const currentNote = this.allNotes[noteIndex];
@@ -212,7 +255,7 @@ export default {
 
             this.notes.push(newNote);
 
-            if(octave === this.endOctave && currentNote === this.endNote){
+            if(octave === this.config.endOctave && currentNote === this.config.endNote){
               break;
             }
 
@@ -225,7 +268,9 @@ export default {
       this. whiteNoteWidthSize = 100 / this.notes.length;
     },
 
-    generateNotesIndexesByKey(){
+    generateNotesIndexesByKey() {
+      this.notesIndexesByKey.length = 0; // we clear the array but the reference remains the same
+
       for(let i = 0; i < this.notes.length; i++){
         this.notesIndexesByKey[this.notes[i].key] = i;
 
@@ -239,6 +284,16 @@ export default {
       delete this.notesIndexesByKey[noteObject.key];
       noteObject.key = value;
       this.notesIndexesByKey[noteObject.key] = index;      
+    }
+  },
+
+  computed: {
+    startOctavesSelect: function() {
+      return this.allOctaves.slice(0, this.config.endOctave);
+    },
+
+    endOctavesSelect: function() {
+      return this.allOctaves.slice(this.allOctaves[this.config.startOctave], this.allOctaves.length);
     }
   }
 }
