@@ -1,27 +1,19 @@
 <template>
   <div id="app">
-    
-    <piano> </piano>
-    
-    
+    <piano>  </piano>
   </div>
 </template>
 
 <script>
-import { Sampler } from "tone";
 import Piano from "./components/Piano";
-
-const SAMPLE_BASE_URL = "./samples/1/";
 
 export default {
   components : { Piano },
   data: () => {
-    return { };
+    return {
+     
+    }
   },
-  methods: {
-   
-  }
-  
 }
 </script>
 
