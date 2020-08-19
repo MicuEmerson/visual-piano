@@ -1,6 +1,6 @@
 <template>
 <div id="piano-container">
-
+   
     <div class='piano-dashboard'>
       <button class='piano-dashboard-button' @click="editKeys = !editKeys; showKeys = true"> 
         <template v-if="!editKeys"> edit keys </template>
@@ -10,6 +10,8 @@
       <button class='piano-dashboard-button' @click="showNotes = !showNotes"> show notes </button>
 
       <button class='piano-dashboard-button' @click="showKeys = !showKeys"> show keys </button>
+
+       <button class='piano-dashboard-button' @click="togglePlayback"> PLAYYYYY </button>
 
       <div>
         <label> Start Octave: </label>
@@ -95,7 +97,8 @@
 </template>
 
 <script>
-import { Sampler } from "tone";
+// import { Sampler, Transport, Draw, context } from "tone"
+import { Midi } from "@tonejs/midi"
 
 const SAMPLE_BASE_URL = "./samples/1/";
 
@@ -103,18 +106,19 @@ export default {
     
   data: () => {
     return {
-      sampler: {  type: Sampler, default: {} },
-       
+      sampler: {  type: window.Tone.Sampler, default: {} },
+      tone : { type: window.Tone, default: {}},
       editKeys : false,
       showKeys : false,
       showNotes: false,
       isMousePressed: false,
       isShiftPressed: false,
       whiteNoteWidthSize: 0,
+      playing: false,
 
       config: {
-        startOctave: 3,
-        endOctave: 5,
+        startOctave: 0,
+        endOctave: 6,
         startNote: "C",
         endNote: "B",
       },
@@ -151,18 +155,72 @@ export default {
   },
 
   created() {
-
+    this.tone = window.Tone;
     this.generateNotes();
     this.generateNotesIndexesByKey();
+    
 
     const SAMPLE_MAP = this.samples.flat().reduce((acc, val) => {
         acc[val] = `${val.replace("#", "s")}.mp3`;
         return acc;
     }, {});
 
-    this.sampler = new Sampler({
+    
+
+    this.sampler = new this.tone.Sampler({
       urls: SAMPLE_MAP,
-      onload : () => {},
+      onload : () => {
+        
+        /*
+        const now = this.tone.now() + 0.5
+        Midi.fromUrl("/audio/beyonce-halo.mid")
+            .then(midi => {
+              midi.tracks.forEach(track => {
+                track.notes.forEach(note => {
+
+                  //here we play the note
+                  this.tone.Transport.schedule(() => {
+                    console.log(note.name, note.duration, note.velocity, this.sampler);
+                    this.sampler.triggerAttackRelease(
+                      note.name,
+                      note.duration,
+                      this.tone.now(),
+                      note.velocity
+                    );
+                  }, note.time + now)
+
+                  let currentNote = null;
+
+                  for (let i of this.notes) {
+                      if(i.note === note.name){
+                        currentNote = i;
+                        break;
+                      } 
+                      else if(i.blackNote && i.blackNote.note === note.name){
+                        currentNote = i.blackNote;
+                        break;
+                      }
+                  }
+                  
+                  // add animation
+                  this.tone.Transport.schedule(time => {
+                    this.tone.Draw.schedule(() => {
+                      currentNote.pressed = true;
+                    }, time)
+                  }, note.time + now)
+
+                  // remove animation
+                  this.tone.Transport.schedule(time => {
+                    this.tone.Draw.schedule(() => {
+                      currentNote.pressed = false;
+                    }, time)
+                  }, note.time + note.duration + now)
+
+                })
+              })
+          })
+      */
+      },
       baseUrl: SAMPLE_BASE_URL
     }).toDestination();
 
@@ -202,14 +260,26 @@ export default {
   watch: {
     config:{
       handler: function () {
-            this.generateNotes();
-            this.generateNotesIndexesByKey();
+          this.generateNotes();
+          this.generateNotesIndexesByKey();
       },
       deep: true,
     }
   },
 
   methods: {
+    togglePlayback() {
+      if (this.playing) {
+        console.log("Am dat pe pauza");
+        this.tone.Transport.pause()
+      } else {
+        console.log("Am dat pe start");
+        this.tone.Transport.start()
+      }
+
+      this.playing = !this.playing
+    },
+
     playNote(noteObject) {
         if(!noteObject.pressed && !this.editKeys){
           this.sampler.triggerAttackRelease(noteObject.note, "2n");
