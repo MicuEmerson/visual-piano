@@ -1,6 +1,8 @@
 <template>
 <div id="piano-container">
-   
+
+    <audio controls> </audio>
+
     <div class='piano-dashboard'>
       <button class='piano-dashboard-button' @click="editKeys = !editKeys; showKeys = true"> 
         <template v-if="!editKeys"> edit keys </template>
@@ -11,7 +13,11 @@
 
       <button class='piano-dashboard-button' @click="showKeys = !showKeys"> show keys </button>
 
-       <button class='piano-dashboard-button' @click="togglePlayback"> PLAYYYYY </button>
+      <button class='piano-dashboard-button' @click="togglePlayback"> PLAYYYYY </button>
+
+      <button class='piano-dashboard-button' @click="startRecording"> start rec </button>
+
+      <button class='piano-dashboard-button' @click="stopRecording"> stop rec </button>
 
       <div>
         <label> Start Octave: </label>
@@ -97,7 +103,6 @@
 </template>
 
 <script>
-// import { Sampler, Transport, Draw, context } from "tone"
 import { Midi } from "@tonejs/midi"
 
 const SAMPLE_BASE_URL = "./samples/1/";
@@ -115,6 +120,9 @@ export default {
       isShiftPressed: false,
       whiteNoteWidthSize: 0,
       playing: false,
+    
+      recorder: {},
+      recordedChunks: [],
 
       config: {
         startOctave: 0,
@@ -165,15 +173,14 @@ export default {
         return acc;
     }, {});
 
-    
 
     this.sampler = new this.tone.Sampler({
       urls: SAMPLE_MAP,
       onload : () => {
         
-        /*
+        
         const now = this.tone.now() + 0.5
-        Midi.fromUrl("/audio/beyonce-halo.mid")
+        Midi.fromUrl("/audio/bach_850_format0.mid")
             .then(midi => {
               midi.tracks.forEach(track => {
                 track.notes.forEach(note => {
@@ -219,11 +226,15 @@ export default {
                 })
               })
           })
-      */
+          
+      
       },
       baseUrl: SAMPLE_BASE_URL
     }).toDestination();
 
+    const dest  = this.tone.context.createMediaStreamDestination();
+    this.recorder = new MediaRecorder(dest.stream);
+    this.sampler.connect(dest);
 
     window.addEventListener("keydown", e => {
       const key = e.key;
@@ -278,6 +289,20 @@ export default {
       }
 
       this.playing = !this.playing
+    },
+
+    startRecording(){
+      this.recordedChunks.length = 0;
+      this.recorder.start();
+      this.recorder.ondataavailable = e => {console.log(e, e.data); this.recordedChunks.push(e.data)};
+    },
+
+    stopRecording(){
+      this.recorder.stop();
+      this.recorder.onstop = evt => {
+        let blob = new Blob(this.recordedChunks, { type: 'audio/midi; codecs=opus' });
+        document.querySelector('audio').src = URL.createObjectURL(blob);
+      };
     },
 
     playNote(noteObject) {
