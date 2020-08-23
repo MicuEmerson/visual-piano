@@ -22,7 +22,8 @@ export default {
   -webkit-user-select: none; /* Safari */
   -ms-user-select: none; /* IE 10+ and Edge */
   user-select: none; /* Standard syntax */
-  box-sizing: border-box
+  box-sizing: border-box;
+  font-family: "Lucida Console", Courier, monospace;
 }
 
 body, html {
@@ -33,7 +34,7 @@ body, html {
 
 #app {
   height: 100%;
-  margin: 0 17%;
+  /* margin: 0 17%; */
   display: flex;
   align-items: center;
   justify-content: center;

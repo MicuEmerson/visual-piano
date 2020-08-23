@@ -1,62 +1,93 @@
 <template>
 <div id="piano-container">
-
-    <audio controls> </audio>
-
-    <div class='piano-dashboard'>
-      <button class='piano-dashboard-button' @click="editKeys = !editKeys; showKeys = true"> 
-        <template v-if="!editKeys"> edit keys </template>
-        <template v-else> save keys </template>
-      </button>
-
-      <button class='piano-dashboard-button' @click="showNotes = !showNotes"> show notes </button>
-
-      <button class='piano-dashboard-button' @click="showKeys = !showKeys"> show keys </button>
-
-      <button class='piano-dashboard-button' @click="togglePlayback"> PLAYYYYY </button>
-
-      <button class='piano-dashboard-button' @click="startRecording"> start rec </button>
-
-      <button class='piano-dashboard-button' @click="stopRecording"> stop rec </button>
-
-      <div>
-        <label> Start Octave: </label>
-        <select v-model="config.startOctave">
-          <option v-for="option in startOctavesSelect" :value="option" :key="option">
-            {{ option }}
-          </option>
-        </select>
-      </div>
-
-      <div>
-        <label> End Octave: </label>
-        <select v-model="config.endOctave">
-          <option v-for="option in endOctavesSelect" :value="option" :key="option">
-            {{ option }}
-          </option>
-        </select>
-      </div>
-
-      <div>
-        <label> Start Note: </label>
-        <select v-model="config.startNote">
-          <option v-for="option in allNotes" :value="option" :key="option">
-            {{ option }}
-          </option>
-        </select>
-      </div>
-
-      <div>
-        <label> End Note: </label>
-        <select v-model="config.endNote">
-          <option v-for="option in allNotes" :value="option" :key="option">
-            {{ option }}
-          </option>
-        </select>
-      </div>
-
+    <!-- <audio controls> </audio> -->
+   
+     <!-- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  ----- DASHBOARD ----- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-->
+     <div class="piano-dashboard">
+      <!-- v-if -->
+      <template v-if="showConfig">
+        <div class="piano-dashboard-buttons-group">
+          <button class="piano-dashboard-button" @click="editKeys = !editKeys; showKeys = true">
+            <template v-if="!editKeys">Edit Keys</template>
+            <template v-else>Save Keys</template>
+          </button>
+ 
+          <div class="piano-dashboard-div-select piano-dashboard-button">
+            <label>Start Octave:</label>
+            <select size="3" v-model="config.startOctave" class="piano-dashboard-select">
+              <option
+                class="piano-dashboard-select-option"
+                v-for="option in startOctavesSelect"
+                :value="option"
+                :key="option"
+              >{{ option }}</option>
+            </select>
+          </div>
+ 
+          <div class="piano-dashboard-div-select piano-dashboard-button">
+            <label>End Octave:</label>
+            <select size="3" v-model="config.endOctave" class="piano-dashboard-select">
+              <option
+                class="piano-dashboard-select-option"
+                v-for="option in endOctavesSelect"
+                :value="option"
+                :key="option"
+              >{{ option }}</option>
+            </select>
+          </div>
+        </div>
+ 
+        <button class="piano-dashboard-button" @click="showConfig = !showConfig">
+          <v-icon class="paino-dashboard-icon" size="3vw">mdi-window-close</v-icon>
+        </button>
+      </template>
+ 
+      <!-- v-if -->
+      <template v-else>
+        <div class="piano-dashboard-buttons-group" style="flex:1">
+          <button class="piano-dashboard-button">
+            <v-icon class="paino-dashboard-icon" size="3vw">mdi-record</v-icon>
+          </button>
+          <button class="piano-dashboard-button">
+            <v-icon class="paino-dashboard-icon" size="3vw">mdi-play</v-icon>
+          </button>
+          <button class="piano-dashboard-button">
+            <v-icon class="paino-dashboard-icon" size="3vw">mdi-stop</v-icon>
+          </button>
+        </div>
+ 
+        <div class="piano-dashboard-screen">
+          <select size="3" v-model="config.endOctave" class="piano-dashboard-screen-list">
+            <option
+              v-for="option in endOctavesSelect"
+              :value="option"
+              :key="option"
+            >Hello {{ option }}</option>
+          </select>
+        </div>
+ 
+        <div class="piano-dashboard-buttons-group" style="flex: 1; justify-content: flex-end">
+          <button class="piano-dashboard-button">
+            <v-icon class="paino-dashboard-icon" size="3vw">mdi-playlist-music</v-icon>
+          </button>
+ 
+          <button @click="showNotes = !showNotes" class="piano-dashboard-button">
+            <v-icon class="paino-dashboard-icon" size="3vw">mdi-music-note</v-icon>
+          </button>
+ 
+          <button @click="showKeys = !showKeys" class="piano-dashboard-button">
+            <v-icon class="paino-dashboard-icon" size="3vw">mdi-keyboard-outline</v-icon>
+          </button>
+ 
+          <button class="piano-dashboard-button" @click="showConfig = !showConfig">
+            <v-icon class="paino-dashboard-icon" size="3vw">mdi-cogs</v-icon>
+          </button>
+        </div>
+      </template>
     </div>
 
+
+    <!-- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  ----- KEYBOARD ----- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-->
     <div class="piano-keyboard">
 
         <div v-for="(noteObject, index) in notes" :key="index"
@@ -72,11 +103,11 @@
 
             <div class="key-group">
              <template v-if="showKeys">
-                <input :disabled="editKeys !== true" v-model="noteObject.blackNote.key" class="key-input"/>
+                <input :disabled="editKeys !== true" v-model="noteObject.blackNote.key" class="key-input key-input-on-black-note"/>
               </template>
 
               <template v-if="showNotes">
-                <div class="key-text">
+                <div class="key-text key-text-on-black-note">
                   {{noteObject.blackNote.note}}
                 </div>
               </template>
@@ -111,16 +142,12 @@ export default {
     
   data: () => {
     return {
-      sampler: {  type: window.Tone.Sampler, default: {} },
+
+      // TONEJS
+      sampler: { type: window.Tone.Sampler, default: {} },
       tone : { type: window.Tone, default: {}},
-      editKeys : false,
-      showKeys : false,
-      showNotes: false,
-      isMousePressed: false,
-      isShiftPressed: false,
-      whiteNoteWidthSize: 0,
-      playing: false,
-    
+      
+      // RECORDING STUFF
       recorder: {},
       recordedChunks: [],
       recordedMap: {},
@@ -128,13 +155,23 @@ export default {
       startRecordTime: 0,
       endRecordTime: 0,
       isRecording: false,
+      songUrlName : "bach_846.mid",
 
+      // CONFIG STUFF
+      showConfig : false,
       config: {
         startOctave: 0,
         endOctave: 6,
         startNote: "C",
         endNote: "B",
       },
+      editKeys : false,
+      showKeys : false,
+      showNotes: false,
+      isMousePressed: false,
+      isShiftPressed: false,
+      whiteNoteWidthSize: 0,
+      playing: false,
 
       notesIndexesByKey: {},
       notes : [],
@@ -171,70 +208,15 @@ export default {
     this.tone = window.Tone;
     this.generateNotes();
     this.generateNotesIndexesByKey();
-    
 
     const SAMPLE_MAP = this.samples.flat().reduce((acc, val) => {
         acc[val] = `${val.replace("#", "s")}.mp3`;
         return acc;
     }, {});
 
-  
-
     this.sampler = new this.tone.Sampler({
       urls: SAMPLE_MAP,
-      onload : () => {
-        
-        /*
-        const now = this.tone.now() + 0.5
-        Midi.fromUrl("/audio/bach_846.mid")
-            .then(midi => {
-              midi.tracks.forEach(track => {
-                track.notes.forEach(note => {
-
-                  //here we play the note
-                  // console.log("time", note.time, "duration", note.duration)
-                  this.tone.Transport.schedule(() => {
-                    console.log(note.name, note.duration, note.velocity, this.sampler);
-                    this.sampler.triggerAttackRelease(
-                      note.name,
-                      note.duration,
-                      this.tone.now(),
-                      note.velocity
-                    );
-                  }, note.time + now)
-
-                  let currentNote = null;
-
-                  for (let i of this.notes) {
-                      if(i.note === note.name){
-                        currentNote = i;
-                        break;
-                      } 
-                      else if(i.blackNote && i.blackNote.note === note.name){
-                        currentNote = i.blackNote;
-                        break;
-                      }
-                  }
-                  
-                  // add animation
-                  this.tone.Transport.schedule(time => {
-                    this.tone.Draw.schedule(() => {
-                      currentNote.pressed = true;
-                    }, time)
-                  }, note.time + now)
-
-                  // remove animation
-                  this.tone.Transport.schedule(time => {
-                    this.tone.Draw.schedule(() => {
-                      currentNote.pressed = false;
-                    }, time)
-                  }, note.time + note.duration + now)
-
-                })
-              })
-          })
-          */
-      },
+      onload : () => {},
       baseUrl: SAMPLE_BASE_URL
     }).toDestination();
 
@@ -339,7 +321,63 @@ export default {
       this.playMyRecord();
     },
 
-     playMyRecord(){
+    playRecord(){
+
+      if(this.songUrlName === 'bach_850_format0.mid') {
+        this.songUrlName = 'bach_846.mid';
+      } else {
+        this.songUrlName = 'bach_850_format0.mid';
+      }
+      
+      const now = 0;
+
+      Midi.fromUrl("/audio/" + this.songUrlName)
+          .then(midi => {
+            midi.tracks.forEach(track => {
+              track.notes.forEach(note => {
+
+                console.log("intra aici?");
+                this.tone.Transport.schedule(() => {
+                  console.log(note.name, note.duration, note.velocity, this.sampler);
+                  this.sampler.triggerAttackRelease(
+                    note.name,
+                    note.duration,
+                    this.tone.now(),
+                    note.velocity
+                  );
+                }, note.time + now)
+
+                let currentNote = null;
+
+                for (let i of this.notes) {
+                    if(i.note === note.name){
+                      currentNote = i;
+                      break;
+                    } 
+                    else if(i.blackNote && i.blackNote.note === note.name){
+                      currentNote = i.blackNote;
+                      break;
+                    }
+                }
+                
+                this.tone.Transport.schedule(time => {
+                  this.tone.Draw.schedule(() => {
+                    currentNote.pressed = true;
+                  }, time)
+                }, note.time + now)
+
+                this.tone.Transport.schedule(time => {
+                  this.tone.Draw.schedule(() => {
+                    currentNote.pressed = false;
+                  }, time)
+                }, note.time + note.duration + now)
+
+              })
+            })
+        })
+    },
+
+    playMyRecord(){
       const now = 0;
 
       console.log("AM INTRAT IN PLAY RECORD");
@@ -503,35 +541,27 @@ export default {
 </script>
 
 <style>
-
 #piano-container {
-  width: 100%; 
+  width: 100%;
   background-color: black;
   border-radius: 10px;
-  box-shadow: 
-    0.6vw 0.6vw 0.8vw 0 rgba(255, 255, 255, 0.2) inset,
-    -0.4vw -0.4vw 0.6vw 0 rgba(0, 0, 0, .25) inset;
+  box-shadow: 0.6vw 0.6vw 0.8vw 0 rgba(255, 255, 255, 0.2) inset,
+    -0.4vw -0.4vw 0.6vw 0 rgba(0, 0, 0, 0.25) inset;
+  padding: 0 1%;
 }
-
-.piano-dashboard{
-  height: 6vw; /* set height according to width size */
-  display: flex;
-  justify-content: space-evenly;
-  align-items: center;
-}
-
+ 
 .piano-keyboard {
   position: relative;
   height: 20vw; /* set height according to width size */
-  width: 98%;
-  margin: 0 1%;
+  width: 100%;
 }
-
+ 
 .white-note {
   display: flex;
   justify-content: center;
   float: left;
   position: relative;
+  cursor: pointer;
   color: black;
   height: 98%;
   width: 4.761%;
@@ -539,94 +569,185 @@ export default {
   border-bottom: 1px solid #bbb;
   border-right: 1px solid #333;
   border-radius: 0 0 5px 5px;
-  box-shadow: -1px 0 0 rgba(255,255,255,0.8) inset
-    0 0 5px #ccc inset,0 0 3px rgba(0,0,0,0.2);
-  background: linear-gradient(to bottom,#eee 0%,#fff 100%)
+  box-shadow: 0px 0px 0px rgba(255, 255, 255, 0.8) inset,
+    -2px -5px 3px #ccc inset, 0 0 3px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(to bottom, #eee 0%, #fff 100%);
 }
-
+ 
 .white-note-pressed {
   border-left: 1px solid #999;
   border-bottom: 1px solid #999;
   border-right: 1px solid #777;
-  box-shadow: 2px 0 3px rgba(0,0,0,0.1) inset,
-    -5px 5px 20px rgba(0,0,0,0.2) inset,
-    0 0 3px rgba(0,0,0,0.2);
-  background: linear-gradient(to bottom,#fff 0%,#e9e9e9 100%)
+  box-shadow: 2px 0 3px rgba(0, 0, 0, 0.1) inset,
+    -5px 5px 20px rgba(0, 0, 0, 0.2) inset, 0 0 3px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(to bottom, #fff 0%, #e9e9e9 100%);
 }
-
+ 
 .black-note {
   display: flex;
   align-items: flex-end;
   justify-content: center;
   position: absolute;
+  cursor: pointer;
   height: 65%;
   width: 65%;
   left: 68%;
   z-index: 1;
   color: white;
-  border: 1px solid #000;
   border-radius: 0 0 3px 3px;
-  box-shadow: -1px -1px 2px rgba(255,255,255,0.2) inset,
-    0 -5px 2px 3px rgba(0,0,0,0.6) inset,
-    0 2px 4px rgba(0,0,0,0.5);
-  background: linear-gradient(45deg,#222 0%,#555 100%)
+  box-shadow: -1px -1px 2px rgba(255, 255, 255, 0.2) inset,
+    0 -5px 2px 3px rgba(0, 0, 0, 0.5) inset, 0 2px 4px rgba(0, 0, 0, 0.5);
+  background: linear-gradient(45deg, #555, #222);
 }
-
+ 
 .black-note-pressed {
-  box-shadow: -1px -1px 2px rgba(255,255,255,0.2) inset,
-    0 -2px 2px 3px rgba(0,0,0,0.6) inset,
-    0 1px 2px rgba(0,0,0,0.5);
-  background: linear-gradient(to right,#444 0%,#222 100%)
+  box-shadow: -1px -1px 2px rgba(255, 255, 255, 0.2) inset,
+    0 -2px 2px 3px rgba(0, 0, 0, 0.5) inset, 0 1px 2px rgba(0, 0, 0, 0.5);
+  background: linear-gradient(to bottom, #333, #222);
 }
-
+ 
 .key-group {
   align-self: flex-end;
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 8px; 
+  margin-bottom: 0.8vw;
   font-size: 1.2vw;
 }
-
+ 
 .key-text {
-  margin-top: 5px;
+  margin-top: 0.8vw;
 }
-
+ 
+.key-text-on-black-note {
+  transform: rotate(-90deg);
+  margin: 0.8vw 0;
+  margin-top: 1vw;
+}
+ 
 .key-input {
   text-align: center;
   width: 2em;
-  background-color: #eeeeee;
   border: 1px solid #aaaaaa;
   color: inherit;
   font-size: 1vw;
 }
-
+ 
 .key-input:disabled {
   background: inherit;
   border: none;
   color: inherit;
 }
-
-.key-input:focus{
-  outline: 0;
-}
-
+ 
 .key-input-on-black-note {
-  background-color: #666;
-  border: 1px solid #222;
+  background-color: rgb(60, 60, 60);
+  border: 1px solid rgb(80, 80, 80);
 }
-
-.piano-dashboard-button{
-  background-color: #444;
+ 
+.piano-dashboard {
+  height: 9vw; /* set height according to width size */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+ 
+.piano-dashboard-button {
+  height: 70%;
   border: none;
-  border-radius: 5px;
-  box-shadow: inset 0 0 1vw 0.5vw #666;
-  font-size: 1vw;
-  width: 6em;
-  min-height: 2em; /* relative to font size */
+  border-radius: 5%;
+  margin: 0.5em 0.5em;
+  box-shadow: 0 -5px 2px rgba(0, 0, 0, 0.8) inset, 0 2px 4px rgba(0, 0, 0, 0.7);
+  background-color: #333;
+ 
+  color: gainsboro;
+  font-size: 1.2vw;
+  padding: 0.8em;
+  text-transform: uppercase;
+  height: 65%;
 }
-
-.piano-dashboard-button:focus {
+ 
+.paino-dashboard-icon {
+  color: gainsboro !important;
+}
+ 
+.piano-dashboard-screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 7vw;
+  width: 30%;
+  background-color: #eeeeee;
+  box-shadow: -0.35vw -0.35vw black inset, -0.45vw -0.45vw 0.45vw black inset,
+    0.35vw 0.35vw black inset, 0.45vw 0.45vw 0.45vw black inset;
+  padding: 0.8vw;
+}
+ 
+.piano-dashboard-screen-list {
+  width: 100%; 
+  height: 100%;
+}
+ 
+.piano-dashboard-screen-list::-webkit-scrollbar {
+  width: 1px;
+}
+ 
+.piano-dashboard-buttons-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 100%;
+}
+ 
+.piano-dashboard-div-select {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+}
+ 
+.piano-dashboard-select {
+  margin-left: 0.5em;
+  cursor: pointer;
+  border-radius: 4px;
+  display: inline-block;
+  font: inherit;
+  line-height: 1.5em;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+ 
+.piano-dashboard-select::-webkit-scrollbar {
+  width: 12px;
+}
+ 
+.piano-dashboard-select::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+}
+ 
+.piano-dashboard-select::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
+}
+ 
+.piano-dashboard-select-option {
+  color: white;
+}
+ 
+select:focus {
   outline: 0;
 }
+ 
+button:focus {
+  outline: 0;
+}
+ 
+input:focus {
+  outline: 0;
+}
+
 </style>
