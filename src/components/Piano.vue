@@ -123,6 +123,11 @@ export default {
     
       recorder: {},
       recordedChunks: [],
+      recordedMap: {},
+      recordedArray: [],
+      startRecordTime: 0,
+      endRecordTime: 0,
+      isRecording: false,
 
       config: {
         startOctave: 0,
@@ -173,19 +178,21 @@ export default {
         return acc;
     }, {});
 
+  
 
     this.sampler = new this.tone.Sampler({
       urls: SAMPLE_MAP,
       onload : () => {
         
-        
+        /*
         const now = this.tone.now() + 0.5
-        Midi.fromUrl("/audio/bach_850_format0.mid")
+        Midi.fromUrl("/audio/bach_846.mid")
             .then(midi => {
               midi.tracks.forEach(track => {
                 track.notes.forEach(note => {
 
                   //here we play the note
+                  // console.log("time", note.time, "duration", note.duration)
                   this.tone.Transport.schedule(() => {
                     console.log(note.name, note.duration, note.velocity, this.sampler);
                     this.sampler.triggerAttackRelease(
@@ -226,8 +233,7 @@ export default {
                 })
               })
           })
-          
-      
+          */
       },
       baseUrl: SAMPLE_BASE_URL
     }).toDestination();
@@ -252,7 +258,7 @@ export default {
 
       if(index != undefined){
         const noteObject = this.notes[index].key === key ? this.notes[index] : this.notes[index].blackNote;
-        noteObject.pressed = false;
+        this.removePressedKey(noteObject);
       }
 
     });
@@ -280,11 +286,13 @@ export default {
 
   methods: {
     togglePlayback() {
+      //TODO, add break
       if (this.playing) {
-        console.log("Am dat pe pauza");
-        this.tone.Transport.pause()
+        console.log("stop");
+        this.tone.Transport.stop();
+        this.tone.Transport.cancel();
       } else {
-        console.log("Am dat pe start");
+        console.log("start");
         this.tone.Transport.start()
       }
 
@@ -293,22 +301,98 @@ export default {
 
     startRecording(){
       this.recordedChunks.length = 0;
+      this.recordedArray.length = 0;
       this.recorder.start();
-      this.recorder.ondataavailable = e => {console.log(e, e.data); this.recordedChunks.push(e.data)};
+      this.recorder.ondataavailable = e => this.recordedChunks.push(e.data);
+
+      this.isRecording = true;
+      this.startRecordTime = new Date().getTime();
     },
 
     stopRecording(){
       this.recorder.stop();
       this.recorder.onstop = evt => {
-        let blob = new Blob(this.recordedChunks, { type: 'audio/midi; codecs=opus' });
+        let blob = new Blob(this.recordedChunks, { type: 'audio/ogg; codecs=opus' });
         document.querySelector('audio').src = URL.createObjectURL(blob);
       };
+      this.isRecording = false;
+      this.endRecordTime = new Date().getTime();
+
+      if(this.recordedArray.length != 0){
+        
+        this.recordedArray[0].time = this.recordedArray[0].startTime - this.startRecordTime;
+        this.recordedArray[0].duration = this.recordedArray[0].endTime - this.recordedArray[0].startTime;
+
+        for(let i = 1; i < this.recordedArray.length; i++){
+          this.recordedArray[i].time = this.recordedArray[i - 1].time + this.recordedArray[i].startTime - this.recordedArray[i - 1].startTime; 
+          this.recordedArray[i].duration = this.recordedArray[i].endTime - this.recordedArray[i].startTime;
+        }
+      }
+
+      for(let i = 0 ; i < this.recordedArray.length; i++){
+        this.recordedArray[i].time /= 1000;
+        this.recordedArray[i].duration /= 1000;
+      }
+
+      console.log("Recordedddd array", this.recordedArray);
+
+      this.playMyRecord();
+    },
+
+     playMyRecord(){
+      const now = 0;
+
+      console.log("AM INTRAT IN PLAY RECORD");
+      this.recordedArray.forEach(note => {
+          
+          this.tone.Transport.schedule(() => {
+            console.log("BAI, nu intri?");
+            this.sampler.triggerAttackRelease(note.noteName, "2n", this.tone.now());
+          }, note.time + now)
+
+          let currentNote = null;
+          for (let i of this.notes) {
+              if(i.note === note.noteName){
+                currentNote = i;
+                break;
+              } 
+              else if(i.blackNote && i.blackNote.note === note.noteName){
+                currentNote = i.blackNote;
+                break;
+              }
+          }
+
+          console.log("DAR AICI INTRI?");
+
+                      
+          this.tone.Transport.schedule(time => {
+            this.tone.Draw.schedule(() => {
+              currentNote.pressed = true;
+            }, time)
+          }, note.time + now)
+
+          this.tone.Transport.schedule(time => {
+            this.tone.Draw.schedule(() => {
+              currentNote.pressed = false;
+            }, time)
+          }, note.time + note.duration + now)
+
+      })
     },
 
     playNote(noteObject) {
         if(!noteObject.pressed && !this.editKeys){
           this.sampler.triggerAttackRelease(noteObject.note, "2n");
           noteObject.pressed = true;
+          
+          if(this.isRecording){
+            this.recordedMap[noteObject.note] = {
+                noteName: noteObject.note,
+                startTime: new Date().getTime(),
+                endTime: null
+            };
+          }
+
         }
     },
 
@@ -325,6 +409,20 @@ export default {
 
     removePressedKey(noteObject) {
       noteObject.pressed = false;
+      
+      if(this.isRecording){
+
+        if(this.recordedMap[noteObject.note] != undefined){
+          
+          const noteName = this.recordedMap[noteObject.note].noteName;
+          const startTime = this.recordedMap[noteObject.note].startTime;
+          const endTime = new Date().getTime();
+
+          delete this.recordedMap[noteObject.note];
+
+          this.recordedArray.push({ noteName, startTime, endTime });          
+        }
+      }
     },
 
     removePressedKeyMouse(noteObject) {
