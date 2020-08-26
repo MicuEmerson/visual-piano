@@ -39,4 +39,16 @@ body, html {
   align-items: center;
   justify-content: center;
 }
+
+select:focus {
+  outline: 0;
+}
+ 
+button:focus {
+  outline: 0;
+}
+ 
+input:focus {
+  outline: 0;
+}
 </style>

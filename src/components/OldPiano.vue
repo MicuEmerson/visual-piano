@@ -291,7 +291,7 @@ export default {
       if(this.songUrlName === 'bach_850_format0.mid') {
         this.songUrlName = 'bach_846.mid';
       } else {
-        this.songUrlName = 'bach_850_format0.mid';
+        this.songUrlName = 'crawling.mid';
       }
       
       const now = 0;
@@ -471,7 +471,7 @@ export default {
           noteIndex = 0;
       }
 
-      this. whiteNoteWidthSize = 100 / this.notes.length;
+      this.whiteNoteWidthSize = 100 / this.notes.length;
     },
 
     generateNotesIndexesByKey() {
