@@ -5,7 +5,7 @@
           class="white-note" :class="[noteObject.pressed ? 'white-note-pressed' : '']"
           :style="{'width': keyboardState.whiteNoteWidthSize + '%'}" 
           @mousedown="playNoteMouse({index})" @mouseup="removePressedKeyMouse({index})"
-           @mouseover="playNoteHover({index})" @mouseleave="removePressedKey({index})">
+          @mouseover="playNoteHover({index})" @mouseleave="removePressedKey({index})">
             
           <div v-if="noteObject.blackNote" 
             class="black-note" :class="[noteObject.blackNote.pressed ? 'black-note-pressed' : '']" 
@@ -60,14 +60,46 @@ export default {
   created() {
     this.generateNotes();
     this.generateNotesIndexesByKey();
+
+    window.addEventListener("keydown", e => {
+      const key = e.key;
+      const index = this.keyboardState.notesIndexesByKey[key];
+
+      if(index != undefined) {
+        const forBlackNote = this.keyboardState.notes[index].key === key ? false : true;
+        this.playNote({index, forBlackNote});
+      }
+    });
+
+    window.addEventListener("keyup", e => {
+      const key = e.key;
+      const index = this.keyboardState.notesIndexesByKey[key];
+
+      if(index != undefined) {
+        const forBlackNote = this.keyboardState.notes[index].key === key ? false : true;
+        this.removePressedKey({index, forBlackNote});
+      }
+
+    });
+
+    window.onmouseup = () => {
+       this.$store.commit("keyboardState/SET_MOUSE_PRESSED", false);
+    }
   },
+
+  destroyed() {
+    window.removeEventListener('keydown', () => {});
+    window.removeEventListener('keyup', () => {});
+    window.removeEventListener('onmouseup', () => {});
+  },
+
 
   methods: {
     ...mapActions('keyboardState', ['generateNotes', 'generateNotesIndexesByKey', 'playNote', 'playNoteMouse',
      'playNoteHover', 'removePressedKey', 'removePressedKeyMouse', 'changeInput']),
 
     handleInput(value, key, index, forBlackNote){
-      this.changeInput({value, key, index, forBlackNote})
+      this.changeInput({value, key, index, forBlackNote});
     }
   },
 

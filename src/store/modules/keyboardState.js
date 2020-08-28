@@ -124,7 +124,7 @@ export default {
         const currentNote = forBlackNote ? state.notes[index].blackNote : state.notes[index];
         
         if(!currentNote.pressed && !rootState.dashboardState.editKeys) {
-          // this.sampler.triggerAttackRelease(currentNote.note, "2n");
+          rootState.toneState.sampler.triggerAttackRelease(currentNote.note, "2n");
           const pressed = true;
           commit("SET_NOTE_PRESSED", { index, forBlackNote, pressed });
 
@@ -174,19 +174,10 @@ export default {
       },
 
       changeInput({ commit }, {value, key, index, forBlackNote}) {
-        console.log("AM INTRAT", value, key, index, forBlackNote);
         commit("DELETE_INDEX_KEY", key);
-        // delete this.notesIndexesByKey[noteObject.key];
-
         commit("SET_NOTE_KEY", {value, index, forBlackNote});
-        // noteObject.key = value;
-
         commit("UPDATE_INDEX_KEY", {key, index})
-        // this.notesIndexesByKey[noteObject.key] = index;      
       }
     },
     
-    getters: {
-      
-    },
 }
