@@ -11,28 +11,39 @@
             <template v-else>Save Keys</template>
           </button>
  
-          <div class="piano-dashboard-div-select piano-dashboard-button">
+          <div class="piano-dashboard-change-octave piano-dashboard-button">
             <label>Start Octave:</label>
-            <select size="3" v-model="startOctave" class="piano-dashboard-select">
+            <div class="piano-octave-ctrl">
+              <v-icon class="paino-dashboard-icon arrow-icon" size="1.8vw">mdi-chevron-up</v-icon>
+              <div>4</div>
+              <v-icon class="paino-dashboard-icon arrow-icon" size="1.8vw">mdi-chevron-down</v-icon>
+            </div>
+
+            <!-- <select size="3" v-model="startOctave" class="piano-dashboard-select">
               <option
                 class="piano-dashboard-select-option"
                 v-for="option in startOctavesSelect"
                 :value="option"
                 :key="option"
               >{{ option }}</option>
-            </select>
+            </select> -->
           </div>
  
-          <div class="piano-dashboard-div-select piano-dashboard-button">
+          <div class="piano-dashboard-change-octave piano-dashboard-button">
             <label>End Octave:</label>
-            <select size="3" v-model="endOctave" class="piano-dashboard-select">
+             <div class="piano-octave-ctrl">
+              <v-icon class="paino-dashboard-icon arrow-icon" size="1.8vw">mdi-chevron-up</v-icon>
+              <div>4</div>
+              <v-icon class="paino-dashboard-icon arrow-icon" size="1.8vw">mdi-chevron-down</v-icon>
+            </div>
+            <!-- <select size="3" v-model="endOctave" class="piano-dashboard-select">
               <option
                 class="piano-dashboard-select-option"
                 v-for="option in endOctavesSelect"
                 :value="option"
                 :key="option"
               >{{ option }}</option>
-            </select>
+            </select> -->
           </div>
         </div>
  
@@ -58,10 +69,12 @@
         <div class="piano-dashboard-screen">
           <select size="3" v-model="dashboardState.endOctave" class="piano-dashboard-screen-list">
             <option
+              class="piano-dashboard-screen-song"
               v-for="option in endOctavesSelect"
               :value="option"
-              :key="option"
-            >Hello {{ option }}</option>
+              :key="option">
+              Hello 
+            </option>
           </select>
         </div>
  
@@ -178,6 +191,13 @@ export default {
 .paino-dashboard-icon {
   color: gainsboro !important;
 }
+
+.piano-octave-ctrl {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
  
 .piano-dashboard-screen {
   flex: 1;
@@ -190,12 +210,17 @@ export default {
   background-color: #eeeeee;
   box-shadow: -0.35vw -0.35vw black inset, -0.45vw -0.45vw 0.45vw black inset,
     0.35vw 0.35vw black inset, 0.45vw 0.45vw 0.45vw black inset;
-  padding: 0.8vw;
+  padding: 0.9vw;
 }
  
 .piano-dashboard-screen-list {
   width: 100%; 
   height: 100%;
+}
+
+.piano-dashboard-screen-song {
+  height: 33.33%;
+  font-size: 1.5vw;
 }
  
 .piano-dashboard-screen-list::-webkit-scrollbar {
@@ -209,7 +234,7 @@ export default {
   height: 100%;
 }
  
-.piano-dashboard-div-select {
+.piano-dashboard-change-octave{
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;
@@ -245,5 +270,13 @@ export default {
  
 .piano-dashboard-select-option {
   color: white;
+}
+
+.arrow-icon {
+  cursor: pointer;
+}
+
+.arrow-icon:hover {
+  color:#ffb200 !important;
 }
 </style>
