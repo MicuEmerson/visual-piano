@@ -52,12 +52,6 @@ export default {
     },
     
     getters: {
-        // getEventById: state => id => {
-        //     return state.events.find(event => event.id === id);
-        // },
-
-        // isLastPage: state => {
-        //     return state.events.length != state.perPage;
-        // }
+      
     },
 }
