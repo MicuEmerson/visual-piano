@@ -27,7 +27,7 @@ export default {
         ADD_RECORD_MIDI(state, note){
             if(state.recordingHelperMap[note] != undefined) {
                 state.recordedMidiChunks.push({
-                    noteName : state.recordingHelperMap[note].noteName,
+                    name : state.recordingHelperMap[note].name,
                     startTime : state.recordingHelperMap[note].startTime,
                     endTime : new Date().getTime()
                 });
@@ -40,7 +40,7 @@ export default {
         },
         ADD_RECORD_MAP(state, note){
             state.recordingHelperMap[note] = {
-                noteName: note,
+                name: note,
                 startTime : new Date().getTime(),
                 endTime : null
             };
@@ -104,42 +104,19 @@ export default {
             commit("SET_IS_RECORDING", false);
             commit("SET_END_RECORD_TIME", new Date().getTime());
             commit("CALCULATE_DURATION_AND_TIME_MIDI");
-            dispatch("prepareMyRecord");
+            // dispatch("prepareMyRecord");
+            const newSong = {
+                name : "aaaa"+new Date().getTime(),
+                notes : state.recordedMidiChunks,
+                forPlaylist: false
+            };
+
+            commit("playlistState/ADD_NEW_RECORDED_SONG", newSong, {root:true})
+            commit("playlistState/SET_CURRENT_SONG", "", {root:true});
         },
 
         prepareMyRecord({ commit, state, rootState }){
-            state.recordedMidiChunks.forEach(note => {
-                rootState.toneState.tone.Transport.schedule(() => {
-                  rootState.toneState.sampler.triggerAttackRelease(note.noteName, "2n", rootState.toneState.tone.now());
-                }, note.time)
       
-                let index = null;
-                let forBlackNote = false;
-                for (let i = 0; i < rootState.keyboardState.notes.length; i++) {
-                    if(rootState.keyboardState.notes[i].note === note.noteName){
-                      index = i;
-                      break;
-                    } 
-                    else if(rootState.keyboardState.notes[i].blackNote && rootState.keyboardState.notes[i].blackNote.note === note.noteName){
-                      index = i;
-                      forBlackNote = true;
-                      break;
-                    }
-                }
-                            
-                rootState.toneState.tone.Transport.schedule(time => {
-                    rootState.toneState.tone.Draw.schedule(() => {
-                        commit("keyboardState/SET_NOTE_PRESSED", {index, forBlackNote, pressed : true}, {root:true});
-                  }, time)
-                }, note.time)
-      
-                rootState.toneState.tone.Transport.schedule(time => {
-                    rootState.toneState.tone.Draw.schedule(() => {
-                        commit("keyboardState/SET_NOTE_PRESSED", {index, forBlackNote, pressed : false}, {root:true});
-                  }, time)
-                }, note.time + note.duration)
-      
-            })
         }
 
     }

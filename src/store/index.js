@@ -5,6 +5,7 @@ import dashboardState from '@/store/modules/dashboardState.js'
 import keyboardState from '@/store/modules/keyboardState.js'
 import toneState from '@/store/modules/toneState.js'
 import recordingState from '@/store/modules/recordingState.js'
+import playlistState from '@/store/modules/playlistState.js'
 
 Vue.use(Vuex)
 
@@ -14,9 +15,7 @@ export default new Vuex.Store({
     dashboardState,
     toneState,
     recordingState,
-    // configuration,
-    // recording,
-    // playlist,
+    playlistState
   },
   state: {},
 })

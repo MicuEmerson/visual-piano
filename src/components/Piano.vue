@@ -28,63 +28,6 @@ export default {
   methods: {
     ...mapActions('toneState', ['createSampler']),
     ...mapActions('recordingState', ['createRecorder']),
-    
-
-    playRecord(){
-
-      if(this.songUrlName === 'bach_850_format0.mid') {
-        this.songUrlName = 'bach_846.mid';
-      } else {
-        this.songUrlName = 'bach_850_format0.mid';
-      }
-      
-      const now = 0;
-
-      Midi.fromUrl("/audio/" + this.songUrlName)
-          .then(midi => {
-            midi.tracks.forEach(track => {
-              track.notes.forEach(note => {
-
-                console.log("intra aici?");
-                this.tone.Transport.schedule(() => {
-                  console.log(note.name, note.duration, note.velocity, this.sampler);
-                  this.sampler.triggerAttackRelease(
-                    note.name,
-                    note.duration,
-                    this.tone.now(),
-                    note.velocity
-                  );
-                }, note.time + now)
-
-                let currentNote = null;
-
-                for (let i of this.notes) {
-                    if(i.note === note.name){
-                      currentNote = i;
-                      break;
-                    } 
-                    else if(i.blackNote && i.blackNote.note === note.name){
-                      currentNote = i.blackNote;
-                      break;
-                    }
-                }
-                
-                this.tone.Transport.schedule(time => {
-                  this.tone.Draw.schedule(() => {
-                    currentNote.pressed = true;
-                  }, time)
-                }, note.time + now)
-
-                this.tone.Transport.schedule(time => {
-                  this.tone.Draw.schedule(() => {
-                    currentNote.pressed = false;
-                  }, time)
-                }, note.time + note.duration + now)
-
-              })
-            })
-        })
-    },
   }
 }
 </script>
