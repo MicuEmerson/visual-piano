@@ -52,11 +52,12 @@
       <!-- v-else -->
       <template v-else>
         <div class="piano-dashboard-buttons-group" style="flex:1">
-          <button class="piano-dashboard-button" @click="startRecording()">
+          <button style="position: relative" class="piano-dashboard-button" @click="startRecording()">
+            <div :style="{background: recordLight}" class="record-light"/>
             <v-icon class="paino-dashboard-icon" size="3vw">mdi-record</v-icon>
           </button>
           <button class="piano-dashboard-button" @click="togglePlay()">
-            <v-icon class="paino-dashboard-icon" size="3vw">mdi-play</v-icon>
+            <v-icon class="paino-dashboard-icon" size="3vw">{{playIcon}}</v-icon>
           </button>
           <button class="piano-dashboard-button" @click="stopRecording()">
             <v-icon class="paino-dashboard-icon" size="3vw">mdi-stop</v-icon>
@@ -142,7 +143,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['dashboardState', 'toneState', 'playlistState']),
+    ...mapState(['dashboardState', 'toneState', 'playlistState', 'recordingState']),
 
     startOctavesSelect: function() {
       return this.dashboardState.allOctaves.slice(0, this.dashboardState.endOctave);
@@ -151,7 +152,15 @@ export default {
     endOctavesSelect: function() {
       return this.dashboardState.allOctaves.slice(this.dashboardState.allOctaves[this.dashboardState.startOctave], this.dashboardState.allOctaves.length);
     },
-  
+    
+    recordLight : function() {
+      return this.recordingState.isRecording ? "linear-gradient(-45deg, green, rgb(152,251,152,0.7))" : "linear-gradient(-45deg, red, rgb(240,128,128,0.7))";
+    },
+
+    playIcon: function() {
+      return this.playing ? 'mdi-pause' : 'mdi-play';
+    },
+
     startOctave: {
       get () {
         return this.dashboardState.startOctave;
@@ -298,4 +307,17 @@ export default {
 .arrow-icon:hover {
   color:#ffb200 !important;
 }
+
+.record-light {
+  position: absolute !important;
+  right: 0.5vw;
+  top: 0.5vw;
+  width: 0.7vw;
+  height: 0.7vw;
+  border-radius: 50%;
+    box-shadow:
+    0 0 0.5vw 0.1vw rgba(255,255,255,0.4),
+    inset 0 0 0.25vw rgba(255,255,255,0.6)
+}
+
 </style>

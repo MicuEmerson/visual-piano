@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" data-app>
     <piano>  </piano>
   </div>
 </template>

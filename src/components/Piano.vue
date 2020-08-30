@@ -1,9 +1,55 @@
 <template>
+<!-- <div > 
+ <v-btn
+    color="primary"
+    dark
+    @click.stop="dialog = true"
+  >
+    Open Dialog
+  </v-btn>
+  <v-dialog
+      persistent
+      v-model="dialog"
+      max-width="400px"
+    >
+      <v-card>
+        <v-card-title>Save recording</v-card-title>
+
+        <v-card-text>
+          <audio controls style="width: 100%; min-width: 200px;"> </audio> 
+          <v-text-field
+            label="Song name"
+          ></v-text-field>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer/>
+          <v-btn
+            style="margin: 5px"
+            dark
+            @click="dialog = false"
+          >
+            Cancel
+          </v-btn>
+
+          <v-btn
+          style="margin: 5px"
+            dark
+            @click="dialog = false"
+          >
+            Save
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    </div> -->
+
 <div id="piano-container">
    <audio controls> </audio>
-   <pianoDashboard> </pianoDashboard>
-   <pianoKeyboard> </pianoKeyboard>
-</div>
+   <pianoDashboard> </pianoDashboard> 
+   <pianoKeyboard> </pianoKeyboard> 
+</div> 
 </template>
 
 <script>
@@ -16,7 +62,7 @@ export default {
   components: { PianoDashboard, PianoKeyboard },
   data: () => {
     return {
- 
+      dialog: true,
     };
   },
 
