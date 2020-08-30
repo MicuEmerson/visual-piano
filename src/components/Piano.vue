@@ -1,5 +1,6 @@
 <template>
 <div id="piano-container">
+   <audio controls> </audio>
    <pianoDashboard> </pianoDashboard>
    <pianoKeyboard> </pianoKeyboard>
 </div>
@@ -15,88 +16,19 @@ export default {
   components: { PianoDashboard, PianoKeyboard },
   data: () => {
     return {
-     
-      // RECORDING STUFF
-      recorder: {},
-      recordedChunks: [],
-      recordedMap: {},
-      recordedArray: [],
-      startRecordTime: 0,
-      endRecordTime: 0,
-      isRecording: false,
-      songUrlName : "bach_846.mid",     
-
-
+ 
     };
   },
 
   created() {
     this.createSampler();
-
-    // const dest  = this.tone.context.createMediaStreamDestination();
-    // this.recorder = new MediaRecorder(dest.stream);
-    // this.sampler.connect(dest);
+    this.createRecorder();    
   },
-
-  
  
-
   methods: {
     ...mapActions('toneState', ['createSampler']),
+    ...mapActions('recordingState', ['createRecorder']),
     
-    togglePlayback() {
-      //TODO, add break
-      if (this.playing) {
-        console.log("stop");
-        this.tone.Transport.stop();
-        this.tone.Transport.cancel();
-      } else {
-        console.log("start");
-        this.tone.Transport.start()
-      }
-
-      this.playing = !this.playing
-    },
-
-    startRecording(){
-      this.recordedChunks.length = 0;
-      this.recordedArray.length = 0;
-      this.recorder.start();
-      this.recorder.ondataavailable = e => this.recordedChunks.push(e.data);
-
-      this.isRecording = true;
-      this.startRecordTime = new Date().getTime();
-    },
-
-    stopRecording(){
-      this.recorder.stop();
-      this.recorder.onstop = evt => {
-        let blob = new Blob(this.recordedChunks, { type: 'audio/ogg; codecs=opus' });
-        document.querySelector('audio').src = URL.createObjectURL(blob);
-      };
-      this.isRecording = false;
-      this.endRecordTime = new Date().getTime();
-
-      if(this.recordedArray.length != 0){
-        
-        this.recordedArray[0].time = this.recordedArray[0].startTime - this.startRecordTime;
-        this.recordedArray[0].duration = this.recordedArray[0].endTime - this.recordedArray[0].startTime;
-
-        for(let i = 1; i < this.recordedArray.length; i++){
-          this.recordedArray[i].time = this.recordedArray[i - 1].time + this.recordedArray[i].startTime - this.recordedArray[i - 1].startTime; 
-          this.recordedArray[i].duration = this.recordedArray[i].endTime - this.recordedArray[i].startTime;
-        }
-      }
-
-      for(let i = 0 ; i < this.recordedArray.length; i++){
-        this.recordedArray[i].time /= 1000;
-        this.recordedArray[i].duration /= 1000;
-      }
-
-      console.log("Recordedddd array", this.recordedArray);
-
-      this.playMyRecord();
-    },
 
     playRecord(){
 
@@ -153,51 +85,6 @@ export default {
             })
         })
     },
-
-    playMyRecord(){
-      const now = 0;
-
-      console.log("AM INTRAT IN PLAY RECORD");
-      this.recordedArray.forEach(note => {
-          
-          this.tone.Transport.schedule(() => {
-            console.log("BAI, nu intri?");
-            this.sampler.triggerAttackRelease(note.noteName, "2n", this.tone.now());
-          }, note.time + now)
-
-          let currentNote = null;
-          for (let i of this.notes) {
-              if(i.note === note.noteName){
-                currentNote = i;
-                break;
-              } 
-              else if(i.blackNote && i.blackNote.note === note.noteName){
-                currentNote = i.blackNote;
-                break;
-              }
-          }
-
-          console.log("DAR AICI INTRI?");
-
-                      
-          this.tone.Transport.schedule(time => {
-            this.tone.Draw.schedule(() => {
-              currentNote.pressed = true;
-            }, time)
-          }, note.time + now)
-
-          this.tone.Transport.schedule(time => {
-            this.tone.Draw.schedule(() => {
-              currentNote.pressed = false;
-            }, time)
-          }, note.time + note.duration + now)
-
-      })
-    },
-
-  
-    
-    
   }
 }
 </script>

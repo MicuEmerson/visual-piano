@@ -5,7 +5,7 @@ export default {
 
     state: {
         sampler: { type: window.Tone.Sampler, default: {} },
-        tone : { type: window.Tone, default: {} },
+        tone : window.Tone,
 
         samples: [
             ["A0", "A#0", "B0", "C1", "C#1", "D1", "D#1", "E1", "F1", "F#1"],
@@ -20,9 +20,6 @@ export default {
     },
 
     mutations: {
-        CREATE_TONE(state){
-            state.tone = window.Tone;
-        },
         CREATE_SAMPLER(state, SAMPLE_MAP) {
             state.sampler = new state.tone.Sampler({
                 urls: SAMPLE_MAP,
@@ -34,15 +31,16 @@ export default {
 
     actions: {
         createSampler({ commit, dispatch, state }){
-            commit("CREATE_TONE");
-
             const SAMPLE_MAP = state.samples.flat().reduce((acc, val) => {
                 acc[val] = `${val.replace("#", "s")}.mp3`;
                 return acc;
             }, {});
             
             commit("CREATE_SAMPLER", SAMPLE_MAP);
-        } 
+        },
+        connectSampler({state}, dest){
+            state.sampler.connect(dest);
+        }
     }
     
     

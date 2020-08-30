@@ -4,19 +4,19 @@
         <div v-for="(noteObject, index) in keyboardState.notes" :key="index"
           class="white-note" :class="[noteObject.pressed ? 'white-note-pressed' : '']"
           :style="{'width': keyboardState.whiteNoteWidthSize + '%'}" 
-          @mousedown="playNoteMouse({index})" @mouseup="removePressedKeyMouse({index})"
-          @mouseover="playNoteHover({index})" @mouseleave="removePressedKey({index})">
+          @mousedown="playNoteMouse({index, forBlackNote : false})" @mouseup="removePressedKeyMouse({index, forBlackNote : false})"
+          @mouseover="playNoteHover({index, forBlackNote : false})" @mouseleave="removePressedKey({index, forBlackNote : false})">
             
           <div v-if="noteObject.blackNote" 
             class="black-note" :class="[noteObject.blackNote.pressed ? 'black-note-pressed' : '']" 
-            @mousedown.stop="playNoteMouse({index, forBlackNote})" @mouseup.stop="removePressedKeyMouse({index, forBlackNote})"
-            @mouseover.stop="playNoteHover({index, forBlackNote})" @mouseleave.stop="removePressedKey({ index, forBlackNote })">
+            @mousedown.stop="playNoteMouse({index, forBlackNote : true})" @mouseup.stop="removePressedKeyMouse({index, forBlackNote : true})"
+            @mouseover.stop="playNoteHover({index, forBlackNote : true})" @mouseleave.stop="removePressedKey({ index, forBlackNote : true})">
 
             <div class="key-group">
                 <template v-if="dashboardState.showKeys">
                   <input :disabled="dashboardState.editKeys !== true" class="key-input key-input-on-black-note"
                   :value="noteObject.blackNote.key"
-                  @input="handleInput($event.target.value, noteObject.blackNote.key, index, forBlackNote)"/>
+                  @input="handleInput($event.target.value, noteObject.blackNote.key, index, true)"/>
                 </template>
 
                 <template v-if="dashboardState.showNotes">
@@ -32,7 +32,7 @@
             <template v-if="dashboardState.showKeys" >
               <input :disabled="dashboardState.editKeys !== true" class="key-input"
                 :value="noteObject.key"
-                @input="handleInput($event.target.value, noteObject.key, index)"/>
+                @input="handleInput($event.target.value, noteObject.key, index, false)"/>
             </template>
 
             <template v-if="dashboardState.showNotes">
@@ -52,7 +52,6 @@ import { mapState, mapActions } from 'vuex';
 export default {
   data: () => {
     return {
-      forBlackNote: true,
 
     }
   },
@@ -66,8 +65,7 @@ export default {
       const index = this.keyboardState.notesIndexesByKey[key];
 
       if(index != undefined) {
-        const forBlackNote = this.keyboardState.notes[index].key === key ? false : true;
-        this.playNote({index, forBlackNote});
+        this.playNote({index, forBlackNote : this.keyboardState.notes[index].key === key ? false : true});
       }
     });
 
@@ -76,8 +74,7 @@ export default {
       const index = this.keyboardState.notesIndexesByKey[key];
 
       if(index != undefined) {
-        const forBlackNote = this.keyboardState.notes[index].key === key ? false : true;
-        this.removePressedKey({index, forBlackNote});
+        this.removePressedKey({index, forBlackNote : this.keyboardState.notes[index].key === key ? false : true});
       }
 
     });
@@ -110,7 +107,6 @@ export default {
 </script>
 
 <style>
- 
 .piano-keyboard {
   position: relative;
   height: 20vw; /* set height according to width size */
