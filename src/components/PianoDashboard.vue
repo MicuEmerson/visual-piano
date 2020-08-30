@@ -8,28 +8,39 @@
             <template v-else>Save Keys</template>
           </button>
  
-          <div class="piano-dashboard-div-select piano-dashboard-button">
+          <div class="piano-dashboard-change-octave piano-dashboard-button">
             <label>Start Octave:</label>
-            <select size="3" v-model="startOctave" class="piano-dashboard-select">
+            <div class="piano-octave-ctrl">
+              <v-icon class="paino-dashboard-icon arrow-icon" size="1.8vw">mdi-chevron-up</v-icon>
+              <div>4</div>
+              <v-icon class="paino-dashboard-icon arrow-icon" size="1.8vw">mdi-chevron-down</v-icon>
+            </div>
+
+            <!-- <select size="3" v-model="startOctave" class="piano-dashboard-select">
               <option
                 class="piano-dashboard-select-option"
                 v-for="option in startOctavesSelect"
                 :value="option"
                 :key="option"
               >{{ option }}</option>
-            </select>
+            </select> -->
           </div>
  
-          <div class="piano-dashboard-div-select piano-dashboard-button">
+          <div class="piano-dashboard-change-octave piano-dashboard-button">
             <label>End Octave:</label>
-            <select size="3" v-model="endOctave" class="piano-dashboard-select">
+             <div class="piano-octave-ctrl">
+              <v-icon class="paino-dashboard-icon arrow-icon" size="1.8vw">mdi-chevron-up</v-icon>
+              <div>4</div>
+              <v-icon class="paino-dashboard-icon arrow-icon" size="1.8vw">mdi-chevron-down</v-icon>
+            </div>
+            <!-- <select size="3" v-model="endOctave" class="piano-dashboard-select">
               <option
                 class="piano-dashboard-select-option"
                 v-for="option in endOctavesSelect"
                 :value="option"
                 :key="option"
               >{{ option }}</option>
-            </select>
+            </select> -->
           </div>
         </div>
  
@@ -41,11 +52,12 @@
       <!-- v-else -->
       <template v-else>
         <div class="piano-dashboard-buttons-group" style="flex:1">
-          <button class="piano-dashboard-button" @click="startRecording()">
+          <button style="position: relative" class="piano-dashboard-button" @click="startRecording()">
+            <div :style="{background: recordLight}" class="record-light"/>
             <v-icon class="paino-dashboard-icon" size="3vw">mdi-record</v-icon>
           </button>
           <button class="piano-dashboard-button" @click="togglePlay()">
-            <v-icon class="paino-dashboard-icon" size="3vw">mdi-play</v-icon>
+            <v-icon class="paino-dashboard-icon" size="3vw">{{playIcon}}</v-icon>
           </button>
           <button class="piano-dashboard-button" @click="stopRecording()">
             <v-icon class="paino-dashboard-icon" size="3vw">mdi-stop</v-icon>
@@ -131,7 +143,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['dashboardState', 'toneState', 'playlistState']),
+    ...mapState(['dashboardState', 'toneState', 'playlistState', 'recordingState']),
 
     startOctavesSelect: function() {
       return this.dashboardState.allOctaves.slice(0, this.dashboardState.endOctave);
@@ -140,7 +152,15 @@ export default {
     endOctavesSelect: function() {
       return this.dashboardState.allOctaves.slice(this.dashboardState.allOctaves[this.dashboardState.startOctave], this.dashboardState.allOctaves.length);
     },
-  
+    
+    recordLight : function() {
+      return this.recordingState.isRecording ? "linear-gradient(-45deg, green, rgb(152,251,152,0.7))" : "linear-gradient(-45deg, red, rgb(240,128,128,0.7))";
+    },
+
+    playIcon: function() {
+      return this.playing ? 'mdi-pause' : 'mdi-play';
+    },
+
     startOctave: {
       get () {
         return this.dashboardState.startOctave;
@@ -199,6 +219,13 @@ export default {
 .paino-dashboard-icon {
   color: gainsboro !important;
 }
+
+.piano-octave-ctrl {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
  
 .piano-dashboard-screen {
   flex: 1;
@@ -211,12 +238,17 @@ export default {
   background-color: #eeeeee;
   box-shadow: -0.35vw -0.35vw black inset, -0.45vw -0.45vw 0.45vw black inset,
     0.35vw 0.35vw black inset, 0.45vw 0.45vw 0.45vw black inset;
-  padding: 0.8vw;
+  padding: 0.9vw;
 }
  
 .piano-dashboard-screen-list {
   width: 100%; 
   height: 100%;
+}
+
+.piano-dashboard-screen-song {
+  height: 33.33%;
+  font-size: 1.5vw;
 }
  
 .piano-dashboard-screen-list::-webkit-scrollbar {
@@ -230,7 +262,7 @@ export default {
   height: 100%;
 }
  
-.piano-dashboard-div-select {
+.piano-dashboard-change-octave{
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;
@@ -267,4 +299,25 @@ export default {
 .piano-dashboard-select-option {
   color: white;
 }
+
+.arrow-icon {
+  cursor: pointer;
+}
+
+.arrow-icon:hover {
+  color:#ffb200 !important;
+}
+
+.record-light {
+  position: absolute !important;
+  right: 0.5vw;
+  top: 0.5vw;
+  width: 0.7vw;
+  height: 0.7vw;
+  border-radius: 50%;
+    box-shadow:
+    0 0 0.5vw 0.1vw rgba(255,255,255,0.4),
+    inset 0 0 0.25vw rgba(255,255,255,0.6)
+}
+
 </style>
