@@ -87,22 +87,19 @@ export default {
             commit("CLEAR_RECORD_MIDI");
             commit("CLEAR_RECORD_AUDIO");
 
-            // state.recorder.start();
-            // state.recorder.ondataavailable = e => state.recordedAudioChunks.push(e.data);
+            state.recorder.start();
+            state.recorder.ondataavailable = e => state.recordedAudioChunks.push(e.data);
 
             commit("SET_IS_RECORDING", true);
             commit("SET_START_RECORD_TIME", new Date().getTime());
         },
 
         stopRecording({ commit, dispatch, state }){
-            // this.recorder.stop();
-            // this.recorder.onstop = evt => {
-            // let blob = new Blob(this.recordedChunks, { type: 'audio/ogg; codecs=opus' });
-            // document.querySelector('audio').src = URL.createObjectURL(blob);
-            // };
-
-            console.log("AAAAAAAAAAAAA",state.recordedAudioChunks);
-
+            state.recorder.stop();
+            state.recorder.onstop = e => {
+                let blob = new Blob(state.recordedAudioChunks, { type: 'audio/ogg; codecs=opus' });
+                document.querySelector('audio').src = URL.createObjectURL(blob);
+            };
 
             commit("SET_IS_RECORDING", false);
             commit("SET_END_RECORD_TIME", new Date().getTime());
