@@ -76,7 +76,6 @@ export default {
       if(index != undefined) {
         this.removePressedKey({index, forBlackNote : this.keyboardState.notes[index].key === key ? false : true});
       }
-
     });
 
     window.onmouseup = () => {
@@ -137,7 +136,8 @@ export default {
   border-right: 1px solid #777;
   box-shadow: 2px 0 3px rgba(0, 0, 0, 0.1) inset,
     -5px 5px 20px rgba(0, 0, 0, 0.2) inset, 0 0 3px rgba(0, 0, 0, 0.2);
-  background: linear-gradient(to bottom, #fff 0%, #e9e9e9 100%);
+  /* background:  linear-gradient(to bottom, #fff 0%, #e9e9e9 100%); */
+  background: blue;
 }
  
 .black-note {
@@ -160,7 +160,8 @@ export default {
 .black-note-pressed {
   box-shadow: -1px -1px 2px rgba(255, 255, 255, 0.2) inset,
     0 -2px 2px 3px rgba(0, 0, 0, 0.5) inset, 0 1px 2px rgba(0, 0, 0, 0.5);
-  background: linear-gradient(to bottom, #333, #222);
+  /* background: linear-gradient(to bottom, #333, #222); */
+  background: red;
 }
  
 .key-group {

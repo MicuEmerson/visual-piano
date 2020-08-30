@@ -64,14 +64,12 @@
         </div>
  
         <div class="piano-dashboard-screen">
-          <select size="3" v-model="dashboardState.endOctave" class="piano-dashboard-screen-list">
+          <select size="3" v-model="currentSongPlaylist" class="piano-dashboard-screen-list">
             <option
-              class="piano-dashboard-screen-song"
-              v-for="option in endOctavesSelect"
+              v-for="(option, index) in playlistState.songs"
               :value="option"
-              :key="option">
-              Hello 
-            </option>
+              :key="index"
+            >{{ option.name }}</option>
           </select>
         </div>
  
@@ -144,6 +142,8 @@ export default {
   },
 
   computed: {
+    ...mapState(['dashboardState', 'toneState', 'playlistState']),
+
     startOctavesSelect: function() {
       return this.dashboardState.allOctaves.slice(0, this.dashboardState.endOctave);
     },
@@ -151,15 +151,22 @@ export default {
     endOctavesSelect: function() {
       return this.dashboardState.allOctaves.slice(this.dashboardState.allOctaves[this.dashboardState.startOctave], this.dashboardState.allOctaves.length);
     },
-    
-    ...mapState(['dashboardState', 'toneState']),
-
+  
     startOctave: {
       get () {
         return this.dashboardState.startOctave;
       },
       set (value) {
         this.$store.dispatch("dashboardState/changeStartOctave", value)
+      }
+    },
+
+    currentSongPlaylist: {
+      get () {
+        return this.playlistState.currentSong;
+      },
+      set (value){
+        this.$store.dispatch("playlistState/changeSong", value);
       }
     },
 
@@ -171,8 +178,6 @@ export default {
         this.$store.dispatch("dashboardState/changeEndOctave", value)
       }
     },
-
-
   }
 }
 
