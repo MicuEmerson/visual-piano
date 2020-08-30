@@ -1,8 +1,5 @@
 <template>
     <div class="piano-dashboard">
-      
-      <!-- <audio controls> </audio> -->
-
       <!-- v-if -->
       <template v-if="dashboardState.showConfig">
         <div class="piano-dashboard-buttons-group">
@@ -44,13 +41,13 @@
       <!-- v-else -->
       <template v-else>
         <div class="piano-dashboard-buttons-group" style="flex:1">
-          <button class="piano-dashboard-button">
+          <button class="piano-dashboard-button" @click="startRecording()">
             <v-icon class="paino-dashboard-icon" size="3vw">mdi-record</v-icon>
           </button>
-          <button class="piano-dashboard-button">
+          <button class="piano-dashboard-button" @click="togglePlay()">
             <v-icon class="paino-dashboard-icon" size="3vw">mdi-play</v-icon>
           </button>
-          <button class="piano-dashboard-button">
+          <button class="piano-dashboard-button" @click="stopRecording()">
             <v-icon class="paino-dashboard-icon" size="3vw">mdi-stop</v-icon>
           </button>
         </div>
@@ -87,16 +84,33 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapActions } from 'vuex';
 
 export default {
   data: () => {
     return {
-        
+     playing: false,    
+     
     }
   },
 
   methods:{
+
+    togglePlay() {
+        if (this.playing) {
+          console.log("stop");
+          this.toneState.tone.Transport.stop();
+          this.toneState.tone.Transport.cancel();
+        } else {
+          console.log("start");
+          this.toneState.tone.Transport.start()
+        }
+
+        this.playing = !this.playing
+    },
+
+    ...mapActions('recordingState', ['startRecording', 'stopRecording']),
+
     editKeys(){
       this.$store.commit("dashboardState/SET_EDIT_KEYS", !this.dashboardState.editKeys);
       this.$store.commit("dashboardState/SET_SHOW_KEYS", !this.dashboardState.showKeys);
@@ -125,7 +139,7 @@ export default {
       return this.dashboardState.allOctaves.slice(this.dashboardState.allOctaves[this.dashboardState.startOctave], this.dashboardState.allOctaves.length);
     },
     
-    ...mapState(['dashboardState']),
+    ...mapState(['dashboardState', 'toneState']),
 
     startOctave: {
       get () {

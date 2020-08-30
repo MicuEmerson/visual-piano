@@ -43,11 +43,13 @@ export default {
         changeStartOctave({ commit, dispatch }, startOctave){
             commit("SET_START_OCTAVE", startOctave);
             dispatch("keyboardState/generateNotes", {}, {root:true});
+            dispatch("keyboardState/generateNotesIndexesByKey", {}, {root:true});
         }, 
 
         changeEndOctave({ commit, dispatch}, endOctave){
             commit("SET_END_OCTAVE", endOctave);
             dispatch("keyboardState/generateNotes", {}, {root:true});
+            dispatch("keyboardState/generateNotesIndexesByKey", {}, {root:true});
         }
     },
     
