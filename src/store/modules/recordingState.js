@@ -8,7 +8,8 @@ export default {
        recordedMidiChunks: [],
        startRecordTime: 0,
        endRecordTime: 0,
-       isRecording: false
+       isRecording: false,
+       saveRecordingDialog: false,
     },
 
     mutations: {
@@ -23,6 +24,9 @@ export default {
         },
         SET_END_RECORD_TIME(state, val){
             state.endRecordTime = val;
+        },
+        SET_SAVE_RECORDING_DIALOG(state, val){
+            state.saveRecordingDialog = val;
         },
         ADD_RECORD_MIDI(state, note){
             if(state.recordingHelperMap[note] != undefined) {
@@ -104,20 +108,19 @@ export default {
             commit("SET_IS_RECORDING", false);
             commit("SET_END_RECORD_TIME", new Date().getTime());
             commit("CALCULATE_DURATION_AND_TIME_MIDI");
-            
-            const newSong = {
-                name : "aaaa"+new Date().getTime(),
-                notes : state.recordedMidiChunks,
-                forPlaylist: false
-            };
-
-            commit("playlistState/ADD_NEW_RECORDED_SONG", newSong, {root:true})
+            commit("SET_SAVE_RECORDING_DIALOG", true);
             commit("playlistState/SET_CURRENT_SONG", "", {root:true});
         },
 
-        prepareMyRecord({ commit, state, rootState }){
+        saveSong({state, commit}, songName){
+            const newSong = {
+                name : songName,
+                notes : Array.from(state.recordedMidiChunks),
+                forPlaylist: false
+            };
       
+            commit("playlistState/ADD_NEW_RECORDED_SONG", newSong, {root:true});
+            commit("SET_SAVE_RECORDING_DIALOG", false);
         }
-
     }
 }

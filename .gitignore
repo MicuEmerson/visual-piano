@@ -3,7 +3,7 @@ node_modules/
 /dist/
 chestii.txt
 /public/all_instruments
-/public/audio
+# /public/audio
 # local env files
 .env.local
 .env.*.local

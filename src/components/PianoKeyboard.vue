@@ -64,7 +64,7 @@ export default {
       const key = e.key;
       const index = this.keyboardState.notesIndexesByKey[key];
 
-      if(index != undefined) {
+      if(index != undefined && !this.recordingState.saveRecordingDialog) {
         this.playNote({index, forBlackNote : this.keyboardState.notes[index].key === key ? false : true});
       }
     });
@@ -100,7 +100,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['keyboardState', 'dashboardState'])
+    ...mapState(['keyboardState', 'dashboardState', 'recordingState'])
   }
 }
 </script>
