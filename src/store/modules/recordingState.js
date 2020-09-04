@@ -94,7 +94,7 @@ export default {
             commit("SET_START_RECORD_TIME", new Date().getTime());
         },
 
-        stopRecording({ commit, dispatch, state }){
+        stopRecording({ commit, state }){
             state.recorder.stop();
             state.recorder.onstop = e => {
                 let blob = new Blob(state.recordedAudioChunks, { type: 'audio/ogg; codecs=opus' });
@@ -104,7 +104,7 @@ export default {
             commit("SET_IS_RECORDING", false);
             commit("SET_END_RECORD_TIME", new Date().getTime());
             commit("CALCULATE_DURATION_AND_TIME_MIDI");
-            // dispatch("prepareMyRecord");
+            
             const newSong = {
                 name : "aaaa"+new Date().getTime(),
                 notes : state.recordedMidiChunks,

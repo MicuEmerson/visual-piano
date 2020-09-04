@@ -62,6 +62,14 @@ export default {
         DELETE_INDEX_KEY(state, key){
           delete state.notesIndexesByKey[key];
         },
+        CLEAR_PRESSED_KEYS(state) {
+          for(let note of state.notes) {
+            note.pressed = false;
+            if(note.blackNote){
+              note.blackNote.pressed = false;
+            }
+          }
+        }
     },
 
     actions: {

@@ -11,36 +11,31 @@
           <div class="piano-dashboard-change-octave piano-dashboard-button">
             <label>Start Octave:</label>
             <div class="piano-octave-ctrl">
-              <v-icon class="paino-dashboard-icon arrow-icon" size="1.8vw">mdi-chevron-up</v-icon>
-              <div>4</div>
-              <v-icon class="paino-dashboard-icon arrow-icon" size="1.8vw">mdi-chevron-down</v-icon>
+              <v-icon :disabled="dashboardState.startOctave == 0" @click="setStartOctave(dashboardState.startOctave - 1)"
+                class="paino-dashboard-icon arrow-icon" size="1.8vw">
+                mdi-chevron-up
+              </v-icon>
+              <div>{{dashboardState.startOctave}}</div>
+              <v-icon :disabled="dashboardState.endOctave - dashboardState.startOctave <= 1" @click="setStartOctave(dashboardState.startOctave + 1)"
+                class="paino-dashboard-icon arrow-icon" size="1.8vw">
+                mdi-chevron-down
+              </v-icon>
             </div>
-
-            <!-- <select size="3" v-model="startOctave" class="piano-dashboard-select">
-              <option
-                class="piano-dashboard-select-option"
-                v-for="option in startOctavesSelect"
-                :value="option"
-                :key="option"
-              >{{ option }}</option>
-            </select> -->
           </div>
  
           <div class="piano-dashboard-change-octave piano-dashboard-button">
             <label>End Octave:</label>
              <div class="piano-octave-ctrl">
-              <v-icon class="paino-dashboard-icon arrow-icon" size="1.8vw">mdi-chevron-up</v-icon>
-              <div>4</div>
-              <v-icon class="paino-dashboard-icon arrow-icon" size="1.8vw">mdi-chevron-down</v-icon>
+              <v-icon :disabled="dashboardState.endOctave - dashboardState.startOctave <= 1" @click="setEndOctave(dashboardState.endOctave - 1)"
+                class="paino-dashboard-icon arrow-icon" size="1.8vw">
+                mdi-chevron-up
+              </v-icon>
+              <div>{{dashboardState.endOctave}}</div>
+              <v-icon :disabled="dashboardState.endOctave == dashboardState.maxEndOctave" @click="setEndOctave(dashboardState.endOctave + 1)"
+                class="paino-dashboard-icon arrow-icon" size="1.8vw">
+                mdi-chevron-down
+              </v-icon>
             </div>
-            <!-- <select size="3" v-model="endOctave" class="piano-dashboard-select">
-              <option
-                class="piano-dashboard-select-option"
-                v-for="option in endOctavesSelect"
-                :value="option"
-                :key="option"
-              >{{ option }}</option>
-            </select> -->
           </div>
         </div>
  
@@ -52,14 +47,14 @@
       <!-- v-else -->
       <template v-else>
         <div class="piano-dashboard-buttons-group" style="flex:1">
-          <button style="position: relative" class="piano-dashboard-button" @click="startRecording()">
+          <button style="position: relative" class="piano-dashboard-button" @click="handleRecording()">
             <div :style="{background: recordLight}" class="record-light"/>
             <v-icon class="paino-dashboard-icon" size="3vw">mdi-record</v-icon>
           </button>
           <button class="piano-dashboard-button" @click="togglePlay()">
             <v-icon class="paino-dashboard-icon" size="3vw">{{playIcon}}</v-icon>
           </button>
-          <button class="piano-dashboard-button" @click="stopRecording()">
+          <button class="piano-dashboard-button" @click="stopPlaying()">
             <v-icon class="paino-dashboard-icon" size="3vw">mdi-stop</v-icon>
           </button>
         </div>
@@ -75,9 +70,9 @@
         </div>
  
         <div class="piano-dashboard-buttons-group" style="flex: 1; justify-content: flex-end">
-          <button class="piano-dashboard-button">
+          <!-- <button class="piano-dashboard-button">
             <v-icon class="paino-dashboard-icon" size="3vw">mdi-playlist-music</v-icon>
-          </button>
+          </button> -->
  
           <button @click="showNotes()" class="piano-dashboard-button">
             <v-icon class="paino-dashboard-icon" size="3vw">mdi-music-note</v-icon>
@@ -101,24 +96,28 @@ import { mapState, mapActions } from 'vuex';
 export default {
   data: () => {
     return {
-     playing: false,    
+      
      
     }
   },
 
   methods:{
-
     togglePlay() {
-        if (this.playing) {
-          console.log("stop");
-          this.toneState.tone.Transport.stop();
-          this.toneState.tone.Transport.cancel();
+        if (this.dashboardState.playing) {
+          this.toneState.tone.Transport.pause();
         } else {
-          console.log("start");
           this.toneState.tone.Transport.start()
         }
 
-        this.playing = !this.playing
+        this.$store.commit("dashboardState/SET_PLAYING", !this.dashboardState.playing);
+    },
+
+    stopPlaying() {
+        this.$store.dispatch("playlistState/stopPlaying", "");
+    },
+
+    handleRecording(){
+      this.recordingState.isRecording ? this.stopRecording() : this.startRecording();
     },
 
     ...mapActions('recordingState', ['startRecording', 'stopRecording']),
@@ -140,6 +139,14 @@ export default {
       this.$store.commit("dashboardState/SET_SHOW_NOTES", !this.dashboardState.showNotes);
     },
 
+    setStartOctave(value){
+        this.$store.dispatch("dashboardState/changeStartOctave", value)
+    },
+
+    setEndOctave(value){
+        this.$store.dispatch("dashboardState/changeEndOctave", value)
+    }
+
   },
 
   computed: {
@@ -158,16 +165,7 @@ export default {
     },
 
     playIcon: function() {
-      return this.playing ? 'mdi-pause' : 'mdi-play';
-    },
-
-    startOctave: {
-      get () {
-        return this.dashboardState.startOctave;
-      },
-      set (value) {
-        this.$store.dispatch("dashboardState/changeStartOctave", value)
-      }
+      return this.dashboardState.playing ? 'mdi-pause' : 'mdi-play';
     },
 
     currentSongPlaylist: {
@@ -175,18 +173,11 @@ export default {
         return this.playlistState.currentSong;
       },
       set (value){
-        this.$store.dispatch("playlistState/changeSong", value);
+        this.$store.dispatch("dashboardState/changeStartOctave", 0);
+        this.$store.dispatch("dashboardState/changeEndOctave", this.dashboardState.maxEndOctave);
+        this.$store.dispatch("playlistState/stopPlaying", value);
       }
-    },
-
-    endOctave: {
-      get () {
-        return this.dashboardState.endOctave;
-      },
-      set (value) {
-        this.$store.dispatch("dashboardState/changeEndOctave", value)
-      }
-    },
+    }
   }
 }
 
