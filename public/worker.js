@@ -1,55 +1,60 @@
 var canvas = null;
 var ctxWorker = null;
-var speed = 0;
+var speed = 0; //asta o as fie constanta pt toate notele(reactangle), 
+              // care pot sa i-o dau din mesaj in functie de cat de rapida sa fie (ex: velocity 50%, 100%, 120% etc)
+              // dar deocamdata las constant
+
 
 // Waiting to receive the OffScreenCanvas
 onmessage = function(e) {
-  canvas = e.data.canvas;
+  const {canvas, messageType, height, width} = e.data;
+  
+  if(messageType === "INIT"){
+    handleInit(canvas);
+  } else if(messageType === "RESIZE"){
+    handleResize(height, width);
+  }
+ 
+}
+
+function handleResize(height, width){
+  canvas.height = height;
+  canvas.width = width;
+}
+
+function handleInit(canvasData){
+  canvas = canvasData;
   ctxWorker = canvas.getContext("2d");
-  console.log("contenxttt",ctxWorker);
-  console.log("canvasss",canvas);
+  // console.log("contenxttt",ctxWorker);
+  // console.log("canvasss",canvas);
   
   startCounting();
   setInterval(function() {
     speed = 0;
-  }, 3500);
-
+  }, 4500);
 }
 
 // Start the counter for Canvas B
 function startCounting() {
   setInterval(function() {
-    redrawCanvas();
     speed++;
-  }, 5);
+    redrawCanvas();
+  }, 10);
 }
 
 function redrawCanvas() {
-  ctxWorker.clearRect(0, 0, canvas.width, canvas.height);
+  // ctxWorker.clearRect(0, 0, canvas.width, canvas.height);
   ctxWorker.fillStyle = "blue";
-  ctxWorker.fillRect(0,speed,25,40);
-  ctxWorker.fillRect(30,speed+speed,25,40);
-  ctxWorker.fillRect(60,speed,25,40);
-  ctxWorker.fillRect(90,speed,25,40);
-  ctxWorker.fillRect(120,speed,25,40);
-  ctxWorker.fillRect(150,speed,25,40);
-  ctxWorker.fillRect(180,speed,25,40);
-  ctxWorker.fillRect(210,speed,25,40);
-  ctxWorker.fillRect(240,speed,25,40);
-  ctxWorker.fillRect(270,speed,25,40);
-  ctxWorker.fillRect(300,speed,25,40);
-  ctxWorker.fillRect(330,speed,25,40);
+  ctxWorker.clearRect(202, speed - 1, 36, 40);
+  ctxWorker.fillRect(202, speed, 36, 40);
 
-  ctxWorker.fillRect(500,speed+speed,25,40);
-  ctxWorker.fillRect(530,speed*3,25,40);
-  ctxWorker.fillRect(560,speed,25,40);
-  ctxWorker.fillRect(590,speed,25,40);
-  ctxWorker.fillRect(620,speed,25,40);
-  ctxWorker.fillRect(650,speed,25,40);
-  ctxWorker.fillRect(680,speed,25,40);
-  ctxWorker.fillRect(710,speed,25,40);
-  ctxWorker.fillRect(740,speed,25,40);
-  ctxWorker.fillRect(770,speed,25,40);
-  ctxWorker.fillRect(800,speed,25,40);
-  ctxWorker.fillRect(830,speed,25,40);
+  ctxWorker.clearRect(10, speed - 1, 36, 40);
+  ctxWorker.fillRect(10, speed, 36, 40);
+
+  // ctxWorker.clearRect(0, (speed - 1) * 2, canvas.width, canvas.height);
+  // ctxWorker.fillRect(30,speed * 2, 25, 40);
+
+  // ctxWorker.clearRect(0, (speed - 1) * 3, canvas.width, canvas.height);
+  // ctxWorker.fillRect(60,speed * 3, 25, 40);
+
 }

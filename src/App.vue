@@ -1,28 +1,57 @@
 <template>
   <div id="app" data-app>
-    <canvas id="pianoCanvas" width="1800" height="430" style="border:1px solid; background: url('./images/black.jpg')"> </canvas>
+    <canvas style="background: url('./images/black.jpg')"> </canvas>
     <piano>  </piano>
   </div>
 </template>
 
 <script>
 import Piano from "./components/Piano";
+import CanvasMessage from "./utils/CanvasMessages"
 
 export default {
   components : { Piano },
   data: () => {
     return {
-     
+     worker: {},
     }
   },
 
-  mounted(){
-    const canvas = document.getElementById('pianoCanvas');
-    const offscreen = canvas.transferControlToOffscreen();
-    
-    const worker = new Worker('./worker.js');
-    worker.postMessage({ canvas: offscreen }, [offscreen]);
+  mounted() {
+    this.$nextTick(function () {
+      const canvas = document.getElementsByTagName("canvas")[0];
+      const pianoHeight = document.getElementById("piano-container").getBoundingClientRect().height;
+      
+      canvas.height = window.innerHeight - pianoHeight + 1;
+      canvas.width = window.innerWidth;
+
+      const offscreen = canvas.transferControlToOffscreen();
+      this.worker = new Worker("./worker.js");
+      this.worker.postMessage({ canvas: offscreen, messageType : CanvasMessage.INIT}, [offscreen]);
+    })
   },
+
+  created(){
+    window.addEventListener("resize", this.resizeCanvas);
+  },
+
+  destroyed() {
+    window.removeEventListener("resize", {});
+  },
+
+  methods: {
+    resizeCanvas() {
+      const pianoHeight = document.getElementById("piano-container").getBoundingClientRect().height;
+      const height = window.innerHeight - pianoHeight + 1;
+      const width = window.innerWidth;
+
+      this.worker.postMessage({ messageType : CanvasMessage.RESIZE, height, width});
+
+      console.log("bai", window.innerHeight, window.innerWidth);
+    },
+  },
+ 
+
 }
 </script>
 
@@ -37,13 +66,16 @@ export default {
 
 body, html {
   height: 100%;
-  margin: 0;
+  width: 100%;
+  margin: 0 !important;
+  padding: 0 !important;
   text-align: center;
 }
 
 
 #app {
   height: 100%;
+  width: 100%;
   /* margin: 0 17%; */
   display: flex;
   align-items: center;
