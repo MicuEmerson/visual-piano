@@ -3,14 +3,14 @@
 
         <div v-for="(noteObject, index) in keyboardState.notes" :key="index"
           class="white-note" :class="[noteObject.pressed ? 'white-note-pressed' : '']"
-          :style="{'width': keyboardState.whiteNoteWidthSize + '%'}" 
+          :style="{'width': keyboardState.whiteNoteWidthSize + '%'}" :data-note="noteObject.note"
           @mousedown="playNoteMouse({index, forBlackNote : false})" @mouseup="removePressedKeyMouse({index, forBlackNote : false})"
           @mouseover="playNoteHover({index, forBlackNote : false})" @mouseleave="removePressedKey({index, forBlackNote : false})">
             
           <div v-if="noteObject.blackNote" 
-            class="black-note" :class="[noteObject.blackNote.pressed ? 'black-note-pressed' : '']" 
+            class="black-note" :class="[noteObject.blackNote.pressed ? 'black-note-pressed' : '']" :data-note="noteObject.blackNote.note"
             @mousedown.stop="playNoteMouse({index, forBlackNote : true})" @mouseup.stop="removePressedKeyMouse({index, forBlackNote : true})"
-            @mouseover.stop="playNoteHover({index, forBlackNote : true})" @mouseleave.stop="removePressedKey({ index, forBlackNote : true})">
+            @mouseover.stop="playNoteHover({index, forBlackNote : true})" @mouseleave.stop="removePressedKey({index, forBlackNote : true})">
 
             <div class="key-group">
                 <template v-if="dashboardState.showKeys">
@@ -47,13 +47,33 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex';
+import { mapState, mapActions } from "vuex";
+import CanvasMessage from "../utils/CanvasMessages"
 
 export default {
   data: () => {
     return {
 
     }
+  },
+
+  mounted() {
+    const canvas = document.getElementsByTagName("canvas")[0];
+    const pianoHeight = document.getElementById("piano-container").getBoundingClientRect().height;
+
+    canvas.height = window.innerHeight - pianoHeight + 1;
+    canvas.width = window.innerWidth;
+
+    const offscreen = canvas.transferControlToOffscreen();
+    this.$store.commit("canvasState/SET_WORKER", new Worker("./worker.js"));
+    this.canvasState.worker.postMessage({ canvas: offscreen, messageType : CanvasMessage.INIT}, [offscreen]);
+
+    const whiteNotes = document.getElementsByClassName("white-note");
+    const blackNotes = document.getElementsByClassName("black-note");
+    const whiteWidth = whiteNotes[0].getBoundingClientRect().width;
+    const blackWidth = blackNotes[0].getBoundingClientRect().width;
+    const array = Array.from(whiteNotes).concat(Array.from(blackNotes));
+    this.setDrawingDataForCanvas({array, whiteWidth, blackWidth});
   },
 
   created() {
@@ -91,8 +111,10 @@ export default {
 
 
   methods: {
-    ...mapActions('keyboardState', ['generateNotes', 'generateNotesIndexesByKey', 'playNote', 'playNoteMouse',
-     'playNoteHover', 'removePressedKey', 'removePressedKeyMouse', 'changeInput']),
+    ...mapActions('keyboardState', ['generateNotes', 'generateNotesIndexesByKey', 'generateCanvasIndexesByNote',
+     'playNote', 'playNoteMouse', 'playNoteHover', 'removePressedKey', 'removePressedKeyMouse', 'changeInput']),
+
+    ...mapActions('canvasState', ['setDrawingDataForCanvas']),
 
     handleInput(value, key, index, forBlackNote){
       this.changeInput({value, key, index, forBlackNote});
@@ -100,7 +122,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['keyboardState', 'dashboardState', 'recordingState'])
+    ...mapState(['keyboardState', 'dashboardState', 'recordingState', 'canvasState'])
   }
 }
 </script>

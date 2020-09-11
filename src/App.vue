@@ -8,28 +8,21 @@
 <script>
 import Piano from "./components/Piano";
 import CanvasMessage from "./utils/CanvasMessages"
+import { mapState } from 'vuex';
 
 export default {
   components : { Piano },
   data: () => {
     return {
-     worker: {},
+
     }
   },
 
   mounted() {
-    this.$nextTick(function () {
-      const canvas = document.getElementsByTagName("canvas")[0];
-      const pianoHeight = document.getElementById("piano-container").getBoundingClientRect().height;
+    // this.$nextTick(function () {
       
-      canvas.height = window.innerHeight - pianoHeight + 1;
-      canvas.width = window.innerWidth;
-
-      const offscreen = canvas.transferControlToOffscreen();
-      this.worker = new Worker("./worker.js");
-      this.worker.postMessage({ canvas: offscreen, messageType : CanvasMessage.INIT}, [offscreen]);
-    })
-  },
+    // })
+  },  
 
   created(){
     window.addEventListener("resize", this.resizeCanvas);
@@ -45,11 +38,13 @@ export default {
       const height = window.innerHeight - pianoHeight + 1;
       const width = window.innerWidth;
 
-      this.worker.postMessage({ messageType : CanvasMessage.RESIZE, height, width});
-
-      console.log("bai", window.innerHeight, window.innerWidth);
+      this.canvasState.worker.postMessage({ messageType : CanvasMessage.RESIZE, height, width});
     },
   },
+
+  computed:{
+    ...mapState(['canvasState'])
+  }
  
 
 }

@@ -1,3 +1,5 @@
+import CanvasMessage from "../../utils/CanvasMessages"
+
 export default {
     namespaced: true,
 
@@ -27,7 +29,7 @@ export default {
             state.notesIndexesByKey.length = 0;
         },
         SET_WHITE_NOTE_WIDTH_SIZE(state, size){
-            state.whiteNoteWidthSize = size;
+          state.whiteNoteWidthSize = size;
         },
         SET_NOTE_PRESSED(state, { index, forBlackNote, pressed }){
           if(forBlackNote){
@@ -49,7 +51,7 @@ export default {
         ADD_NOTE(state, note){
             state.notes.push(note);
         },
-        ADD_NEW_INDEX_KEY(state, { index, forBlackNote }){
+        ADD_NEW_KEY_INDEX(state, { index, forBlackNote }){
           if(forBlackNote){
             state.notesIndexesByKey[state.notes[index].blackNote.key] = index;
           } else {
@@ -84,6 +86,9 @@ export default {
           if(rootState.recordingState.isRecording){
             commit("recordingState/ADD_RECORD_MAP", currentNote.note, {root:true});
           }
+
+          rootState.canvasState.worker.postMessage({ messageType : CanvasMessage.START_DRAW_NOTE, 
+            drawNote: {noteName: currentNote.note, forBlackNote}});
         }
       },
 
@@ -100,11 +105,15 @@ export default {
 
       removePressedKey({ state, commit, rootState }, { index, forBlackNote }) {
         const currentNote = forBlackNote ? state.notes[index].blackNote : state.notes[index];
+        if(currentNote.pressed === true){
+          commit("SET_NOTE_PRESSED", { index, forBlackNote, pressed : false });
 
-        commit("SET_NOTE_PRESSED", { index, forBlackNote, pressed : false });
+          if(rootState.recordingState.isRecording){
+            commit("recordingState/ADD_RECORD_MIDI", currentNote.note, {root:true});
+          }
 
-        if(rootState.recordingState.isRecording){
-          commit("recordingState/ADD_RECORD_MIDI", currentNote.note, {root:true});
+          rootState.canvasState.worker.postMessage({ messageType : CanvasMessage.STOP_DRAW_NOTE, 
+            drawNote: {noteName: currentNote.note, forBlackNote}});
         }
       },
 
@@ -164,15 +173,14 @@ export default {
           
           for(let index = 0; index < state.notes.length; index++){
             let forBlackNote = false;  
-            commit("ADD_NEW_INDEX_KEY", { index, forBlackNote });
+            commit("ADD_NEW_KEY_INDEX", { index, forBlackNote });
     
             if(state.notes[index].blackNote != undefined){
               forBlackNote = true;
-              commit("ADD_NEW_INDEX_KEY", { index, forBlackNote });
+              commit("ADD_NEW_KEY_INDEX", { index, forBlackNote });
             } 
           }
       },
 
     },
-    
 }
