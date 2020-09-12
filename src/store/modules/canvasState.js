@@ -8,8 +8,6 @@ export default {
       canvasDataIndexesByNote: {},  //here we have a map where the key is a note name (ex: C4, E#4, etc) and value is the x position in the browser of that note
       canvasWhiteNoteWidth : 0,
       canvasBlackNoteWidth: 0,
-      windowHeight: 0,
-      windowWidth: 0,
     },
 
     mutations: {
@@ -22,10 +20,10 @@ export default {
         SET_WORKER(state, worker){
             state.worker = worker;
         },
-        SET_WINDOW_HEIGHT(state, size){
+        SET_CANVAS_HEIGHT(state, size){
             state.windowHeight = size;
         },
-        SET_WINDOW_WIDTH(state, size){
+        SET_CANVAS_WIDTH(state, size){
             state.windowWidth = size;
         },
         CLEAR_CANVAS_INDICES_ARRAY(state){
@@ -42,23 +40,19 @@ export default {
             state.worker.postMessage({ canvas: offscreenCanvas, messageType : CanvasMessage.INIT}, [offscreenCanvas]);
         },
 
-        resizeCanvas({ commit, state }, { height, width, pianoHeight }){
-            height = Math.floor(height - pianoHeight + 1);
-            width = Math.floor(width);
-
-            commit("SET_WINDOW_HEIGHT", height);
-            commit("SET_WINDOW_WIDTH", width);
+        resizeCanvas({ commit, state }, { height, width }){
+            commit("SET_CANVAS_HEIGHT", height);
+            commit("SET_CANVAS_WIDTH", width);
 
             state.worker.postMessage({ messageType : CanvasMessage.RESIZE, height, width});
         },
-
 
         setDrawingDataForCanvas({ commit, state }, { array, whiteWidth, blackWidth }){
             commit("CLEAR_CANVAS_INDICES_ARRAY");
     
             for(let index = 0; index < array.length; index++){
               const key = array[index].getAttribute("data-note");
-              const value = Math.floor(array[index].getBoundingClientRect().x);
+              const value = array[index].getBoundingClientRect().x;
               commit("ADD_CANVAS_NOTE_INDEX", { key, value })
             }
 
@@ -76,8 +70,5 @@ export default {
         stopDrawNote({state}, drawNote){
             state.worker.postMessage({ messageType : CanvasMessage.STOP_DRAW_NOTE, drawNote });
         }
-
     }
-    
-    
 }

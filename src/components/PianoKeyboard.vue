@@ -59,10 +59,10 @@ export default {
 
   mounted() {
     const canvas = document.getElementsByTagName("canvas")[0];
-    const pianoHeight = document.getElementById("piano-container").getBoundingClientRect().height;
+    const pianoContainerDimensions = document.getElementById("piano-container").getBoundingClientRect();
 
-    canvas.height = window.innerHeight - pianoHeight + 1;
-    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight - pianoContainerDimensions.height;
+    canvas.width = pianoContainerDimensions.width;
 
     const offscreenCanvas = canvas.transferControlToOffscreen();
     this.initCanvas({offscreenCanvas, workerFile : "./worker.js"});
@@ -71,6 +71,7 @@ export default {
     const blackNotes = document.getElementsByClassName("black-note");
     const whiteWidth = whiteNotes[0].getBoundingClientRect().width;
     const blackWidth = blackNotes[0].getBoundingClientRect().width;
+
     const array = Array.from(whiteNotes).concat(Array.from(blackNotes));
     this.setDrawingDataForCanvas({array, whiteWidth, blackWidth});
   },

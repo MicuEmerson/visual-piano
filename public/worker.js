@@ -38,12 +38,14 @@ function handleResize(height, width){
   canvas.height = height;
   canvas.width = width;
   startingPosition = height;
+  ctxWorker.clearRect(0, 0, canvas.width, canvas.height);
 }
 
 function handleSetDrawingData(data){
   canvasDataIndexesByNote = data.array;
   whiteNoteWidth = data.whiteWidth;
   blackNoteWidth = data.blackWidth;
+  ctxWorker.clearRect(0, 0, canvas.width, canvas.height);
 }
 
 function handleStartDrawnNote(drawNote){
@@ -79,14 +81,18 @@ function handleStopDrawnNote(drawNote){
 
 function drawAnimationNote(noteName, forBlackNote, yPosition, noteHeight) {
   ctxWorker.fillStyle = forBlackNote ?  "red" : "blue";
+  let noteWidth = forBlackNote ? blackNoteWidth : whiteNoteWidth;
 
   ctxWorker.clearRect(canvasDataIndexesByNote[noteName],
-      yPosition + 1,
-      forBlackNote ? blackNoteWidth : whiteNoteWidth,
+      yPosition + 2,
+      noteWidth,
       noteHeight);
+  
+  offsetForXPosition = noteWidth * 0.2 / 2;
+  noteWidht = noteWidth * 0.8;
 
-  ctxWorker.fillRect(canvasDataIndexesByNote[noteName], //idk why I need to add 8 pixels, TODO: figure out!
+  ctxWorker.fillRect(canvasDataIndexesByNote[noteName] + offsetForXPosition, 
       yPosition,
-      forBlackNote ? blackNoteWidth : whiteNoteWidth,
+      noteWidht,
       noteHeight);
 }
