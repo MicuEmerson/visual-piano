@@ -8,7 +8,7 @@
 <script>
 import Piano from "./components/Piano";
 import CanvasMessage from "./utils/CanvasMessages"
-import { mapState } from 'vuex';
+import { mapState, mapActions } from 'vuex';
 
 export default {
   components : { Piano },
@@ -18,14 +18,8 @@ export default {
     }
   },
 
-  mounted() {
-    // this.$nextTick(function () {
-      
-    // })
-  },  
-
   created(){
-    window.addEventListener("resize", this.resizeCanvas);
+    window.addEventListener("resize", this.resize);
   },
 
   destroyed() {
@@ -33,20 +27,24 @@ export default {
   },
 
   methods: {
-    resizeCanvas() {
+    ...mapActions('canvasState', ['setDrawingDataForCanvas', 'resizeCanvas']),
+
+    resize() {
+      // documnet.getElementById/getElementsByClassName are took from Piano.vue and PianoKeyboard.vue because they are already rendered in resize event eventually happens.
       const pianoHeight = document.getElementById("piano-container").getBoundingClientRect().height;
-      const height = window.innerHeight - pianoHeight + 1;
+      const height = window.innerHeight;
       const width = window.innerWidth;
+      this.resizeCanvas({height, width, pianoHeight});
 
-      this.canvasState.worker.postMessage({ messageType : CanvasMessage.RESIZE, height, width});
+      const whiteNotes = document.getElementsByClassName("white-note");
+      const blackNotes = document.getElementsByClassName("black-note");
+      const whiteWidth = whiteNotes[0].getBoundingClientRect().width;
+      const blackWidth = blackNotes[0].getBoundingClientRect().width;
+      const array = Array.from(whiteNotes).concat(Array.from(blackNotes));
+      this.setDrawingDataForCanvas({array, whiteWidth, blackWidth});
     },
+
   },
-
-  computed:{
-    ...mapState(['canvasState'])
-  }
- 
-
 }
 </script>
 

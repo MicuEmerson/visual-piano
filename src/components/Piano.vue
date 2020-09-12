@@ -1,6 +1,6 @@
 <template>
 <div id="piano-container">
-   <!-- <pianoDashboard> </pianoDashboard>  -->
+   <pianoDashboard> </pianoDashboard> 
    <pianoKeyboard> </pianoKeyboard>
    <saveSongDialog> </saveSongDialog>
 </div> 
@@ -43,6 +43,6 @@ export default {
   border-radius: 10px;
   box-shadow: 0.6vw 0.6vw 0.8vw 0 rgba(255, 255, 255, 0.2) inset,
     -0.4vw -0.4vw 0.6vw 0 rgba(0, 0, 0, 0.25) inset;
-  padding: 0 1%;
+  /* padding: 0 1%; */
 }
 </style>

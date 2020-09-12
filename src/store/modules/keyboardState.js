@@ -75,7 +75,7 @@ export default {
     },
 
     actions: {
-      playNote({ commit, state, rootState }, { index, forBlackNote }) {
+      playNote({ commit, state, rootState, dispatch}, { index, forBlackNote }) {
         const currentNote = forBlackNote ? state.notes[index].blackNote : state.notes[index];
         
         if(!currentNote.pressed && !rootState.dashboardState.editKeys) {
@@ -87,8 +87,7 @@ export default {
             commit("recordingState/ADD_RECORD_MAP", currentNote.note, {root:true});
           }
 
-          rootState.canvasState.worker.postMessage({ messageType : CanvasMessage.START_DRAW_NOTE, 
-            drawNote: {noteName: currentNote.note, forBlackNote}});
+          dispatch("canvasState/startDrawNote", {noteName: currentNote.note, forBlackNote}, {root:true});
         }
       },
 
@@ -103,7 +102,7 @@ export default {
         }
       },
 
-      removePressedKey({ state, commit, rootState }, { index, forBlackNote }) {
+      removePressedKey({ state, commit, rootState, dispatch }, { index, forBlackNote }) {
         const currentNote = forBlackNote ? state.notes[index].blackNote : state.notes[index];
         if(currentNote.pressed === true){
           commit("SET_NOTE_PRESSED", { index, forBlackNote, pressed : false });
@@ -112,8 +111,7 @@ export default {
             commit("recordingState/ADD_RECORD_MIDI", currentNote.note, {root:true});
           }
 
-          rootState.canvasState.worker.postMessage({ messageType : CanvasMessage.STOP_DRAW_NOTE, 
-            drawNote: {noteName: currentNote.note, forBlackNote}});
+          dispatch("canvasState/stopDrawNote", {noteName: currentNote.note, forBlackNote}, {root:true});
         }
       },
 

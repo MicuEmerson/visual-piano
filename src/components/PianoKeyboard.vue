@@ -64,10 +64,9 @@ export default {
     canvas.height = window.innerHeight - pianoHeight + 1;
     canvas.width = window.innerWidth;
 
-    const offscreen = canvas.transferControlToOffscreen();
-    this.$store.commit("canvasState/SET_WORKER", new Worker("./worker.js"));
-    this.canvasState.worker.postMessage({ canvas: offscreen, messageType : CanvasMessage.INIT}, [offscreen]);
-
+    const offscreenCanvas = canvas.transferControlToOffscreen();
+    this.initCanvas({offscreenCanvas, workerFile : "./worker.js"});
+   
     const whiteNotes = document.getElementsByClassName("white-note");
     const blackNotes = document.getElementsByClassName("black-note");
     const whiteWidth = whiteNotes[0].getBoundingClientRect().width;
@@ -109,12 +108,11 @@ export default {
     window.removeEventListener('onmouseup', () => {});
   },
 
-
   methods: {
     ...mapActions('keyboardState', ['generateNotes', 'generateNotesIndexesByKey', 'generateCanvasIndexesByNote',
      'playNote', 'playNoteMouse', 'playNoteHover', 'removePressedKey', 'removePressedKeyMouse', 'changeInput']),
 
-    ...mapActions('canvasState', ['setDrawingDataForCanvas']),
+    ...mapActions('canvasState', ['setDrawingDataForCanvas', 'initCanvas']),
 
     handleInput(value, key, index, forBlackNote){
       this.changeInput({value, key, index, forBlackNote});
