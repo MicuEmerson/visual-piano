@@ -35,11 +35,21 @@ export default {
         prepareNotes({state, rootState, commit, dispatch}, {notes, lastSong}) {
             notes.forEach((note, i) => {
                 rootState.toneState.tone.Transport.schedule(() => {
-                  if(state.currentSong.fromPlaylist){
-                    rootState.toneState.sampler.triggerAttackRelease(note.name, note.duration, rootState.toneState.tone.now(), note.velocity);
-                  } else {
-                    rootState.toneState.sampler.triggerAttackRelease(note.name, "2n", rootState.toneState.tone.now());
-                  }
+
+                setTimeout( () => {
+                    if(state.currentSong.fromPlaylist){
+                        rootState.toneState.sampler.triggerAttackRelease(note.name, note.duration, rootState.toneState.tone.now(), note.velocity);
+                    } else {
+                        rootState.toneState.sampler.triggerAttackRelease(note.name, "2n", rootState.toneState.tone.now());
+                    }
+                }, rootState.canvasState.waterfallDelay)
+
+                // if(state.currentSong.fromPlaylist){
+                //     rootState.toneState.sampler.triggerAttackRelease(note.name, note.duration, rootState.toneState.tone.now(), note.velocity);
+                // } else {
+                //     rootState.toneState.sampler.triggerAttackRelease(note.name, "2n", rootState.toneState.tone.now());
+                // }
+
                 }, note.time)
       
                 let index = null;
@@ -58,15 +68,27 @@ export default {
        
                 rootState.toneState.tone.Transport.schedule(time => {
                     rootState.toneState.tone.Draw.schedule(() => {
-                        if(index != null)
-                            commit("keyboardState/SET_NOTE_PRESSED", {index, forBlackNote, pressed : true}, {root:true});
+                        if(index != null){
+                            setTimeout( () => {
+                                commit("keyboardState/SET_NOTE_PRESSED", {index, forBlackNote, pressed : true}, {root:true});
+                            }, rootState.canvasState.waterfallDelay);
+                            
+                            // commit("keyboardState/SET_NOTE_PRESSED", {index, forBlackNote, pressed : true}, {root:true});
+                            dispatch("canvasState/startDrawNote", {noteName : note.name, forBlackNote}, {root:true});
+                        }
                   }, time)
                 }, note.time)
       
                 rootState.toneState.tone.Transport.schedule(time => {
                     rootState.toneState.tone.Draw.schedule(() => {
-                        if(index != null)
-                            commit("keyboardState/SET_NOTE_PRESSED", {index, forBlackNote, pressed : false}, {root:true});
+                        if(index != null){
+                            setTimeout( () => {
+                                commit("keyboardState/SET_NOTE_PRESSED", {index, forBlackNote, pressed : false}, {root:true});
+                            }, rootState.canvasState.waterfallDelay);
+
+                            // commit("keyboardState/SET_NOTE_PRESSED", {index, forBlackNote, pressed : false}, {root:true});
+                            dispatch("canvasState/stopDrawNote", {noteName : note.name, forBlackNote}, {root:true});
+                        }
                         if(lastSong && i === notes.length - 1){
                             dispatch("stopPlaying", "");
                         }

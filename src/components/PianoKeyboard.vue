@@ -61,7 +61,7 @@ export default {
     const canvas = document.getElementsByTagName("canvas")[0];
     const pianoContainerDimensions = document.getElementById("piano-container").getBoundingClientRect();
 
-    canvas.height = window.innerHeight - pianoContainerDimensions.height;
+    canvas.height = window.innerHeight - pianoContainerDimensions.height + 1;
     canvas.width = pianoContainerDimensions.width;
 
     const offscreenCanvas = canvas.transferControlToOffscreen();
@@ -71,9 +71,10 @@ export default {
     const blackNotes = document.getElementsByClassName("black-note");
     const whiteWidth = whiteNotes[0].getBoundingClientRect().width;
     const blackWidth = blackNotes[0].getBoundingClientRect().width;
-
     const array = Array.from(whiteNotes).concat(Array.from(blackNotes));
-    this.setDrawingDataForCanvas({array, whiteWidth, blackWidth});
+    const waterfallDelay = canvas.height * 10; 
+
+    this.setDrawingDataForCanvas({array, whiteWidth, blackWidth, waterfallDelay});
   },
 
   created() {

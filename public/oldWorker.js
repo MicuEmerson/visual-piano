@@ -31,13 +31,13 @@ onmessage = function(e) {
 function handleInit(canvasData){
   canvas = canvasData;
   ctxWorker = canvas.getContext("2d");
-  startingPosition = 0;
+  startingPosition = canvas.height;
 }
 
 function handleResize(height, width){
   canvas.height = height;
   canvas.width = width;
-  startingPosition = 0;
+  startingPosition = height;
   ctxWorker.clearRect(0, 0, canvas.width, canvas.height);
 }
 
@@ -56,7 +56,7 @@ function handleStartDrawnNote(drawNote){
   dataMap[noteName].yPosition = startingPosition;
 
   let noteSetInterval = setInterval(function() {
-    drawAnimationNote(noteName, forBlackNote, dataMap[noteName].yPosition, ++dataMap[noteName].noteHeight);
+    drawAnimationNote(noteName, forBlackNote, --dataMap[noteName].yPosition, ++dataMap[noteName].noteHeight);
   }, animationSpeed);
   
   dataMap[noteName].noteSetInterval = noteSetInterval;
@@ -71,7 +71,7 @@ function handleStopDrawnNote(drawNote){
   let noteHeight = dataMap[noteName].noteHeight;
 
   let noteSetInterval = setInterval(function() {
-    if(++yPosition >= canvas.height + noteHeight){
+    if(--yPosition + noteHeight <= 0){
       clearInterval(noteSetInterval);
     }
     drawAnimationNote(noteName, forBlackNote, yPosition, noteHeight);
@@ -82,18 +82,17 @@ function handleStopDrawnNote(drawNote){
 function drawAnimationNote(noteName, forBlackNote, yPosition, noteHeight) {
   ctxWorker.fillStyle = forBlackNote ?  "red" : "blue";
   let noteWidth = forBlackNote ? blackNoteWidth : whiteNoteWidth;
- 
+
   ctxWorker.clearRect(canvasDataIndexesByNote[noteName],
-      yPosition - 2,
+      yPosition + 2,
       noteWidth,
       noteHeight);
   
-  let offsetForXPosition = noteWidth * 0.2 / 2;
+  offsetForXPosition = noteWidth * 0.2 / 2;
   noteWidht = noteWidth * 0.8;
 
   ctxWorker.fillRect(canvasDataIndexesByNote[noteName] + offsetForXPosition, 
       yPosition,
       noteWidht,
       noteHeight);
-  
 }

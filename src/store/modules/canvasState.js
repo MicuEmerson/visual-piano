@@ -5,9 +5,14 @@ export default {
 
     state: {
       worker: {}, // where offscreencanvas is draw
-      canvasDataIndexesByNote: {},  //here we have a map where the key is a note name (ex: C4, E#4, etc) and value is the x position in the browser of that note
+      canvasDataIndexesByNote: {},  // Here we have a map where the key is a note name (ex: C4, E#4, etc) 
+                                    // And value is a pair (x, width)
+                                    // x position in the browser of that note
+                                    // width for overlapping notes (ex: when C4 and C#4 are pressed simultaneous when we need to prevent the overlapping color)
+                                    
       canvasWhiteNoteWidth : 0,
       canvasBlackNoteWidth: 0,
+      waterfallDelay: 0,
     },
 
     mutations: {
@@ -26,6 +31,9 @@ export default {
         SET_CANVAS_WIDTH(state, size){
             state.windowWidth = size;
         },
+        SET_CANVAS_WATERFALL_DELAY(state, delay){
+            state.waterfallDelay = delay;
+        },
         CLEAR_CANVAS_INDICES_ARRAY(state){
             state.canvasDataIndexesByNote.length = 0;
         },
@@ -37,6 +45,7 @@ export default {
     actions: {
         initCanvas({ commit, state }, { offscreenCanvas, workerFile }){
             commit("SET_WORKER", new Worker(workerFile));
+
             state.worker.postMessage({ canvas: offscreenCanvas, messageType : CanvasMessage.INIT}, [offscreenCanvas]);
         },
 
@@ -47,7 +56,7 @@ export default {
             state.worker.postMessage({ messageType : CanvasMessage.RESIZE, height, width});
         },
 
-        setDrawingDataForCanvas({ commit, state }, { array, whiteWidth, blackWidth }){
+        setDrawingDataForCanvas({ commit, state }, { array, whiteWidth, blackWidth, waterfallDelay}){
             commit("CLEAR_CANVAS_INDICES_ARRAY");
     
             for(let index = 0; index < array.length; index++){
@@ -58,6 +67,7 @@ export default {
 
             commit("SET_CANVAS_WHITE_NOTE_WIDTH", whiteWidth);
             commit("SET_CANVAS_BLACK_NOTE_WIDTH", blackWidth);
+            commit("SET_CANVAS_WATERFALL_DELAY", waterfallDelay);
 
             state.worker.postMessage({ messageType : CanvasMessage.SET_DRAWING_DATA, 
                 drawningData : { whiteWidth, blackWidth, array : state.canvasDataIndexesByNote }});
