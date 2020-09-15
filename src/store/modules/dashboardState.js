@@ -47,10 +47,26 @@ export default {
             dispatch("keyboardState/generateNotesIndexesByKey", {}, {root:true});
         }, 
 
-        changeEndOctave({ commit, dispatch}, endOctave){
+        changeEndOctave({ commit, dispatch }, endOctave){
             commit("SET_END_OCTAVE", endOctave);
             dispatch("keyboardState/generateNotes", {}, {root:true});
             dispatch("keyboardState/generateNotesIndexesByKey", {}, {root:true});
+        },
+
+        setPlaying({ commit, dispatch, state }){
+            if(state.playing){
+                dispatch("playlistState/pauseTimers", {}, {root:true});
+            } else{
+                dispatch("playlistState/resumeTimers", {}, {root:true});
+            }
+
+            dispatch("canvasState/pauseOrResumeSong", !state.playing, {root:true});
+            commit("SET_PLAYING", !state.playing);
+        },
+
+        stopPlaying({ commit, dispatch }){
+            dispatch("canvasState/stopSong", {}, {root:true});
+            commit("SET_PLAYING", false);
         }
     },
     

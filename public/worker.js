@@ -2,6 +2,8 @@ var canvas = null;
 var ctxWorker = null;
 var startingPosition = 0; // y position of start drawning the note
 var animationSpeed = 10 // the animation speed in ms
+var playingState = 3 // 1 = play, 2 = pause , 3 = stop
+var waterfall = true // variable to indicate the animation, from top to bottom (waterfall) = true,  or from bottom to top = false 
 
 var canvasDataIndexesByNote = null; // map where we keep positions of X coordonates for every note 
                                     // ex:(key = noteName (C4, C#3, etc), value = x positon of that note in the screen);
@@ -13,8 +15,7 @@ var dataMap = {}; // Helper map where we keep handleStartDrawnNote info like (se
                   // and to get the final height of the note + yPosition and after we start again a setInterval with this data
 
 onmessage = function(e) {
-  const {canvas, messageType, height, width, drawningData, drawNote} = e.data;
-  
+  const {canvas, messageType, height, width, drawningData, drawNote, playing, waterfall} = e.data;
   if(messageType === "INIT"){
     handleInit(canvas);
   } else if(messageType === "RESIZE"){
@@ -25,6 +26,10 @@ onmessage = function(e) {
     handleStartDrawnNote(drawNote);
   } else if(messageType === "STOP_DRAW_NOTE"){
     handleStopDrawnNote(drawNote);
+  } else if(messageType === "PAUSE_SONG"){
+    playingState = playing;
+  } else if(messageType === "STOP_SONG"){
+    playingState = 3;
   }
 }
 
@@ -56,7 +61,18 @@ function handleStartDrawnNote(drawNote){
   dataMap[noteName].yPosition = startingPosition;
 
   let noteSetInterval = setInterval(function() {
-    drawAnimationNote(noteName, forBlackNote, dataMap[noteName].yPosition, ++dataMap[noteName].noteHeight);
+
+    if(playingState === 1){
+      ++dataMap[noteName].noteHeight;
+    } 
+
+    if(playingState === 3) {
+      clearInterval(noteSetInterval);
+      ctxWorker.clearRect(0, 0, canvas.width, canvas.height);
+    } else {
+      drawAnimationNote(noteName, forBlackNote, dataMap[noteName].yPosition, dataMap[noteName].noteHeight);
+    }
+
   }, animationSpeed);
   
   dataMap[noteName].noteSetInterval = noteSetInterval;
@@ -71,10 +87,22 @@ function handleStopDrawnNote(drawNote){
   let noteHeight = dataMap[noteName].noteHeight;
 
   let noteSetInterval = setInterval(function() {
-    if(++yPosition >= canvas.height + noteHeight){
-      clearInterval(noteSetInterval);
+    
+    if(playingState === 1){
+      ++yPosition;
     }
-    drawAnimationNote(noteName, forBlackNote, yPosition, noteHeight);
+
+    if((yPosition >= canvas.height + noteHeight)){
+      clearInterval(noteSetInterval);
+
+    } else if(playingState === 3) {
+      clearInterval(noteSetInterval);
+      ctxWorker.clearRect(0, 0, canvas.width, canvas.height);
+
+    } else {
+      drawAnimationNote(noteName, forBlackNote, yPosition, noteHeight);
+    }
+
   }, animationSpeed);
 
 }
@@ -95,5 +123,4 @@ function drawAnimationNote(noteName, forBlackNote, yPosition, noteHeight) {
       yPosition,
       noteWidht,
       noteHeight);
-  
 }

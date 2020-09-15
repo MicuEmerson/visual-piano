@@ -1,4 +1,5 @@
 import { Midi } from "@tonejs/midi"
+import Timer  from "../../utils/SetTimeoutTimer"
 
 export default {
     namespaced: true,
@@ -13,6 +14,7 @@ export default {
            {name : "Sinding - Rustle of Spring", fromPlaylist: true },
         ],
        currentSong: "",
+       timers : [],
     },
 
     mutations: {
@@ -21,6 +23,12 @@ export default {
        },
        ADD_NEW_RECORDED_SONG(state, val){
            state.songs.unshift(val);
+       },
+       ADD_TIMER(state, timer){
+           state.timers.push(timer);
+       },
+       CLEAR_TIMERS(state){
+           state.timers.length = 0;
        }
     },
 
@@ -32,24 +40,31 @@ export default {
             }
         },
 
+        clearTimes({state, commit}){
+            state.timers.forEach(timer => timer.pause());
+            commit("CLEAR_TIMERS");
+        },
+
+        pauseTimers({state}){
+            state.timers.forEach(timer => timer.pause());
+        },
+
+        resumeTimers({state}){
+            state.timers.forEach(timer => timer.resume());
+        },
+
         prepareNotes({state, rootState, commit, dispatch}, {notes, lastSong}) {
             notes.forEach((note, i) => {
                 rootState.toneState.tone.Transport.schedule(() => {
 
-                setTimeout( () => {
-                    if(state.currentSong.fromPlaylist){
-                        rootState.toneState.sampler.triggerAttackRelease(note.name, note.duration, rootState.toneState.tone.now(), note.velocity);
-                    } else {
-                        rootState.toneState.sampler.triggerAttackRelease(note.name, "2n", rootState.toneState.tone.now());
-                    }
-                }, rootState.canvasState.waterfallDelay)
-
-                // if(state.currentSong.fromPlaylist){
-                //     rootState.toneState.sampler.triggerAttackRelease(note.name, note.duration, rootState.toneState.tone.now(), note.velocity);
-                // } else {
-                //     rootState.toneState.sampler.triggerAttackRelease(note.name, "2n", rootState.toneState.tone.now());
-                // }
-
+                    commit("ADD_TIMER", new Timer(() => {
+                        if(state.currentSong.fromPlaylist){
+                            rootState.toneState.sampler.triggerAttackRelease(note.name, note.duration, rootState.toneState.tone.now(), note.velocity);
+                        } else {
+                            rootState.toneState.sampler.triggerAttackRelease(note.name, "2n", rootState.toneState.tone.now());
+                        }
+                    }, rootState.canvasState.waterfallDelay));
+              
                 }, note.time)
       
                 let index = null;
@@ -69,11 +84,10 @@ export default {
                 rootState.toneState.tone.Transport.schedule(time => {
                     rootState.toneState.tone.Draw.schedule(() => {
                         if(index != null){
-                            setTimeout( () => {
+                            commit("ADD_TIMER", new Timer(() => {
                                 commit("keyboardState/SET_NOTE_PRESSED", {index, forBlackNote, pressed : true}, {root:true});
-                            }, rootState.canvasState.waterfallDelay);
+                            }, rootState.canvasState.waterfallDelay));
                             
-                            // commit("keyboardState/SET_NOTE_PRESSED", {index, forBlackNote, pressed : true}, {root:true});
                             dispatch("canvasState/startDrawNote", {noteName : note.name, forBlackNote}, {root:true});
                         }
                   }, time)
@@ -82,16 +96,16 @@ export default {
                 rootState.toneState.tone.Transport.schedule(time => {
                     rootState.toneState.tone.Draw.schedule(() => {
                         if(index != null){
-                            setTimeout( () => {
+                            commit("ADD_TIMER", new Timer(() => {
                                 commit("keyboardState/SET_NOTE_PRESSED", {index, forBlackNote, pressed : false}, {root:true});
-                            }, rootState.canvasState.waterfallDelay);
+                                if(lastSong && i === notes.length - 1){
+                                    dispatch("stopPlaying", "");
+                                }
+                            }, rootState.canvasState.waterfallDelay));
 
-                            // commit("keyboardState/SET_NOTE_PRESSED", {index, forBlackNote, pressed : false}, {root:true});
                             dispatch("canvasState/stopDrawNote", {noteName : note.name, forBlackNote}, {root:true});
                         }
-                        if(lastSong && i === notes.length - 1){
-                            dispatch("stopPlaying", "");
-                        }
+                        
                   }, time)
                 }, note.time + note.duration)
       
@@ -112,8 +126,9 @@ export default {
             rootState.toneState.tone.Transport.stop();
             rootState.toneState.tone.Transport.cancel();
             dispatch("changeSong", currentSong);
+            dispatch("clearTimes");
             commit("keyboardState/CLEAR_PRESSED_KEYS", {}, {root:true});
-            commit("dashboardState/SET_PLAYING", false, {root:true});
+            dispatch("dashboardState/stopPlaying", {}, {root:true});
         }
     }
     

@@ -102,14 +102,20 @@ export default {
   },
 
   methods:{
+    ...mapActions("recordingState", ["startRecording", "stopRecording"]),
+    ...mapActions("dashboardState", ["setPlaying"]),
+
     togglePlay() {
+      if(this.playlistState.currentSong != ""){
+        
         if (this.dashboardState.playing) {
           this.toneState.tone.Transport.pause();
         } else {
           this.toneState.tone.Transport.start()
         }
 
-        this.$store.commit("dashboardState/SET_PLAYING", !this.dashboardState.playing);
+        this.setPlaying();
+      }
     },
 
     stopPlaying() {
@@ -120,8 +126,7 @@ export default {
       this.recordingState.isRecording ? this.stopRecording() : this.startRecording();
     },
 
-    ...mapActions('recordingState', ['startRecording', 'stopRecording']),
-
+   
     editKeys(){
       this.$store.commit("dashboardState/SET_EDIT_KEYS", !this.dashboardState.editKeys);
       this.$store.commit("dashboardState/SET_SHOW_KEYS", !this.dashboardState.showKeys);
