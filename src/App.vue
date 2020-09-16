@@ -20,6 +20,9 @@ export default {
 
   created(){
     window.addEventListener("resize", this.resize);
+    this.$root.$on("resize_canvas_notes", ()  => {
+      this.resize();
+    });
   },
 
   destroyed() {

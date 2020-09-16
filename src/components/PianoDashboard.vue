@@ -146,10 +146,12 @@ export default {
 
     setStartOctave(value){
         this.$store.dispatch("dashboardState/changeStartOctave", value)
+        setTimeout(() => this.$root.$emit("resize_canvas_notes"), 100);
     },
 
     setEndOctave(value){
         this.$store.dispatch("dashboardState/changeEndOctave", value)
+        setTimeout(() => this.$root.$emit("resize_canvas_notes"), 100);
     }
 
   },
@@ -178,8 +180,8 @@ export default {
         return this.playlistState.currentSong;
       },
       set (value){
-        this.$store.dispatch("dashboardState/changeStartOctave", 0);
-        this.$store.dispatch("dashboardState/changeEndOctave", this.dashboardState.maxEndOctave);
+        // this.$store.dispatch("dashboardState/changeStartOctave", 0);
+        // this.$store.dispatch("dashboardState/changeEndOctave", this.dashboardState.maxEndOctave);
         this.$store.dispatch("playlistState/stopPlaying", value);
       }
     }

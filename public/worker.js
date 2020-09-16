@@ -112,7 +112,7 @@ function drawAnimationNote(noteName, forBlackNote, yPosition, noteHeight) {
   let noteWidth = forBlackNote ? blackNoteWidth : whiteNoteWidth;
  
   ctxWorker.clearRect(canvasDataIndexesByNote[noteName],
-      yPosition - 2,
+      yPosition - 1,
       noteWidth,
       noteHeight);
   
@@ -120,7 +120,7 @@ function drawAnimationNote(noteName, forBlackNote, yPosition, noteHeight) {
   noteWidht = noteWidth * 0.8;
 
   ctxWorker.fillRect(canvasDataIndexesByNote[noteName] + offsetForXPosition, 
-      yPosition,
+      yPosition,  
       noteWidht,
       noteHeight);
 }

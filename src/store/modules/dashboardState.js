@@ -3,7 +3,7 @@ export default {
 
     state: {
         showConfig : false,
-        startOctave: 0,
+        startOctave: 2,
         maxEndOctave: 7,
         endOctave: 7,
         editKeys : false,

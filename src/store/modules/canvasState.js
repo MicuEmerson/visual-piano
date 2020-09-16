@@ -9,7 +9,6 @@ export default {
                                     // And value is a pair (x, width)
                                     // x position in the browser of that note
                                     // width for overlapping notes (ex: when C4 and C#4 are pressed simultaneous when we need to prevent the overlapping color)
-    
       canvasWhiteNoteWidth : 0,
       canvasBlackNoteWidth: 0,
       waterfallDelay: 0,
