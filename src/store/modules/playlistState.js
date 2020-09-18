@@ -94,6 +94,4 @@ export default {
             commit("dashboardState/SET_PLAYING", false, {root:true});
         }
     }
-    
-    
 }

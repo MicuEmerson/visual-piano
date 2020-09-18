@@ -1,17 +1,19 @@
 <template>
   <div id="app" data-app>
+    <pianoMenu> </pianoMenu>
     <canvas style="background: url('./images/black.jpg')"> </canvas>
     <piano>  </piano>
   </div>
 </template>
 
 <script>
+import PianoMenu from "./components/PianoMenu";
 import Piano from "./components/Piano";
 import CanvasMessage from "./utils/CanvasMessages"
 import { mapState, mapActions } from 'vuex';
 
 export default {
-  components : { Piano },
+  components : { Piano, PianoMenu },
   data: () => {
     return {
 
