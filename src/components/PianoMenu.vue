@@ -28,8 +28,8 @@
             <button @click="showConfig()"><v-icon class="paino-icon">{{configIcon}}</v-icon></button>
         </div>
     </div>
-    <div v-if="dashboardState.showConfig" class="sub-top-nav"> 
 
+    <div :class="dashboardState.showConfig ? 'height-auto': 'height-zero'" class="sub-top-nav"> 
     <v-container text-xs-center fluid style="padding: 0 12px !important">
         <v-row justify="center" align="center">
             <v-col cols="12" sm="4"> 
@@ -179,6 +179,18 @@ export default {
     position: absolute;
     z-index: 1;
     width: 100%;
+}
+
+.height-auto {
+  overflow: hidden;
+  transition: max-height 1s;
+  max-height: 200px;
+}
+
+.height-zero {
+  overflow: hidden;
+  transition: max-height 1s;
+  max-height: 0px;
 }
 
 .top-nav .screen {
