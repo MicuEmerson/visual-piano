@@ -1,81 +1,145 @@
 <template>
-<div style="width: 100%;">
-    <div class="top-nav">
-        <div style="flex:1; display: flex; justify-content: space-between">
-            <v-icon class="paino-icon">mdi-piano</v-icon>
-            <div style="display: flex; align-items: center">
-                <div @click="handleRecording()" :style="{background: recordLight}" class="record-icon"/>
-                <button @click="togglePlay()"><v-icon class="paino-icon">{{playIcon}}</v-icon></button>
-                <button @click="stopPlaying()"><v-icon class="paino-icon">mdi-stop</v-icon></button>
-            </div>
-        </div>
-        <div class="screen">
-            <v-select
-                v-model="currentSongPlaylist" 
-                :items="playlistState.songs"
-                item-text="name"
-                :menu-props="{ auto: true, maxHeight: 50 }"
-                return-object
-                hide-details
-                solo
-            ></v-select>
-        </div>
-        <div style="flex: 1;  display: flex; justify-content: space-between"> 
-            <div style="display: flex;">
-                <button @click="showNotes()"><v-icon class="paino-icon">mdi-music-note</v-icon></button>
-                <button @click="showKeys()"><v-icon class="paino-icon">mdi-keyboard-outline</v-icon></button>
-            </div>
-            <button @click="showConfig()"><v-icon class="paino-icon">{{configIcon}}</v-icon></button>
-        </div>
-    </div>
+    <div style="width: 100%">
+        <v-container fluid class="top-nav">
+            <v-row style="align-items: center">
+                <v-col cols="12" sm="4" class="no-default-vertical-padding"> 
+                    <div class="buttons-section">
+                        <v-icon class="piano-icon">mdi-piano</v-icon>
 
-    <div :class="dashboardState.showConfig ? 'height-auto': 'height-zero'" class="sub-top-nav"> 
-    <v-container text-xs-center fluid style="padding: 0 12px !important">
-        <v-row justify="center" align="center">
-            <v-col cols="12" sm="4"> 
-                <div @click="editKeys()" class="config config-button" :style="{fontSize: fontSize + 'em', minHeight: 5 * fontSize + 'em'}">
-                    <template v-if="!dashboardState.editKeys">Edit Keys</template>
-                    <template v-else>Save Keys</template>
-                </div>
-            </v-col>
+                        <div style="display: flex; align-items: center">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                        <div
+                                            @click="handleRecording()" 
+                                            v-bind="attrs"
+                                            v-on="on"
+                                            :style="{background: recordLight}" 
+                                            class="record-icon"/>
+                                </template>
+                                <span>Record</span>
+                            </v-tooltip>
 
-            <v-col cols="12" sm="4">
-                <div class="config" :style="{fontSize: fontSize + 'em', minHeight: 5 * fontSize + 'em'}">
-                    <label>Start Octave:</label>
-                    <div>
-                        <v-icon :disabled="dashboardState.startOctave == 0" @click="setStartOctave(dashboardState.startOctave - 1)"
-                            class="paino-icon arrow-icon" size="1.8vw">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <button 
+                                        @click="togglePlay()"
+                                        v-bind="attrs"
+                                        v-on="on">
+                                        <v-icon class="piano-icon">{{playIcon}}</v-icon>
+                                    </button>
+                                </template>
+                                <span>{{playIconTooltip}}</span>
+                            </v-tooltip>
+
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <button 
+                                        @click="stopPlaying()"
+                                        v-bind="attrs"
+                                        v-on="on">
+                                        <v-icon class="piano-icon">mdi-stop</v-icon>
+                                    </button>
+                                </template>
+                                <span>Stop</span>
+                            </v-tooltip>
+                        </div>
+                    </div>
+                </v-col>
+
+                <v-col cols="12" sm="4" class="no-default-vertical-padding"> 
+                    <div class="screen">
+                        <v-select
+                            v-model="currentSongPlaylist" 
+                            :items="playlistState.songs"
+                            item-text="name"
+                            :menu-props="{ auto: true, maxHeight: 50 }"
+                            return-object
+                            hide-details
+                            solo
+                        ></v-select>
+                    </div>
+                </v-col>
+
+                <v-col cols="12" sm="4" class="no-default-vertical-padding"> 
+                    <div class="buttons-section"> 
+                        <div style="display: flex">
+                             <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <button 
+                                        @click="showNotes()"
+                                        v-bind="attrs"
+                                        v-on="on">
+                                        <v-icon class="piano-icon">mdi-music-note</v-icon>
+                                    </button>
+                                </template>
+                                <span>Music notes</span>
+                            </v-tooltip>
+
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <button 
+                                        @click="showKeys()"
+                                        v-bind="attrs"
+                                        v-on="on">
+                                        <v-icon class="piano-icon">mdi-keyboard-outline</v-icon>
+                                    </button>
+                                </template>
+                                <span>Keys</span>
+                            </v-tooltip>
+
+                        </div>
+
+                        <button @click="showConfig()"><v-icon class="piano-icon">{{configIcon}}</v-icon></button>
+                    </div>
+                </v-col>
+            </v-row>
+        </v-container>
+
+        <v-container text-xs-center fluid :class="dashboardState.showConfig ? 'height-auto': 'height-zero'" class="sub-top-nav">
+            <v-row justify="center" align="center">
+                <v-col cols="12" sm="4"> 
+                    <div @click="editKeys()" class="config config-button" :style="{fontSize: fontSize + 'em', minHeight: 5 * fontSize + 'em'}">
+                        <template v-if="!dashboardState.editKeys">Edit Keys</template>
+                        <template v-else>Save Keys</template>
+                    </div>
+                </v-col>
+
+                <v-col cols="12" sm="4">
+                    <div class="config" :style="{fontSize: fontSize + 'em', minHeight: 5 * fontSize + 'em'}">
+                        <label>Start Octave:</label>
+                        <div>
+                            <v-icon :disabled="dashboardState.startOctave == 0" @click="setStartOctave(dashboardState.startOctave - 1)"
+                                class="piano-icon arrow-icon" size="1em">
+                                mdi-chevron-up
+                            </v-icon>
+                            <div>{{dashboardState.startOctave}}</div>
+                            <v-icon :disabled="dashboardState.endOctave - dashboardState.startOctave <= 1" @click="setStartOctave(dashboardState.startOctave + 1)"
+                                class="piano-icon arrow-icon" size="1em">
+                                mdi-chevron-down
+                            </v-icon>
+                        </div>
+                    </div>
+                </v-col>
+
+                <v-col cols="12" sm="4"> 
+                    <div class="config" :style="{fontSize: fontSize + 'em', minHeight: 5 * fontSize + 'em'}">
+                        <label>End Octave:</label>
+                        <div>
+                        <v-icon :disabled="dashboardState.endOctave - dashboardState.startOctave <= 1" @click="setEndOctave(dashboardState.endOctave - 1)"
+                            class="piano-icon arrow-icon" size="1em">
                             mdi-chevron-up
                         </v-icon>
-                        <div>{{dashboardState.startOctave}}</div>
-                        <v-icon :disabled="dashboardState.endOctave - dashboardState.startOctave <= 1" @click="setStartOctave(dashboardState.startOctave + 1)"
-                            class="paino-icon arrow-icon" size="1.8vw">
+                        <div>{{dashboardState.endOctave}}</div>
+                        <v-icon :disabled="dashboardState.endOctave == dashboardState.maxEndOctave" @click="setEndOctave(dashboardState.endOctave + 1)"
+                            class="piano-icon arrow-icon" size="1em">
                             mdi-chevron-down
                         </v-icon>
+                        </div>
                     </div>
-                </div>
-            </v-col>
-
-            <v-col cols="12" sm="4"> 
-                <div class="config" :style="{fontSize: fontSize + 'em', minHeight: 5 * fontSize + 'em'}">
-                    <label>End Octave:</label>
-                    <div>
-                    <v-icon :disabled="dashboardState.endOctave - dashboardState.startOctave <= 1" @click="setEndOctave(dashboardState.endOctave - 1)"
-                        class="paino-icon arrow-icon" size="1.8vw">
-                        mdi-chevron-up
-                    </v-icon>
-                    <div>{{dashboardState.endOctave}}</div>
-                    <v-icon :disabled="dashboardState.endOctave == dashboardState.maxEndOctave" @click="setEndOctave(dashboardState.endOctave + 1)"
-                        class="paino-icon arrow-icon" size="1.8vw">
-                        mdi-chevron-down
-                    </v-icon>
-                    </div>
-                </div>
-            </v-col>
-        </v-row>
-    </v-container>
+                </v-col>
+            </v-row>
+        </v-container>
     </div>
-</div>
 </template>
 
 <script>
@@ -136,6 +200,10 @@ export default {
             return this.dashboardState.playing ? 'mdi-pause' : 'mdi-play';
         },
 
+        playIconTooltip: function() {
+            return this.dashboardState.playing ? 'Pause' : 'Play';
+        },
+
         configIcon: function() {
             return this.dashboardState.showConfig ? 'mdi-chevron-up' : 'mdi-chevron-down'
         },
@@ -168,8 +236,8 @@ export default {
 <style>
 
 .top-nav {
-    display: flex;
     background-color: #111111;
+    padding: 2px 12px !important;
 }
 
 .sub-top-nav {
@@ -179,43 +247,46 @@ export default {
     position: absolute;
     z-index: 1;
     width: 100%;
+    padding: 0 12px !important;
 }
 
 .height-auto {
-  overflow: hidden;
-  transition: max-height 1s;
-  max-height: 200px;
+    overflow: hidden;
+    transition: max-height 1s;
+    max-height: 200px;
 }
 
 .height-zero {
-  overflow: hidden;
-  transition: max-height 1s;
-  max-height: 0px;
+    overflow: hidden;
+    transition: max-height 1s;
+    max-height: 0px;
 }
 
 .top-nav .screen {
+    margin: 5px 0;
+}
+
+.top-nav .buttons-section {
     display: flex; 
+    justify-content: space-between; 
     align-items: center;
-    justify-content: center;
-    width: 30%;
-    margin: 5px;
 }
 
-.paino-icon {
-  color: gainsboro !important;
-  margin: 0 5px;
+.piano-icon {
+    color: gainsboro !important;
+    margin: 0 5px;
 }
 
-.paino-icon:hover {
-  color:#ffb200 !important;
+.piano-icon:hover {
+    color:#ffb200 !important;
 }
 
 .arrow-icon {
-  cursor: pointer;
+    cursor: pointer;
 }
 
 .arrow-icon:hover {
-  color:#ffb200 !important;
+    color:#ffb200 !important;
 }
 
 .config {
@@ -244,6 +315,10 @@ export default {
         box-shadow:
         0 0 0.5vw 0.1vw rgba(255,255,255,0.4),
         inset 0 0 0.25vw rgba(255,255,255,0.6)
+}
+
+.no-default-vertical-padding {
+    padding: 0 12px !important
 }
 
 .v-text-field.v-text-field--solo .v-input__control {
