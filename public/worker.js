@@ -15,13 +15,11 @@ var dataMap = {}; // Helper map where we keep handleStartDrawnNote info like (se
                   // and to get the final height of the note + yPosition and after we start again a setInterval with this data
 
 onmessage = function(e) {
-  const {canvas, messageType, height, width, drawningData, drawNote, playing, waterfall} = e.data;
+  const {canvas, messageType, resizeData, drawNote, playing, waterfall} = e.data;
   if(messageType === "INIT"){
     handleInit(canvas);
   } else if(messageType === "RESIZE"){
-    handleResize(height, width);
-  } else if(messageType === "SET_DRAWING_DATA"){
-    handleSetDrawingData(drawningData);
+    handleResize(resizeData);
   } else if(messageType === "START_DRAW_NOTE"){
     handleStartDrawnNote(drawNote);
   } else if(messageType === "STOP_DRAW_NOTE"){
@@ -39,19 +37,16 @@ function handleInit(canvasData){
   startingPosition = 0;
 }
 
-function handleResize(height, width){
+function handleResize({height, width, whiteWidth, blackWidth, array}){
   canvas.height = height;
   canvas.width = width;
   startingPosition = 0;
+  canvasDataIndexesByNote = array;
+  whiteNoteWidth = whiteWidth;
+  blackNoteWidth = blackWidth;
   ctxWorker.clearRect(0, 0, canvas.width, canvas.height);
 }
 
-function handleSetDrawingData(data){
-  canvasDataIndexesByNote = data.array;
-  whiteNoteWidth = data.whiteWidth;
-  blackNoteWidth = data.blackWidth;
-  ctxWorker.clearRect(0, 0, canvas.width, canvas.height);
-}
 
 function handleStartDrawnNote(drawNote){
   const {noteName, forBlackNote} = drawNote;

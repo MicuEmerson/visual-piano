@@ -61,20 +61,13 @@ export default {
     const canvas = document.getElementsByTagName("canvas")[0];
     const pianoContainerDimensions = document.getElementById("piano-container").getBoundingClientRect();
 
-    canvas.height = window.innerHeight - pianoContainerDimensions.height + 1;
-    canvas.width = pianoContainerDimensions.width;
+    canvas.height = Math.floor(window.innerHeight - pianoContainerDimensions.height + 1);
+    canvas.width = Math.floor(pianoContainerDimensions.width);
 
     const offscreenCanvas = canvas.transferControlToOffscreen();
     this.initCanvas({offscreenCanvas, workerFile : "./worker.js"});
-   
-    const whiteNotes = document.getElementsByClassName("white-note");
-    const blackNotes = document.getElementsByClassName("black-note");
-    const whiteWidth = whiteNotes[0].getBoundingClientRect().width;
-    const blackWidth = blackNotes[0].getBoundingClientRect().width;
-    const array = Array.from(whiteNotes).concat(Array.from(blackNotes));
-    const waterfallDelay = canvas.height * 10; 
 
-    this.setDrawingDataForCanvas({array, whiteWidth, blackWidth, waterfallDelay});
+    this.$root.$emit("resize_canvas_notes");
   },
 
   created() {

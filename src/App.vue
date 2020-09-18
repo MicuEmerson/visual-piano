@@ -35,17 +35,20 @@ export default {
     resize() {
       // documnet.getElementById/getElementsByClassName are took from Piano.vue and PianoKeyboard.vue because they are already rendered in resize event eventually happens.
       const pianoContainerDimensions = document.getElementById("piano-container").getBoundingClientRect();
+
       const height = window.innerHeight - pianoContainerDimensions.height + 1;
       const width = pianoContainerDimensions.width;
-      this.resizeCanvas({height, width});
 
       const whiteNotes = document.getElementsByClassName("white-note");
       const blackNotes = document.getElementsByClassName("black-note");
+
       const whiteWidth = whiteNotes[0].getBoundingClientRect().width;
       const blackWidth = blackNotes[0].getBoundingClientRect().width;
+
       const array = Array.from(whiteNotes).concat(Array.from(blackNotes));
       const waterfallDelay = height * 10; 
-      this.setDrawingDataForCanvas({array, whiteWidth, blackWidth, waterfallDelay});
+
+      this.resizeCanvas({height, width, array, whiteWidth, blackWidth, waterfallDelay});
     },
 
   },

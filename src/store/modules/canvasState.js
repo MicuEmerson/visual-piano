@@ -44,32 +44,37 @@ export default {
     actions: {
         initCanvas({ commit, state }, { offscreenCanvas, workerFile }){
             commit("SET_WORKER", new Worker(workerFile));
-
             state.worker.postMessage({ canvas: offscreenCanvas, messageType : CanvasMessage.INIT}, [offscreenCanvas]);
         },
 
-        resizeCanvas({ commit, state }, { height, width }){
+        resizeCanvas({ commit, state }, { height, width, array, whiteWidth, blackWidth, waterfallDelay}){
             commit("SET_CANVAS_HEIGHT", height);
             commit("SET_CANVAS_WIDTH", width);
-
-            state.worker.postMessage({ messageType : CanvasMessage.RESIZE, height, width});
-        },
-
-        setDrawingDataForCanvas({ commit, state }, { array, whiteWidth, blackWidth, waterfallDelay}){
             commit("CLEAR_CANVAS_INDICES_ARRAY");
-    
-            for(let index = 0; index < array.length; index++){
-              const key = array[index].getAttribute("data-note");
-              const value = array[index].getBoundingClientRect().x;
-              commit("ADD_CANVAS_NOTE_INDEX", { key, value })
-            }
 
+            for(let index = 0; index < array.length; index++){
+                const key = array[index].getAttribute("data-note");
+                const value = Math.floor(array[index].getBoundingClientRect().x);
+                commit("ADD_CANVAS_NOTE_INDEX", { key, value })
+            }
+  
             commit("SET_CANVAS_WHITE_NOTE_WIDTH", whiteWidth);
             commit("SET_CANVAS_BLACK_NOTE_WIDTH", blackWidth);
             commit("SET_CANVAS_WATERFALL_DELAY", waterfallDelay);
+  
+            state.worker.postMessage({ 
+                messageType : CanvasMessage.RESIZE, 
+                resizeData : {
+                    height: Math.floor(height), 
+                    width: Math.floor(width), 
+                    whiteWidth : Math.floor(whiteWidth), 
+                    blackWidth: Math.floor(blackWidth), 
+                    array : state.canvasDataIndexesByNote 
+                }});
+        },
 
-            state.worker.postMessage({ messageType : CanvasMessage.SET_DRAWING_DATA, 
-                drawningData : { whiteWidth, blackWidth, array : state.canvasDataIndexesByNote }});
+        setDrawingDataForCanvas({ commit, state }, { array, whiteWidth, blackWidth, waterfallDelay}){
+    
         },
 
         startDrawNote({state}, drawNote){
