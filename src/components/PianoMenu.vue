@@ -51,6 +51,7 @@
                         <v-select
                             v-model="currentSongPlaylist" 
                             :items="playlistState.songs"
+                            @change="onChangeSong"
                             item-text="name"
                             :menu-props="{ auto: true, maxHeight: 50 }"
                             return-object
@@ -139,6 +140,12 @@
                 </v-col>
             </v-row>
         </v-container>
+
+        <v-overlay :value="isLoading">
+            <button @click="isLoading=false"> Close </button>
+            <v-progress-circular indeterminate>
+            </v-progress-circular>
+        </v-overlay>
     </div>
 </template>
 
@@ -146,7 +153,13 @@
 import { mapState, mapActions } from 'vuex';
 
 export default {
-     methods:{
+    data: () => {
+        return {
+            isLoading: false
+        }
+    },
+
+    methods:{
         togglePlay() {
             if (this.dashboardState.playing) {
             this.toneState.tone.Transport.pause();
@@ -155,6 +168,10 @@ export default {
             }
 
             this.$store.commit("dashboardState/SET_PLAYING", !this.dashboardState.playing);
+        },
+
+        onChangeSong: function() {
+            this.isLoading = true;
         },
 
         stopPlaying() {
