@@ -3,9 +3,9 @@ export default {
 
     state: {
         showConfig : false,
-        startOctave: 2,
-        maxEndOctave: 7,
-        endOctave: 7,
+        startOctave: 0,
+        endOctave: 6,
+        maxEndOctave: 6,
         editKeys : false,
         showKeys : false,
         showNotes: false,

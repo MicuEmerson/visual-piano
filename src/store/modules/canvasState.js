@@ -73,10 +73,6 @@ export default {
                 }});
         },
 
-        setDrawingDataForCanvas({ commit, state }, { array, whiteWidth, blackWidth, waterfallDelay}){
-    
-        },
-
         startDrawNote({state}, drawNote){
             state.worker.postMessage({ messageType : CanvasMessage.START_DRAW_NOTE, drawNote });
         },
