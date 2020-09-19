@@ -63,7 +63,7 @@
 
                 <v-col cols="12" sm="4" class="no-default-vertical-padding"> 
                     <div class="buttons-section"> 
-                        <div style="display: flex">
+                        <div style="display: flex; align-items: center">
                              <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
                                     <button 
@@ -88,6 +88,19 @@
                                 <span>Keys</span>
                             </v-tooltip>
 
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <button 
+                                        class="sustain-button"
+                                        @click="isSustain = !isSustain"
+                                        v-bind="attrs"
+                                        v-on="on">
+                                        <img v-if="isSustain" src="../assets/sustain-on.png"/>
+                                        <img v-else src="../assets/sustain-off.png"/>
+                                    </button>
+                                </template>
+                                <span>Sustain</span>
+                            </v-tooltip>
                         </div>
 
                         <button @click="showConfig()"><v-icon class="piano-icon">{{configIcon}}</v-icon></button>
@@ -155,7 +168,8 @@ import { mapState, mapActions } from 'vuex';
 export default {
     data: () => {
         return {
-            isLoading: false
+            isLoading: false,
+            isSustain: false
         }
     },
 
@@ -321,6 +335,11 @@ export default {
 
 .config-button:hover {
     color:#ffb200;
+}
+
+.sustain-button {
+    margin: 0 10px; 
+    display: flex;
 }
 
 .record-icon {
