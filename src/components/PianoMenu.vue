@@ -111,44 +111,73 @@
 
         <v-container text-xs-center fluid :class="dashboardState.showConfig ? 'height-auto': 'height-zero'" class="sub-top-nav">
             <v-row justify="center" align="center">
-                <v-col cols="12" sm="4"> 
-                    <div @click="editKeys()" class="config config-button" :style="{fontSize: fontSize + 'em', minHeight: 5 * fontSize + 'em'}">
+                <v-col cols="12" sm="4" md="3"> 
+                    <div @click="editKeys()" class="config config-button" :style="{fontSize: fontSize + 'em', minHeight: 6 * fontSize + 'em'}">
                         <template v-if="!dashboardState.editKeys">Edit Keys</template>
                         <template v-else>Save Keys</template>
                     </div>
                 </v-col>
 
-                <v-col cols="12" sm="4">
-                    <div class="config" :style="{fontSize: fontSize + 'em', minHeight: 5 * fontSize + 'em'}">
-                        <label>Start Octave:</label>
-                        <div>
-                            <v-icon :disabled="dashboardState.startOctave == 0" @click="setStartOctave(dashboardState.startOctave - 1)"
-                                class="piano-icon arrow-icon" size="1em">
-                                mdi-chevron-up
-                            </v-icon>
-                            <div>{{dashboardState.startOctave}}</div>
-                            <v-icon :disabled="dashboardState.endOctave - dashboardState.startOctave <= 1" @click="setStartOctave(dashboardState.startOctave + 1)"
-                                class="piano-icon arrow-icon" size="1em">
-                                mdi-chevron-down
-                            </v-icon>
-                        </div>
+                <v-col cols="12" sm="4" md="3"> 
+                    <div class="config" :style="{fontSize: fontSize + 'em', minHeight: 6 * fontSize + 'em'}">
+                        <label>Volume</label>
+                        <v-slider
+                            style="margin-left: 1em"
+                            dense
+                            hide-details
+                            thumb-label
+                            min="0"
+                            max="100"
+                            thumb-size="24"
+                            color="#ffb200"
+                            track-color="#dcdcdc"
+                            v-model="volume"
+                        ></v-slider>
                     </div>
                 </v-col>
 
-                <v-col cols="12" sm="4"> 
-                    <div class="config" :style="{fontSize: fontSize + 'em', minHeight: 5 * fontSize + 'em'}">
-                        <label>End Octave:</label>
-                        <div>
-                        <v-icon :disabled="dashboardState.endOctave - dashboardState.startOctave <= 1" @click="setEndOctave(dashboardState.endOctave - 1)"
-                            class="piano-icon arrow-icon" size="1em">
-                            mdi-chevron-up
-                        </v-icon>
-                        <div>{{dashboardState.endOctave}}</div>
-                        <v-icon :disabled="dashboardState.endOctave == dashboardState.maxEndOctave" @click="setEndOctave(dashboardState.endOctave + 1)"
-                            class="piano-icon arrow-icon" size="1em">
-                            mdi-chevron-down
-                        </v-icon>
-                        </div>
+                <v-col cols="12" sm="4" md="3"> 
+                    <div class="config" :style="{fontSize: fontSize + 'em', minHeight: 6 * fontSize + 'em'}">
+                        <label>Speed</label>
+                        <v-slider
+                            style="margin-left: 1em"
+                            dense
+                            hide-details
+                            thumb-label
+                            min="0"
+                            max="100"
+                            thumb-size="24"
+                            color="#ffb200"
+                            track-color="#dcdcdc"
+                            v-model="speed"
+                        ></v-slider>
+                    </div>
+                </v-col>
+
+                <v-col cols="12" sm="4" md="3">
+                    <div class="config" :style="{fontSize: fontSize + 'em', minHeight: 6 * fontSize + 'em'}">
+                       <label>Octave</label>
+                        <v-range-slider
+                            style="margin-left: 1em"
+                            dense
+                            hide-details
+                            thumb-label
+                            min="1"
+                            max="7"
+                            thumb-size="24"
+                            color="#ffb200"
+                            track-color="#dcdcdc"
+                            v-model="octaves"
+                        ></v-range-slider>
+                    </div>
+                </v-col>
+
+                <v-col cols="12" sm="4" md="3"> 
+                    <div class="config" :style="{fontSize: fontSize + 'em', minHeight: 6 * fontSize + 'em'}">
+                        <label>White note</label>
+                        <input style="margin-left: 1em" :value="whiteNoteColor" type="color" @change="whiteNoteColorChanged"/>
+                        <label>Black note</label>
+                        <input style="margin-left: 1em" :value="blackNoteColor" type="color" @change="blackNoteColorChanged"/>
                     </div>
                 </v-col>
             </v-row>
@@ -169,7 +198,12 @@ export default {
     data: () => {
         return {
             isLoading: false,
-            isSustain: false
+            isSustain: false,
+            volume: 100,
+            speed: 50,
+            octaves: [2, 4],
+            whiteNoteColor: "#0000ff",
+            blackNoteColor: "#ff0000"
         }
     },
 
@@ -186,6 +220,14 @@ export default {
 
         onChangeSong: function() {
             this.isLoading = true;
+        },
+
+        whiteNoteColorChanged: function(e) {
+            this.whiteNoteColor = e.target.value;
+        },
+
+        blackNoteColorChanged: function(e) {
+            this.blackNoteColor = e.target.value;
         },
 
         stopPlaying() {
@@ -239,8 +281,15 @@ export default {
             return this.dashboardState.showConfig ? 'mdi-chevron-up' : 'mdi-chevron-down'
         },
 
-        recordLight : function() {
+        recordLight: function() {
             return this.recordingState.isRecording ? "linear-gradient(-45deg, green, rgb(152,251,152,0.7))" : "linear-gradient(-45deg, red, rgb(240,128,128,0.7))";
+        },
+
+        fontSize() {
+            switch (this.$vuetify.breakpoint.name) {
+                case 'xs': return 0.7;
+                default: return 0.8;
+            }
         },
 
         currentSongPlaylist: {
@@ -251,13 +300,6 @@ export default {
                 this.$store.dispatch("dashboardState/changeStartOctave", 0);
                 this.$store.dispatch("dashboardState/changeEndOctave", this.dashboardState.maxEndOctave);
                 this.$store.dispatch("playlistState/stopPlaying", value);
-            }
-        },
-
-        fontSize() {
-            switch (this.$vuetify.breakpoint.name) {
-                case 'xs': return 0.7;
-                default: return 0.8;
             }
         }
     }
@@ -284,7 +326,7 @@ export default {
 .height-auto {
     overflow: hidden;
     transition: max-height 1s;
-    max-height: 200px;
+    max-height: 290px;
 }
 
 .height-zero {
@@ -327,6 +369,7 @@ export default {
     background-color: #111111;
     height: 100%;
     border-radius: 0.5em;
+    padding: 0 2em;
 }
 
 .config-button {
@@ -377,5 +420,9 @@ export default {
 .v-icon.v-icon{
     font-size: 2em;
 }  
+
+.v-slider__thumb-label {
+    color: #111111 !important;
+}
 
 </style>
