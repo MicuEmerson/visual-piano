@@ -4,9 +4,11 @@
             <v-row style="align-items: center">
                 <v-col cols="12" sm="4" class="no-default-vertical-padding"> 
                     <div class="buttons-section">
-                        <v-icon class="piano-icon">mdi-piano</v-icon>
+                        <div class="button-group">
+                            <img class="piano-icon" src="../assets/logo-text.png" style="height: 25px">
+                        </div>
 
-                        <div style="display: flex; align-items: center">
+                        <div class="button-group">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
                                         <div
@@ -63,14 +65,14 @@
 
                 <v-col cols="12" sm="4" class="no-default-vertical-padding"> 
                     <div class="buttons-section"> 
-                        <div style="display: flex; align-items: center">
+                        <div class="button-group">
                              <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
                                     <button 
                                         @click="showNotes()"
                                         v-bind="attrs"
                                         v-on="on">
-                                        <v-icon class="piano-icon">mdi-music-note</v-icon>
+                                        <v-icon class="piano-icon">{{notesIcon}}</v-icon>
                                     </button>
                                 </template>
                                 <span>Music notes</span>
@@ -82,7 +84,7 @@
                                         @click="showKeys()"
                                         v-bind="attrs"
                                         v-on="on">
-                                        <v-icon class="piano-icon">mdi-keyboard-outline</v-icon>
+                                        <v-icon class="piano-icon">{{keyboardIcon}}</v-icon>
                                     </button>
                                 </template>
                                 <span>Keys</span>
@@ -103,9 +105,36 @@
                             </v-tooltip>
                         </div>
 
-                        <button @click="showConfig()"><v-icon class="piano-icon">{{configIcon}}</v-icon></button>
+                        <div class="button-group">
+                            <v-dialog v-model="dialog" fullscreen hide-overlay transition="dialog-bottom-transition">
+                                <template v-slot:activator="{ on, attrs }">
+                                    <button
+                                        v-bind="attrs"
+                                        v-on="on">
+                                    <v-icon class="piano-icon">mdi-information-outline</v-icon>
+                                    </button>
+                                </template>
+                                <v-card dark>
+                                    <v-card-title>
+                                        <button @click="dialog = false">
+                                            <v-icon class="piano-icon">mdi-close</v-icon>
+                                        </button>
+                                        About
+                                    </v-card-title>
+
+                                    <v-card-text>
+                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc sit amet commodo massa. Phasellus lacinia eros vel tristique scelerisque. Donec sodales, sem eu pharetra maximus, augue mi ultrices lorem, ut fringilla lorem nulla id nisl. Phasellus tincidunt purus tortor, sed vehicula erat sollicitudin sed. Phasellus vehicula laoreet diam vel interdum. Cras in erat orci. Phasellus imperdiet ultricies dui sed aliquam. Vivamus non accumsan lorem.
+                                    </v-card-text>
+                                </v-card>
+                            </v-dialog>
+
+                            <button @click="showConfig()"><v-icon class="piano-icon">{{configIcon}}</v-icon></button>
+                        </div>
                     </div>
                 </v-col>
+            </v-row>
+            <v-row>
+                <v-progress-linear v-if="isPlaying" style="position: absolute" color="#ffb200" :value="playingPercent"></v-progress-linear>
             </v-row>
         </v-container>
 
@@ -199,6 +228,9 @@ export default {
         return {
             isLoading: false,
             isSustain: false,
+            isPlaying: false,
+            playingPercent: 0,
+            dialog: false,
             volume: 100,
             speed: 50,
             octaves: [2, 4],
@@ -210,12 +242,18 @@ export default {
     methods:{
         togglePlay() {
             if (this.dashboardState.playing) {
-            this.toneState.tone.Transport.pause();
+                this.toneState.tone.Transport.pause();
             } else {
-            this.toneState.tone.Transport.start()
+                this.toneState.tone.Transport.start()
             }
 
             this.$store.commit("dashboardState/SET_PLAYING", !this.dashboardState.playing);
+
+            this.isPlaying = true;
+
+            setInterval(()=>{
+                this.playingPercent += 1;
+            },1000);
         },
 
         onChangeSong: function() {
@@ -232,29 +270,31 @@ export default {
 
         stopPlaying() {
             this.$store.dispatch("playlistState/stopPlaying", "");
+
+            this.isPlaying = false;
         },
 
         handleRecording(){
-        this.recordingState.isRecording ? this.stopRecording() : this.startRecording();
+            this.recordingState.isRecording ? this.stopRecording() : this.startRecording();
         },
 
         ...mapActions('recordingState', ['startRecording', 'stopRecording']),
 
         editKeys(){
-        this.$store.commit("dashboardState/SET_EDIT_KEYS", !this.dashboardState.editKeys);
-        this.$store.commit("dashboardState/SET_SHOW_KEYS", !this.dashboardState.showKeys);
+            this.$store.commit("dashboardState/SET_EDIT_KEYS", !this.dashboardState.editKeys);
+            this.$store.commit("dashboardState/SET_SHOW_KEYS", !this.dashboardState.showKeys);
         },
 
         showConfig(){
-        this.$store.commit("dashboardState/SET_SHOW_CONFIG", !this.dashboardState.showConfig);
+            this.$store.commit("dashboardState/SET_SHOW_CONFIG", !this.dashboardState.showConfig);
         },
 
         showKeys(){
-        this.$store.commit("dashboardState/SET_SHOW_KEYS", !this.dashboardState.showKeys);
+            this.$store.commit("dashboardState/SET_SHOW_KEYS", !this.dashboardState.showKeys);
         },
 
         showNotes(){
-        this.$store.commit("dashboardState/SET_SHOW_NOTES", !this.dashboardState.showNotes);
+            this.$store.commit("dashboardState/SET_SHOW_NOTES", !this.dashboardState.showNotes);
         },
 
         setStartOctave(value){
@@ -275,6 +315,14 @@ export default {
 
         playIconTooltip: function() {
             return this.dashboardState.playing ? 'Pause' : 'Play';
+        },
+
+        notesIcon: function() {
+            return this.dashboardState.showNotes ? 'mdi-music-note-off' : 'mdi-music-note';
+        },
+
+        keyboardIcon: function() {
+            return this.dashboardState.showKeys ? 'mdi-keyboard-off-outline' : 'mdi-keyboard-outline';
         },
 
         configIcon: function() {
@@ -345,20 +393,17 @@ export default {
     align-items: center;
 }
 
+.top-nav .buttons-section .button-group {
+    display: flex; 
+    align-items: center;
+}
+
 .piano-icon {
     color: gainsboro !important;
     margin: 0 5px;
 }
 
 .piano-icon:hover {
-    color:#ffb200 !important;
-}
-
-.arrow-icon {
-    cursor: pointer;
-}
-
-.arrow-icon:hover {
     color:#ffb200 !important;
 }
 
