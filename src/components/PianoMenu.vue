@@ -5,7 +5,7 @@
                 <v-col cols="12" sm="4" class="no-default-vertical-padding"> 
                     <div class="buttons-section">
                         <div class="button-group">
-                            <img class="piano-icon" src="../assets/logo-text.png" style="height: 25px">
+                            <v-icon class="piano-icon">mdi-piano</v-icon>
                         </div>
 
                         <div class="button-group">
@@ -97,8 +97,11 @@
                                         @click="isSustain = !isSustain"
                                         v-bind="attrs"
                                         v-on="on">
-                                        <img v-if="isSustain" src="../assets/sustain-on.png"/>
-                                        <img v-else src="../assets/sustain-off.png"/>
+
+                                        <img :src="getSustainImage" 
+                                            @mouseover="isSustainImageHover = true"
+                                            @mouseleave="isSustainImageHover = false"
+                                        />
                                     </button>
                                 </template>
                                 <span>Sustain</span>
@@ -114,6 +117,7 @@
                                     <v-icon class="piano-icon">mdi-information-outline</v-icon>
                                     </button>
                                 </template>
+                                
                                 <v-card dark>
                                     <v-card-title>
                                         <button @click="dialog = false">
@@ -228,6 +232,7 @@ export default {
         return {
             isLoading: false,
             isSustain: false,
+            isSustainImageHover: false,
             isPlaying: false,
             playingPercent: 0,
             dialog: false,
@@ -338,6 +343,18 @@ export default {
                 case 'xs': return 0.7;
                 default: return 0.8;
             }
+        },
+
+        getSustainImage: function() {
+            const imageName = this.isSustain ? 
+                    this.isSustainImageHover ? 
+                        'sustain-on-hover' :
+                        'sustain-on' :
+                    this.isSustainImageHover ? 
+                        'sustain-off-hover' :
+                        'sustain-off' 
+
+            return require('../assets/' + imageName + '.png');
         },
 
         currentSongPlaylist: {
