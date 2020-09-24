@@ -15,11 +15,15 @@ export default {
         ],
        currentSong: "",
        timers : [],
+       currentSongDuration: 0,
     },
 
     mutations: {
        SET_CURRENT_SONG(state, val){
-           state.currentSong = val;
+            state.currentSong = val;
+       },
+       SET_CURRENT_SONG_DURATION(state, val){
+            state.currentSongDuration = val;
        },
        ADD_NEW_RECORDED_SONG(state, val){
            state.songs.unshift(val);
@@ -55,9 +59,14 @@ export default {
 
         prepareNotes({state, rootState, commit, dispatch}, {notes, lastSong}) {
             notes.forEach((note, i) => {
-                rootState.toneState.tone.Transport.schedule(() => {
 
+                if(lastSong && i === notes.length - 1){
+                    commit("SET_CURRENT_SONG_DURATION", note.time + note.duration);
+                }
+                
+                rootState.toneState.tone.Transport.schedule(() => {
                     commit("ADD_TIMER", new Timer(() => {
+                       
                         if(state.currentSong.fromPlaylist){
                             rootState.toneState.sampler.triggerAttackRelease(note.name, note.duration, rootState.toneState.tone.now(), note.velocity);
                         } else {
@@ -90,7 +99,7 @@ export default {
                             
                             dispatch("canvasState/startDrawNote", {noteName : note.name, forBlackNote}, {root:true});
                         }
-                  }, time)
+                    }, time)
                 }, note.time)
       
                 rootState.toneState.tone.Transport.schedule(time => {
@@ -105,8 +114,7 @@ export default {
 
                             dispatch("canvasState/stopDrawNote", {noteName : note.name, forBlackNote}, {root:true});
                         }
-                        
-                  }, time)
+                    }, time)
                 }, note.time + note.duration)
       
             })

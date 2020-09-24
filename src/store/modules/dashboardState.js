@@ -3,14 +3,13 @@ export default {
 
     state: {
         showConfig : false,
-        startOctave: 0,
+        startOctave: 2,
         endOctave: 6,
-        maxEndOctave: 6,
+        maxEndOctave: 8,
         editKeys : false,
         showKeys : false,
         showNotes: false,
         playing: false,
-        allOctaves:[0, 1, 2, 3, 4, 5, 6],
     },
 
     mutations: {

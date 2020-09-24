@@ -57,6 +57,7 @@
           <button class="piano-dashboard-button" @click="stopPlaying()">
             <v-icon class="paino-dashboard-icon" size="3vw">mdi-stop</v-icon>
           </button>
+         
         </div>
  
         <div class="piano-dashboard-screen">
@@ -158,15 +159,7 @@ export default {
 
   computed: {
     ...mapState(['dashboardState', 'toneState', 'playlistState', 'recordingState']),
-
-    startOctavesSelect: function() {
-      return this.dashboardState.allOctaves.slice(0, this.dashboardState.endOctave);
-    },
-
-    endOctavesSelect: function() {
-      return this.dashboardState.allOctaves.slice(this.dashboardState.allOctaves[this.dashboardState.startOctave], this.dashboardState.allOctaves.length);
-    },
-    
+ 
     recordLight : function() {
       return this.recordingState.isRecording ? "linear-gradient(-45deg, green, rgb(152,251,152,0.7))" : "linear-gradient(-45deg, red, rgb(240,128,128,0.7))";
     },

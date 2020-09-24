@@ -75,10 +75,9 @@ export default {
     actions: {
       playNote({ commit, state, rootState, dispatch}, { index, forBlackNote }) {
         const currentNote = forBlackNote ? state.notes[index].blackNote : state.notes[index];
-        
         if(!currentNote.pressed && !rootState.dashboardState.editKeys) {
-          rootState.toneState.sampler.triggerAttack(currentNote.note, undefined, 1);
-          
+          rootState.toneState.sampler.triggerAttack(currentNote.note, rootState.toneState.tone.now());
+
           commit("SET_NOTE_PRESSED", { index, forBlackNote, pressed : true });
 
           if(rootState.recordingState.isRecording){
@@ -103,7 +102,7 @@ export default {
       removePressedKey({ state, commit, rootState, dispatch }, { index, forBlackNote }) {
         const currentNote = forBlackNote ? state.notes[index].blackNote : state.notes[index];
         if(currentNote.pressed === true){
-          rootState.toneState.sampler.triggerRelease(currentNote.note);
+          rootState.toneState.sampler.triggerRelease(currentNote.note, rootState.toneState.tone.now() + 1);
 
           commit("SET_NOTE_PRESSED", { index, forBlackNote, pressed : false });
 

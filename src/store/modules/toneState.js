@@ -22,7 +22,6 @@ export default {
         CREATE_SAMPLER(state, SAMPLE_MAP) {
             state.sampler = new state.tone.Sampler({
                 urls: SAMPLE_MAP,
-                onload : () => {},
                 baseUrl: SAMPLE_BASE_URL
             }).toDestination();
         },
