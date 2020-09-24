@@ -1,5 +1,5 @@
 <template>
-    <div style="width: 100%">
+    <div id="piano-menu" style="width: 100%">
         <v-container fluid class="top-nav">
             <v-row style="align-items: center">
                 <v-col cols="12" sm="4" class="no-default-vertical-padding"> 

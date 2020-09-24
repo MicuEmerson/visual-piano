@@ -14,14 +14,10 @@ import { mapState, mapActions } from 'vuex';
 
 export default {
   components : { Piano, PianoMenu },
-  data: () => {
-    return {
-
-    }
-  },
-
+ 
   created(){
     window.addEventListener("resize", this.resize);
+
     this.$root.$on("resize_canvas_notes", ()  => {
       this.resize();
     });
@@ -37,8 +33,10 @@ export default {
     resize() {
       // documnet.getElementById/getElementsByClassName are took from Piano.vue and PianoKeyboard.vue because they are already rendered in resize event eventually happens.
       const pianoContainerDimensions = document.getElementById("piano-container").getBoundingClientRect();
+      const pianoMenuDimensions = document.getElementById("piano-menu").getBoundingClientRect();
 
-      const height = window.innerHeight - pianoContainerDimensions.height + 1;
+      console.log("pianoMenuHeight", pianoMenuDimensions.height);
+      const height = window.innerHeight - pianoContainerDimensions.height - pianoMenuDimensions.height + 1;
       const width = pianoContainerDimensions.width;
 
       const whiteNotes = document.getElementsByClassName("white-note");
@@ -72,13 +70,12 @@ body, html {
   margin: 0 !important;
   padding: 0 !important;
   text-align: center;
+  overflow-y: hidden !important;
 }
-
-
+ 
 #app {
   height: 100%;
   width: 100%;
-  /* margin: 0 17%; */
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -95,7 +92,7 @@ button:focus {
  
 input:focus {
   outline: 0;
-}
+} 
 
 /* width */
 ::-webkit-scrollbar {
