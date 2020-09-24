@@ -3,7 +3,11 @@ var context = null;
 var startingPosition = 0; // y position of start drawning the note
 var animationSpeed = 10 // the animation speed in ms
 var playingState = 3 // 1 = play, 2 = pause , 3 = stop
-var waterfall = true // variable to indicate the animation, from top to bottom (waterfall) = true,  or from bottom to top = false 
+var waterfall = true // variable to indicate the animation, from top to bottom (waterfall) = true,  or from bottom to top = false
+var noteColors = {
+  whiteNoteColor: "#1eb7eb",
+  blackNoteColor: "#f9bb2d"
+}
 
 var canvasDataIndexesByNote = null; // map where we keep positions of X coordonates for every note 
                                     // ex:(key = noteName (C4, C#3, etc), value = x positon of that note in the screen);
@@ -15,7 +19,8 @@ var dataMap = {}; // Helper map where we keep handleStartDrawnNote info like (se
                   // and to get the final height of the note + yPosition and after we start again a setInterval with this data
 
 onmessage = function(e) {
-  const {canvas, messageType, resizeData, drawNote, playing, waterfall} = e.data;
+  const {canvas, messageType, resizeData, drawNote, playing, waterfall, colors} = e.data;
+
   if(messageType === "INIT"){
     handleInit(canvas);
   } else if(messageType === "RESIZE"){
@@ -28,6 +33,8 @@ onmessage = function(e) {
     playingState = playing;
   } else if(messageType === "STOP_SONG"){
     playingState = 3;
+  } else if(messageType === "CHANGE_COLOR"){
+    noteColors = colors;
   }
 }
 
@@ -112,9 +119,8 @@ function handleStopDrawnNote(drawNote){
 }
 
 function drawAnimationNote(noteName, forBlackNote, yPosition, noteHeight) {
-  context.fillStyle = forBlackNote ?  "red" : "blue";
-  context.strokeStyle = forBlackNote ?  "red" : "blue";
-
+  context.fillStyle = forBlackNote ?  noteColors.blackNoteColor : noteColors.whiteNoteColor;
+ 
   let noteWidth = forBlackNote ? blackNoteWidth : whiteNoteWidth;
   
   context.clearRect(canvasDataIndexesByNote[noteName],
