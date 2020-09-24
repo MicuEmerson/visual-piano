@@ -208,19 +208,19 @@
                 <v-col cols="12" sm="4" md="3"> 
                     <div class="config" :style="{fontSize: fontSize + 'em', minHeight: 6 * fontSize + 'em'}">
                         <label>White note</label>
-                        <input style="margin-left: 1em" :value="whiteNoteColor" type="color" @change="whiteNoteColorChanged"/>
+                        <input style="margin-left: 1em" :value="dashboardState.whiteNoteColor" type="color" @change="whiteNoteColorChanged"/>
                         <label>Black note</label>
-                        <input style="margin-left: 1em" :value="blackNoteColor" type="color" @change="blackNoteColorChanged"/>
+                        <input style="margin-left: 1em" :value="dashboardState.blackNoteColor" type="color" @change="blackNoteColorChanged"/>
                     </div>
                 </v-col>
             </v-row>
         </v-container>
 
-        <v-overlay :value="isLoading">
+        <!-- <v-overlay :value="isLoading">
             <button @click="isLoading=false"> Close </button>
             <v-progress-circular indeterminate>
             </v-progress-circular>
-        </v-overlay>
+        </v-overlay> -->
     </div>
 </template>
 
@@ -239,26 +239,25 @@ export default {
             volume: 100,
             speed: 50,
             octaves: [2, 4],
-            whiteNoteColor: "#0000ff",
-            blackNoteColor: "#ff0000"
+            blackNoteColor: "#f9bb2d"
         }
     },
 
     methods:{
+        ...mapActions("dashboardState", ["setPlaying"]),
+        ...mapActions('recordingState', ['startRecording', 'stopRecording']),
+
         togglePlay() {
-            if (this.dashboardState.playing) {
-                this.toneState.tone.Transport.pause();
-            } else {
-                this.toneState.tone.Transport.start()
+            if(this.playlistState.currentSong != ""){
+
+                if (this.dashboardState.playing) {
+                    this.toneState.tone.Transport.pause();
+                } else {
+                    this.toneState.tone.Transport.start()
+                }
+
+                this.setPlaying();
             }
-
-            this.$store.commit("dashboardState/SET_PLAYING", !this.dashboardState.playing);
-
-            this.isPlaying = true;
-
-            setInterval(()=>{
-                this.playingPercent += 1;
-            },1000);
         },
 
         onChangeSong: function() {
@@ -266,24 +265,20 @@ export default {
         },
 
         whiteNoteColorChanged: function(e) {
-            this.whiteNoteColor = e.target.value;
+            this.$store.dispatch("dashboardState/whiteNoteColorChanged", e.target.value)
         },
 
         blackNoteColorChanged: function(e) {
-            this.blackNoteColor = e.target.value;
+            this.$store.dispatch("dashboardState/blackNoteColorChanged", e.target.value)
         },
 
         stopPlaying() {
             this.$store.dispatch("playlistState/stopPlaying", "");
-
-            this.isPlaying = false;
         },
 
         handleRecording(){
             this.recordingState.isRecording ? this.stopRecording() : this.startRecording();
         },
-
-        ...mapActions('recordingState', ['startRecording', 'stopRecording']),
 
         editKeys(){
             this.$store.commit("dashboardState/SET_EDIT_KEYS", !this.dashboardState.editKeys);
@@ -362,8 +357,8 @@ export default {
                 return this.playlistState.currentSong;
             },
             set (value){
-                this.$store.dispatch("dashboardState/changeStartOctave", 0);
-                this.$store.dispatch("dashboardState/changeEndOctave", this.dashboardState.maxEndOctave);
+                // this.$store.dispatch("dashboardState/changeStartOctave", 0);
+                // this.$store.dispatch("dashboardState/changeEndOctave", this.dashboardState.maxEndOctave);
                 this.$store.dispatch("playlistState/stopPlaying", value);
             }
         }
