@@ -57,6 +57,7 @@
           <button class="piano-dashboard-button" @click="stopPlaying()">
             <v-icon class="paino-dashboard-icon" size="3vw">mdi-stop</v-icon>
           </button>
+         
         </div>
  
         <div class="piano-dashboard-screen">
@@ -102,14 +103,20 @@ export default {
   },
 
   methods:{
+    ...mapActions("recordingState", ["startRecording", "stopRecording"]),
+    ...mapActions("dashboardState", ["setPlaying"]),
+
     togglePlay() {
+      if(this.playlistState.currentSong != ""){
+        
         if (this.dashboardState.playing) {
           this.toneState.tone.Transport.pause();
         } else {
           this.toneState.tone.Transport.start()
         }
 
-        this.$store.commit("dashboardState/SET_PLAYING", !this.dashboardState.playing);
+        this.setPlaying();
+      }
     },
 
     stopPlaying() {
@@ -120,8 +127,7 @@ export default {
       this.recordingState.isRecording ? this.stopRecording() : this.startRecording();
     },
 
-    ...mapActions('recordingState', ['startRecording', 'stopRecording']),
-
+   
     editKeys(){
       this.$store.commit("dashboardState/SET_EDIT_KEYS", !this.dashboardState.editKeys);
       this.$store.commit("dashboardState/SET_SHOW_KEYS", !this.dashboardState.showKeys);
@@ -141,25 +147,19 @@ export default {
 
     setStartOctave(value){
         this.$store.dispatch("dashboardState/changeStartOctave", value)
+        setTimeout(() => this.$root.$emit("resize_canvas_notes"), 100);
     },
 
     setEndOctave(value){
         this.$store.dispatch("dashboardState/changeEndOctave", value)
+        setTimeout(() => this.$root.$emit("resize_canvas_notes"), 100);
     }
 
   },
 
   computed: {
     ...mapState(['dashboardState', 'toneState', 'playlistState', 'recordingState']),
-
-    startOctavesSelect: function() {
-      return this.dashboardState.allOctaves.slice(0, this.dashboardState.endOctave);
-    },
-
-    endOctavesSelect: function() {
-      return this.dashboardState.allOctaves.slice(this.dashboardState.allOctaves[this.dashboardState.startOctave], this.dashboardState.allOctaves.length);
-    },
-    
+ 
     recordLight : function() {
       return this.recordingState.isRecording ? "linear-gradient(-45deg, green, rgb(152,251,152,0.7))" : "linear-gradient(-45deg, red, rgb(240,128,128,0.7))";
     },
@@ -173,8 +173,8 @@ export default {
         return this.playlistState.currentSong;
       },
       set (value){
-        this.$store.dispatch("dashboardState/changeStartOctave", 0);
-        this.$store.dispatch("dashboardState/changeEndOctave", this.dashboardState.maxEndOctave);
+        // this.$store.dispatch("dashboardState/changeStartOctave", 0);
+        // this.$store.dispatch("dashboardState/changeEndOctave", this.dashboardState.maxEndOctave);
         this.$store.dispatch("playlistState/stopPlaying", value);
       }
     }

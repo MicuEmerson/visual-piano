@@ -1,4 +1,5 @@
 import { Midi } from "@tonejs/midi"
+import Timer  from "../../utils/SetTimeoutTimer"
 
 export default {
     namespaced: true,
@@ -13,14 +14,25 @@ export default {
            {name : "Sinding - Rustle of Spring", fromPlaylist: true },
         ],
        currentSong: "",
+       timers : [],
+       currentSongDuration: 0,
     },
 
     mutations: {
        SET_CURRENT_SONG(state, val){
-           state.currentSong = val;
+            state.currentSong = val;
+       },
+       SET_CURRENT_SONG_DURATION(state, val){
+            state.currentSongDuration = val;
        },
        ADD_NEW_RECORDED_SONG(state, val){
            state.songs.unshift(val);
+       },
+       ADD_TIMER(state, timer){
+           state.timers.push(timer);
+       },
+       CLEAR_TIMERS(state){
+           state.timers.length = 0;
        }
     },
 
@@ -32,14 +44,36 @@ export default {
             }
         },
 
+        clearTimes({state, commit}){
+            state.timers.forEach(timer => timer.pause());
+            commit("CLEAR_TIMERS");
+        },
+
+        pauseTimers({state}){
+            state.timers.forEach(timer => timer.pause());
+        },
+
+        resumeTimers({state}){
+            state.timers.forEach(timer => timer.resume());
+        },
+
         prepareNotes({state, rootState, commit, dispatch}, {notes, lastSong}) {
             notes.forEach((note, i) => {
+
+                if(lastSong && i === notes.length - 1){
+                    commit("SET_CURRENT_SONG_DURATION", note.time + note.duration);
+                }
+                
                 rootState.toneState.tone.Transport.schedule(() => {
-                  if(state.currentSong.fromPlaylist){
-                    rootState.toneState.sampler.triggerAttackRelease(note.name, note.duration, rootState.toneState.tone.now(), note.velocity);
-                  } else {
-                    rootState.toneState.sampler.triggerAttackRelease(note.name, "2n", rootState.toneState.tone.now());
-                  }
+                    commit("ADD_TIMER", new Timer(() => {
+                       
+                        if(state.currentSong.fromPlaylist){
+                            rootState.toneState.sampler.triggerAttackRelease(note.name, note.duration, rootState.toneState.tone.now(), note.velocity);
+                        } else {
+                            rootState.toneState.sampler.triggerAttackRelease(note.name, "2n", rootState.toneState.tone.now());
+                        }
+                    }, rootState.canvasState.waterfallDelay));
+              
                 }, note.time)
       
                 let index = null;
@@ -58,19 +92,29 @@ export default {
        
                 rootState.toneState.tone.Transport.schedule(time => {
                     rootState.toneState.tone.Draw.schedule(() => {
-                        if(index != null)
-                            commit("keyboardState/SET_NOTE_PRESSED", {index, forBlackNote, pressed : true}, {root:true});
-                  }, time)
+                        if(index != null){
+                            commit("ADD_TIMER", new Timer(() => {
+                                commit("keyboardState/SET_NOTE_PRESSED", {index, forBlackNote, pressed : true}, {root:true});
+                            }, rootState.canvasState.waterfallDelay));
+                            
+                            dispatch("canvasState/startDrawNote", {noteName : note.name, forBlackNote}, {root:true});
+                        }
+                    }, time)
                 }, note.time)
       
                 rootState.toneState.tone.Transport.schedule(time => {
                     rootState.toneState.tone.Draw.schedule(() => {
-                        if(index != null)
-                            commit("keyboardState/SET_NOTE_PRESSED", {index, forBlackNote, pressed : false}, {root:true});
-                        if(lastSong && i === notes.length - 1){
-                            dispatch("stopPlaying", "");
+                        if(index != null){
+                            commit("ADD_TIMER", new Timer(() => {
+                                commit("keyboardState/SET_NOTE_PRESSED", {index, forBlackNote, pressed : false}, {root:true});
+                                if(lastSong && i === notes.length - 1){
+                                    dispatch("stopPlaying", "");
+                                }
+                            }, rootState.canvasState.waterfallDelay));
+
+                            dispatch("canvasState/stopDrawNote", {noteName : note.name, forBlackNote}, {root:true});
                         }
-                  }, time)
+                    }, time)
                 }, note.time + note.duration)
       
             })
@@ -90,8 +134,9 @@ export default {
             rootState.toneState.tone.Transport.stop();
             rootState.toneState.tone.Transport.cancel();
             dispatch("changeSong", currentSong);
+            dispatch("clearTimes");
             commit("keyboardState/CLEAR_PRESSED_KEYS", {}, {root:true});
-            commit("dashboardState/SET_PLAYING", false, {root:true});
+            dispatch("dashboardState/stopPlaying", {}, {root:true});
         }
     }
 }

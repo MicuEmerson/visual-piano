@@ -1,5 +1,3 @@
-import CanvasMessage from "../../utils/CanvasMessages"
-
 export default {
     namespaced: true,
 
@@ -18,7 +16,7 @@ export default {
         'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.'
       ],
 
-      allNotes:['A', 'B', 'C', 'D', 'E', 'F', 'G'],
+      allNotes:['C', 'D', 'E', 'F', 'G', 'A', 'B'],
     },
 
     mutations: {
@@ -77,10 +75,9 @@ export default {
     actions: {
       playNote({ commit, state, rootState, dispatch}, { index, forBlackNote }) {
         const currentNote = forBlackNote ? state.notes[index].blackNote : state.notes[index];
-        
         if(!currentNote.pressed && !rootState.dashboardState.editKeys) {
-          rootState.toneState.sampler.triggerAttackRelease(currentNote.note, "2n");
-          
+          rootState.toneState.sampler.triggerAttack(currentNote.note, rootState.toneState.tone.now());
+
           commit("SET_NOTE_PRESSED", { index, forBlackNote, pressed : true });
 
           if(rootState.recordingState.isRecording){
@@ -105,6 +102,8 @@ export default {
       removePressedKey({ state, commit, rootState, dispatch }, { index, forBlackNote }) {
         const currentNote = forBlackNote ? state.notes[index].blackNote : state.notes[index];
         if(currentNote.pressed === true){
+          rootState.toneState.sampler.triggerRelease(currentNote.note, rootState.toneState.tone.now() + 1);
+
           commit("SET_NOTE_PRESSED", { index, forBlackNote, pressed : false });
 
           if(rootState.recordingState.isRecording){
@@ -129,7 +128,7 @@ export default {
       generateNotes({ commit, state, rootState }) {
         commit("CLEAR_NOTES_ARRAY");
         let keyIndex = 0;
-        let noteIndex = state.allNotes.indexOf('C'); // we always start with note C
+        let noteIndex = 0; // we always start with note C
         
         for(let octave = rootState.dashboardState.startOctave; octave <= rootState.dashboardState.endOctave; octave++) {
   
@@ -179,6 +178,5 @@ export default {
             } 
           }
       },
-
     },
 }
