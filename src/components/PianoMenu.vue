@@ -94,13 +94,13 @@
                                 <template v-slot:activator="{ on, attrs }">
                                     <button 
                                         class="sustain-button"
-                                        @click="isSustain = !isSustain"
+                                        @click="handleSutain()"
                                         v-bind="attrs"
                                         v-on="on">
 
                                         <img :src="getSustainImage" 
-                                            @mouseover="isSustainImageHover = true"
-                                            @mouseleave="isSustainImageHover = false"
+                                            @mouseover="sustainImageHover = true"
+                                            @mouseleave="sustainImageHover = false"
                                         />
                                     </button>
                                 </template>
@@ -231,8 +231,7 @@ export default {
     data: () => {
         return {
             isLoading: false,
-            isSustain: false,
-            isSustainImageHover: false,
+            sustainImageHover: false,
             isPlaying: false,
             playingPercent: 0,
             dialog: false,
@@ -297,6 +296,10 @@ export default {
             this.$store.commit("dashboardState/SET_SHOW_NOTES", !this.dashboardState.showNotes);
         },
 
+        handleSutain(){
+             this.$store.commit("dashboardState/SET_SUSTAIN", !this.dashboardState.sustain)
+        },
+
         setStartOctave(value){
             this.$store.dispatch("dashboardState/changeStartOctave", value)
         },
@@ -341,11 +344,11 @@ export default {
         },
 
         getSustainImage: function() {
-            const imageName = this.isSustain ? 
-                    this.isSustainImageHover ? 
+            const imageName = this.dashboardState.sustain ? 
+                    this.sustainImageHover ? 
                         'sustain-on-hover' :
                         'sustain-on' :
-                    this.isSustainImageHover ? 
+                    this.sustainImageHover ? 
                         'sustain-off-hover' :
                         'sustain-off' 
 

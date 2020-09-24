@@ -35,7 +35,6 @@ export default {
       const pianoContainerDimensions = document.getElementById("piano-container").getBoundingClientRect();
       const pianoMenuDimensions = document.getElementById("piano-menu").getBoundingClientRect();
 
-      console.log("pianoMenuHeight", pianoMenuDimensions.height);
       const height = window.innerHeight - pianoContainerDimensions.height - pianoMenuDimensions.height + 1;
       const width = pianoContainerDimensions.width;
 

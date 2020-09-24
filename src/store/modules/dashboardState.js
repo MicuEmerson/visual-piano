@@ -11,7 +11,8 @@ export default {
         showNotes: false,
         playing: false,
         whiteNoteColor: "#1eb7eb",
-        blackNoteColor: "#f9bb2d"
+        blackNoteColor: "#f9bb2d",
+        sustain: true,
     },
 
     mutations: {
@@ -45,6 +46,9 @@ export default {
         SET_BLACK_NOTE_COLOR(state, color){
             state.blackNoteColor = color;
         },
+        SET_SUSTAIN(state, sustain){
+            state.sustain = sustain;
+        }
     },
 
     actions: {

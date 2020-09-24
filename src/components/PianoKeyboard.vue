@@ -127,7 +127,7 @@ export default {
 <style>
 .piano-keyboard {
   position: relative;
-  height: 20vw; /* set height according to width size */
+  height: 14vw; /* set height according to width size */
   width: 100%;
 }
  
