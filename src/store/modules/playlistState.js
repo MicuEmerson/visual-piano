@@ -139,6 +139,4 @@ export default {
             dispatch("dashboardState/stopPlaying", {}, {root:true});
         }
     }
-    
-    
 }
