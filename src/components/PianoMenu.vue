@@ -188,6 +188,8 @@
                     <div class="config" :style="{fontSize: fontSize + 'em', minHeight: 6 * fontSize + 'em'}">
                        <label>Octave</label>
                         <v-range-slider
+                            @change="octaveChanged"
+                            v-model="octaves"
                             style="margin-left: 1em"
                             dense
                             hide-details
@@ -197,7 +199,6 @@
                             thumb-size="24"
                             color="#ffb200"
                             track-color="#dcdcdc"
-                            v-model="octaves"
                         ></v-range-slider>
                     </div>
                 </v-col>
@@ -205,9 +206,9 @@
                 <v-col cols="12" sm="4" md="3"> 
                     <div class="config" :style="{fontSize: fontSize + 'em', minHeight: 6 * fontSize + 'em'}">
                         <label>White note</label>
-                        <input style="margin-left: 0.5em; margin-right: 0.5em" :value="whiteNoteColor" type="color" @change="whiteNoteColorChanged"/>
+                        <input style="margin-left: 0.5em; margin-right: 0.5em" :value="dashboardState.whiteNoteColor" type="color" @change="whiteNoteColorChanged"/>
                         <label>Black note</label>
-                        <input style="margin-left: 0.5em" :value="blackNoteColor" type="color" @change="blackNoteColorChanged"/>
+                        <input style="margin-left: 0.5em" :value="dashboardState.blackNoteColor" type="color" @change="blackNoteColorChanged"/>
                     </div>
                 </v-col>
             </v-row>
@@ -237,8 +238,12 @@ export default {
             dialog: false,
             volume: 100,
             speed: 50,
-            octaves: [2, 4],
+            octaves: []
         }
+    },
+
+    created() {
+        this.octaves = [ this.dashboardState.startOctave, this.dashboardState.endOctave ]
     },
 
     methods:{
@@ -303,12 +308,20 @@ export default {
              this.$store.commit("dashboardState/SET_SUSTAIN", !this.dashboardState.sustain)
         },
 
+        octaveChanged: function(value) {
+            this.octaves = Object.values(value);
+            this.setStartOctave(Math.min(...this.octaves));
+            this.setEndOctave(Math.max(...this.octaves));
+        },
+
         setStartOctave(value){
             this.$store.dispatch("dashboardState/changeStartOctave", value)
+            setTimeout(() => this.$root.$emit("resize_canvas_notes"), 100);
         },
 
         setEndOctave(value){
             this.$store.dispatch("dashboardState/changeEndOctave", value)
+            setTimeout(() => this.$root.$emit("resize_canvas_notes"), 100);
         }
     }, 
 

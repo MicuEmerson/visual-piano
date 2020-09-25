@@ -28,7 +28,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('canvasState', ['setDrawingDataForCanvas', 'resizeCanvas']),
+    ...mapActions('canvasState', ['resizeCanvas']),
 
     resize() {
       // documnet.getElementById/getElementsByClassName are took from Piano.vue and PianoKeyboard.vue because they are already rendered in resize event eventually happens.
