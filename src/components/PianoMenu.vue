@@ -189,7 +189,7 @@
                        <label>Octave</label>
                         <v-range-slider
                             @change="octaveChanged"
-                            v-model="octaves"
+                            :value="dashboardState.octaves"
                             style="margin-left: 1em"
                             dense
                             hide-details
@@ -238,12 +238,7 @@ export default {
             dialog: false,
             volume: 100,
             speed: 50,
-            octaves: []
         }
-    },
-
-    created() {
-        this.octaves = [ this.dashboardState.startOctave, this.dashboardState.endOctave ]
     },
 
     methods:{
@@ -309,20 +304,9 @@ export default {
         },
 
         octaveChanged: function(value) {
-            this.octaves = Object.values(value);
-            this.setStartOctave(Math.min(...this.octaves));
-            this.setEndOctave(Math.max(...this.octaves));
-        },
-
-        setStartOctave(value){
-            this.$store.dispatch("dashboardState/changeStartOctave", value)
+            this.$store.dispatch("dashboardState/changeOctaves", Object.values(value))
             setTimeout(() => this.$root.$emit("resize_canvas_notes"), 100);
         },
-
-        setEndOctave(value){
-            this.$store.dispatch("dashboardState/changeEndOctave", value)
-            setTimeout(() => this.$root.$emit("resize_canvas_notes"), 100);
-        }
     }, 
 
     computed: {

@@ -3,8 +3,7 @@ export default {
 
     state: {
         showConfig : false,
-        startOctave: 2,
-        endOctave: 6,
+        octaves: [2, 6],
         maxEndOctave: 8,
         editKeys : false,
         showKeys : false,
@@ -19,11 +18,8 @@ export default {
         SET_SHOW_CONFIG(state, showConfig){
             state.showConfig = showConfig;
         },
-        SET_START_OCTAVE(state, startOctave){
-            state.startOctave = startOctave;
-        },
-        SET_END_OCTAVE(state, endOctave){
-            state.endOctave = endOctave;
+        SET_OCTAVES(state, octaves){
+            state.octaves = octaves[0] > octaves[1] ? octaves.reverse() : octaves;
         },
         SET_EDIT_KEYS(state, editKeys){
             state.editKeys = editKeys;
@@ -52,17 +48,11 @@ export default {
     },
 
     actions: {
-        changeStartOctave({ commit, dispatch }, startOctave){
-            commit("SET_START_OCTAVE", startOctave);
+        changeOctaves({ commit, dispatch }, octaves){
+            commit("SET_OCTAVES", octaves);
             dispatch("keyboardState/generateNotes", {}, {root:true});
             dispatch("keyboardState/generateNotesIndexesByKey", {}, {root:true});
         }, 
-
-        changeEndOctave({ commit, dispatch }, endOctave){
-            commit("SET_END_OCTAVE", endOctave);
-            dispatch("keyboardState/generateNotes", {}, {root:true});
-            dispatch("keyboardState/generateNotesIndexesByKey", {}, {root:true});
-        },
 
         setPlaying({ commit, dispatch, state }){
             if(state.playing){

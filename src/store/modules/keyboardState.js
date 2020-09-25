@@ -137,8 +137,10 @@ export default {
         commit("CLEAR_NOTES_ARRAY");
         let keyIndex = 0;
         let noteIndex = 0; // we always start with note C
-        
-        for(let octave = rootState.dashboardState.startOctave; octave <= rootState.dashboardState.endOctave; octave++) {
+        const startOctave = rootState.dashboardState.octaves[0];
+        const endOctave = rootState.dashboardState.octaves[1];
+
+        for(let octave = startOctave; octave <= endOctave; octave++) {
   
             while(noteIndex < state.allNotes.length) {
               const currentNote = state.allNotes[noteIndex];
@@ -161,7 +163,7 @@ export default {
             
               commit("ADD_NOTE", newNote);
   
-              if(octave === rootState.dashboardState.endOctave && currentNote === 'B'){ // we always end with note B
+              if(octave === endOctave && currentNote === 'B'){ // we always end with note B
                 break;
               }
   
