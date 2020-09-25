@@ -190,12 +190,14 @@
                         <v-range-slider
                             @change="octaveChanged"
                             :value="dashboardState.octaves"
+                            ticks="always"
+                            tick-size="4"
                             style="margin-left: 1em"
                             dense
                             hide-details
                             thumb-label
                             min="1"
-                            max="7"
+                            :max="dashboardState.maxEndOctave"
                             thumb-size="24"
                             color="#ffb200"
                             track-color="#dcdcdc"
