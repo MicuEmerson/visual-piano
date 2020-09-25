@@ -1,6 +1,5 @@
 <template>
 <div id="piano-container">
-   <pianoDashboard> </pianoDashboard> 
    <pianoKeyboard> </pianoKeyboard>
    <saveSongDialog> </saveSongDialog>
 </div> 

@@ -71,7 +71,7 @@ body, html {
   width: 100%;
   margin: 0 !important;
   padding: 0 !important;
-  text-align: center;
+  /* text-align: center; */
 }
 
 

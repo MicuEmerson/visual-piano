@@ -2,7 +2,7 @@
     <div style="width: 100%">
         <v-container fluid class="top-nav">
             <v-row style="align-items: center">
-                <v-col cols="12" sm="4" class="no-default-vertical-padding"> 
+                <v-col cols="12" md="4" class="no-default-vertical-padding"> 
                     <div class="buttons-section">
                         <div class="button-group">
                             <v-icon class="piano-icon">mdi-piano</v-icon>
@@ -48,7 +48,7 @@
                     </div>
                 </v-col>
 
-                <v-col cols="12" sm="4" class="no-default-vertical-padding"> 
+                <v-col cols="12" md="4" class="no-default-vertical-padding"> 
                     <div class="screen">
                         <v-select
                             v-model="currentSongPlaylist" 
@@ -63,7 +63,7 @@
                     </div>
                 </v-col>
 
-                <v-col cols="12" sm="4" class="no-default-vertical-padding"> 
+                <v-col cols="12" md="4" class="no-default-vertical-padding"> 
                     <div class="buttons-section"> 
                         <div class="button-group">
                              <v-tooltip bottom>
@@ -118,18 +118,7 @@
                                     </button>
                                 </template>
                                 
-                                <v-card dark>
-                                    <v-card-title>
-                                        <button @click="dialog = false">
-                                            <v-icon class="piano-icon">mdi-close</v-icon>
-                                        </button>
-                                        About
-                                    </v-card-title>
-
-                                    <v-card-text>
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc sit amet commodo massa. Phasellus lacinia eros vel tristique scelerisque. Donec sodales, sem eu pharetra maximus, augue mi ultrices lorem, ut fringilla lorem nulla id nisl. Phasellus tincidunt purus tortor, sed vehicula erat sollicitudin sed. Phasellus vehicula laoreet diam vel interdum. Cras in erat orci. Phasellus imperdiet ultricies dui sed aliquam. Vivamus non accumsan lorem.
-                                    </v-card-text>
-                                </v-card>
+                                <AboutDialog :onClose="onCloseAboutDialog"></AboutDialog>
                             </v-dialog>
 
                             <button @click="showConfig()"><v-icon class="piano-icon">{{configIcon}}</v-icon></button>
@@ -234,8 +223,11 @@
 
 <script>
 import { mapState, mapActions } from 'vuex';
+import AboutDialog from './AboutDialog';
 
 export default {
+    components: { AboutDialog },
+
     data: () => {
         return {
             isLoading: false,
@@ -271,6 +263,10 @@ export default {
 
         onChangeSong: function() {
             this.isLoading = true;
+        },
+
+        onCloseAboutDialog: function() {
+            this.dialog = false;
         },
 
         whiteNoteColorChanged: function(e) {
@@ -382,14 +378,14 @@ export default {
 <style>
 
 .top-nav {
-    background-color: #111111;
+    background-color: var(--v-primary-base);
     padding: 2px 12px !important;
 }
 
 .sub-top-nav {
     display: flex;
-    background-color: #222;
-    color: gainsboro;
+    background-color: var(--v-secondary-base);
+    color: var(--v-text-base);
     position: absolute;
     z-index: 1;
     width: 100%;
@@ -424,19 +420,19 @@ export default {
 }
 
 .piano-icon {
-    color: gainsboro !important;
+    color: var(--v-text-base) !important;
     margin: 0 5px;
 }
 
 .piano-icon:hover {
-    color:#ffb200 !important;
+    color:var(--v-accent-base) !important;
 }
 
 .config {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #111111;
+    background-color: var(--v-primary-base);
     height: 100%;
     border-radius: 0.5em;
     padding: 0 2em;
@@ -447,7 +443,7 @@ export default {
 }
 
 .config-button:hover {
-    color:#ffb200;
+    color:var(--v-accent-base);
 }
 
 .sustain-button {
@@ -488,11 +484,11 @@ export default {
 }
 
 .v-icon.v-icon{
-    font-size: 2em;
+    font-size: 1.5em;
 }  
 
 .v-slider__thumb-label {
-    color: #111111 !important;
+    color: var(--v-primary-base) !important;
 }
 
 </style>
