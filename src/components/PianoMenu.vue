@@ -209,9 +209,9 @@
 
                 <v-col cols="12" sm="4" md="3"> 
                     <div class="config" :style="{fontSize: fontSize + 'em', minHeight: 6 * fontSize + 'em'}">
-                        <label>White note</label>
+                        <label style="text-align: center">White note</label>
                         <input style="margin-left: 0.5em; margin-right: 0.5em" :value="dashboardState.whiteNoteColor" type="color" @change="whiteNoteColorChanged"/>
-                        <label>Black note</label>
+                        <label style="text-align: center">Black note</label>
                         <input style="margin-left: 0.5em" :value="dashboardState.blackNoteColor" type="color" @change="blackNoteColorChanged"/>
                     </div>
                 </v-col>
