@@ -12,6 +12,7 @@ export default {
         whiteNoteColor: "#1eb7eb",
         blackNoteColor: "#f9bb2d",
         sustain: true,
+        volume: 100
     },
 
     mutations: {
@@ -44,6 +45,9 @@ export default {
         },
         SET_SUSTAIN(state, sustain){
             state.sustain = sustain;
+        },
+        SET_VOLUME(state, volume){
+            state.volume = volume;
         }
     },
 
@@ -53,6 +57,16 @@ export default {
             dispatch("keyboardState/generateNotes", {}, {root:true});
             dispatch("keyboardState/generateNotesIndexesByKey", {}, {root:true});
         }, 
+
+        changeVolume({ commit, rootState }, volume) {
+            commit("SET_VOLUME", volume);
+            if (volume === 0) {
+                rootState.toneState.sampler.volume.value = -1000;
+            }
+            else {
+                rootState.toneState.sampler.volume.value = volume * 0.3 - 30;
+            }
+        },
 
         setPlaying({ commit, dispatch, state }){
             if(state.playing){

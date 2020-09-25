@@ -152,6 +152,8 @@
                     <div class="config" :style="{fontSize: fontSize + 'em', minHeight: 6 * fontSize + 'em'}">
                         <label>Volume</label>
                         <v-slider
+                            @change="handleVolume"
+                            :value="dashboardState.volume"
                             style="margin-left: 1em"
                             dense
                             hide-details
@@ -161,7 +163,6 @@
                             thumb-size="24"
                             color="#ffb200"
                             track-color="#dcdcdc"
-                            v-model="volume"
                         ></v-slider>
                     </div>
                 </v-col>
@@ -238,7 +239,6 @@ export default {
             isPlaying: false,
             playingPercent: 0,
             dialog: false,
-            volume: 100,
             speed: 50,
         }
     },
@@ -302,7 +302,11 @@ export default {
         },
 
         handleSutain(){
-             this.$store.commit("dashboardState/SET_SUSTAIN", !this.dashboardState.sustain)
+            this.$store.commit("dashboardState/SET_SUSTAIN", !this.dashboardState.sustain)
+        },
+
+        handleVolume(volume){
+            this.$store.dispatch("dashboardState/changeVolume", volume)
         },
 
         octaveChanged: function(value) {
