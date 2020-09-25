@@ -171,16 +171,17 @@
                     <div class="config" :style="{fontSize: fontSize + 'em', minHeight: 6 * fontSize + 'em'}">
                         <label>Speed</label>
                         <v-slider
+                            @change="handleSpeed"
+                            :value="dashboardState.speed"
                             style="margin-left: 1em"
                             dense
                             hide-details
                             thumb-label
-                            min="0"
-                            max="100"
+                            min="30"
+                            max="170"
                             thumb-size="24"
                             color="#ffb200"
                             track-color="#dcdcdc"
-                            v-model="speed"
                         ></v-slider>
                     </div>
                 </v-col>
@@ -238,8 +239,7 @@ export default {
             sustainImageHover: false,
             isPlaying: false,
             playingPercent: 0,
-            dialog: false,
-            speed: 50,
+            dialog: false
         }
     },
 
@@ -307,6 +307,10 @@ export default {
 
         handleVolume(volume){
             this.$store.dispatch("dashboardState/changeVolume", volume)
+        },
+
+        handleSpeed(speed){
+            this.$store.dispatch("dashboardState/changeSpeed", speed)
         },
 
         octaveChanged: function(value) {

@@ -12,7 +12,8 @@ export default {
         whiteNoteColor: "#1eb7eb",
         blackNoteColor: "#f9bb2d",
         sustain: true,
-        volume: 100
+        volume: 100,
+        speed: 100,
     },
 
     mutations: {
@@ -48,6 +49,9 @@ export default {
         },
         SET_VOLUME(state, volume){
             state.volume = volume;
+        },
+        SET_SPEED(state, speed){
+            state.speed = speed;
         }
     },
 
@@ -66,6 +70,11 @@ export default {
             else {
                 rootState.toneState.sampler.volume.value = volume * 0.3 - 30;
             }
+        },
+
+        changeSpeed({ commit, rootState }, speed) {
+            commit("SET_SPEED", speed);
+            rootState.toneState.tone.Transport.bpm.value = speed * 1.2;
         },
 
         setPlaying({ commit, dispatch, state }){
