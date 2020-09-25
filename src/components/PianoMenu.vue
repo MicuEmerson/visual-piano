@@ -1,5 +1,5 @@
 <template>
-    <div style="width: 100%">
+    <div id="piano-menu" style="width: 100%">
         <v-container fluid class="top-nav">
             <v-row style="align-items: center">
                 <v-col cols="12" md="4" class="no-default-vertical-padding"> 
@@ -94,13 +94,13 @@
                                 <template v-slot:activator="{ on, attrs }">
                                     <button 
                                         class="sustain-button"
-                                        @click="isSustain = !isSustain"
+                                        @click="handleSutain()"
                                         v-bind="attrs"
                                         v-on="on">
 
                                         <img :src="getSustainImage" 
-                                            @mouseover="isSustainImageHover = true"
-                                            @mouseleave="isSustainImageHover = false"
+                                            @mouseover="sustainImageHover = true"
+                                            @mouseleave="sustainImageHover = false"
                                         />
                                     </button>
                                 </template>
@@ -213,11 +213,11 @@
             </v-row>
         </v-container>
 
-        <v-overlay :value="isLoading">
+        <!-- <v-overlay :value="isLoading">
             <button @click="isLoading=false"> Close </button>
             <v-progress-circular indeterminate>
             </v-progress-circular>
-        </v-overlay>
+        </v-overlay> -->
     </div>
 </template>
 
@@ -231,34 +231,31 @@ export default {
     data: () => {
         return {
             isLoading: false,
-            isSustain: false,
-            isSustainImageHover: false,
+            sustainImageHover: false,
             isPlaying: false,
             playingPercent: 0,
             dialog: false,
             volume: 100,
             speed: 50,
             octaves: [2, 4],
-            whiteNoteColor: "#0000ff",
-            blackNoteColor: "#ff0000",
         }
     },
 
     methods:{
+        ...mapActions("dashboardState", ["setPlaying"]),
+        ...mapActions('recordingState', ['startRecording', 'stopRecording']),
+
         togglePlay() {
-            if (this.dashboardState.playing) {
-                this.toneState.tone.Transport.pause();
-            } else {
-                this.toneState.tone.Transport.start()
+            if(this.playlistState.currentSong != ""){
+
+                if (this.dashboardState.playing) {
+                    this.toneState.tone.Transport.pause();
+                } else {
+                    this.toneState.tone.Transport.start()
+                }
+
+                this.setPlaying();
             }
-
-            this.$store.commit("dashboardState/SET_PLAYING", !this.dashboardState.playing);
-
-            this.isPlaying = true;
-
-            setInterval(()=>{
-                this.playingPercent += 1;
-            },1000);
         },
 
         onChangeSong: function() {
@@ -270,24 +267,20 @@ export default {
         },
 
         whiteNoteColorChanged: function(e) {
-            this.whiteNoteColor = e.target.value;
+            this.$store.dispatch("dashboardState/whiteNoteColorChanged", e.target.value)
         },
 
         blackNoteColorChanged: function(e) {
-            this.blackNoteColor = e.target.value;
+            this.$store.dispatch("dashboardState/blackNoteColorChanged", e.target.value)
         },
 
         stopPlaying() {
             this.$store.dispatch("playlistState/stopPlaying", "");
-
-            this.isPlaying = false;
         },
 
         handleRecording(){
             this.recordingState.isRecording ? this.stopRecording() : this.startRecording();
         },
-
-        ...mapActions('recordingState', ['startRecording', 'stopRecording']),
 
         editKeys(){
             this.$store.commit("dashboardState/SET_EDIT_KEYS", !this.dashboardState.editKeys);
@@ -304,6 +297,10 @@ export default {
 
         showNotes(){
             this.$store.commit("dashboardState/SET_SHOW_NOTES", !this.dashboardState.showNotes);
+        },
+
+        handleSutain(){
+             this.$store.commit("dashboardState/SET_SUSTAIN", !this.dashboardState.sustain)
         },
 
         setStartOctave(value){
@@ -350,11 +347,11 @@ export default {
         },
 
         getSustainImage: function() {
-            const imageName = this.isSustain ? 
-                    this.isSustainImageHover ? 
+            const imageName = this.dashboardState.sustain ? 
+                    this.sustainImageHover ? 
                         'sustain-on-hover' :
                         'sustain-on' :
-                    this.isSustainImageHover ? 
+                    this.sustainImageHover ? 
                         'sustain-off-hover' :
                         'sustain-off' 
 
@@ -366,8 +363,8 @@ export default {
                 return this.playlistState.currentSong;
             },
             set (value){
-                this.$store.dispatch("dashboardState/changeStartOctave", 0);
-                this.$store.dispatch("dashboardState/changeEndOctave", this.dashboardState.maxEndOctave);
+                // this.$store.dispatch("dashboardState/changeStartOctave", 0);
+                // this.$store.dispatch("dashboardState/changeEndOctave", this.dashboardState.maxEndOctave);
                 this.$store.dispatch("playlistState/stopPlaying", value);
             }
         }

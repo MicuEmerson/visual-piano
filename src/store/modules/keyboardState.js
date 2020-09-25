@@ -76,7 +76,12 @@ export default {
       playNote({ commit, state, rootState, dispatch}, { index, forBlackNote }) {
         const currentNote = forBlackNote ? state.notes[index].blackNote : state.notes[index];
         if(!currentNote.pressed && !rootState.dashboardState.editKeys) {
-          rootState.toneState.sampler.triggerAttack(currentNote.note, rootState.toneState.tone.now());
+
+          if(rootState.dashboardState.sustain == false){
+            rootState.toneState.sampler.triggerAttack(currentNote.note);
+          } else {
+            rootState.toneState.sampler.triggerAttackRelease(currentNote.note, "2n");
+          }
 
           commit("SET_NOTE_PRESSED", { index, forBlackNote, pressed : true });
 
@@ -102,7 +107,10 @@ export default {
       removePressedKey({ state, commit, rootState, dispatch }, { index, forBlackNote }) {
         const currentNote = forBlackNote ? state.notes[index].blackNote : state.notes[index];
         if(currentNote.pressed === true){
-          rootState.toneState.sampler.triggerRelease(currentNote.note, rootState.toneState.tone.now() + 1);
+
+          if(rootState.dashboardState.sustain == false){
+            rootState.toneState.sampler.triggerRelease(currentNote.note);
+          }
 
           commit("SET_NOTE_PRESSED", { index, forBlackNote, pressed : false });
 

@@ -88,6 +88,10 @@ export default {
 
         stopSong({state}){
             state.worker.postMessage({ messageType : CanvasMessage.STOP_SONG, playing : 3});
+        },
+
+        changeNoteColors({state}, { blackNoteColor, whiteNoteColor }){
+            state.worker.postMessage({ messageType : CanvasMessage.CHANGE_COLOR, colors : { blackNoteColor, whiteNoteColor }});
         }
     }
 }

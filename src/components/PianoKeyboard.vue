@@ -3,12 +3,13 @@
 
         <div v-for="(noteObject, index) in keyboardState.notes" :key="index"
           class="white-note" :class="[noteObject.pressed ? 'white-note-pressed' : '']"
-          :style="{'width': keyboardState.whiteNoteWidthSize + '%'}" :data-note="noteObject.note"
+          :style="{width: keyboardState.whiteNoteWidthSize + '%', background: whiteNoteBackground(noteObject.pressed)}" :data-note="noteObject.note"
           @mousedown="playNoteMouse({index, forBlackNote : false})" @mouseup="removePressedKeyMouse({index, forBlackNote : false})"
           @mouseover="playNoteHover({index, forBlackNote : false})" @mouseleave="removePressedKey({index, forBlackNote : false})">
             
           <div v-if="noteObject.blackNote" 
-            class="black-note" :class="[noteObject.blackNote.pressed ? 'black-note-pressed' : '']" :data-note="noteObject.blackNote.note"
+            class="black-note" :class="[noteObject.blackNote.pressed ? 'black-note-pressed' : '']" 
+            :style="{background: blackNoteBackground(noteObject.blackNote.pressed)}" :data-note="noteObject.blackNote.note"
             @mousedown.stop="playNoteMouse({index, forBlackNote : true})" @mouseup.stop="removePressedKeyMouse({index, forBlackNote : true})"
             @mouseover.stop="playNoteHover({index, forBlackNote : true})" @mouseleave.stop="removePressedKey({index, forBlackNote : true})">
 
@@ -51,12 +52,7 @@ import { mapState, mapActions } from "vuex";
 import CanvasMessage from "../utils/CanvasMessages"
 
 export default {
-  data: () => {
-    return {
-
-    }
-  },
-
+  
   mounted() {
     const canvas = document.getElementsByTagName("canvas")[0];
     const pianoContainerDimensions = document.getElementById("piano-container").getBoundingClientRect();
@@ -111,11 +107,19 @@ export default {
 
     handleInput(value, key, index, forBlackNote){
       this.changeInput({value, key, index, forBlackNote});
+    },
+
+    whiteNoteBackground: function(pressed){
+      return pressed ? this.dashboardState.whiteNoteColor : 'linear-gradient(to bottom, #eee 0%, #fff 100%)';
+    },
+    
+    blackNoteBackground: function(pressed){
+      return pressed ? this.dashboardState.blackNoteColor : 'linear-gradient(45deg, #555, #222)';
     }
   },
 
   computed: {
-    ...mapState(['keyboardState', 'dashboardState', 'recordingState', 'canvasState'])
+    ...mapState(['keyboardState', 'dashboardState', 'recordingState', 'canvasState']),
   }
 }
 </script>
@@ -123,7 +127,7 @@ export default {
 <style>
 .piano-keyboard {
   position: relative;
-  height: 20vw; /* set height according to width size */
+  height: 14vw; /* set height according to width size */
   width: 100%;
 }
  
@@ -142,7 +146,6 @@ export default {
   border-radius: 0 0 5px 5px;
   box-shadow: 0px 0px 0px rgba(255, 255, 255, 0.8) inset,
     -2px -5px 3px #ccc inset, 0 0 3px rgba(0, 0, 0, 0.2);
-  background: linear-gradient(to bottom, #eee 0%, #fff 100%);
 }
  
 .white-note-pressed {
@@ -151,8 +154,6 @@ export default {
   border-right: 1px solid #777;
   box-shadow: 2px 0 3px rgba(0, 0, 0, 0.1) inset,
     -5px 5px 20px rgba(0, 0, 0, 0.2) inset, 0 0 3px rgba(0, 0, 0, 0.2);
-  /* background:  linear-gradient(to bottom, #fff 0%, #e9e9e9 100%); */
-  background: blue;
 }
  
 .black-note {
@@ -169,14 +170,11 @@ export default {
   border-radius: 0 0 3px 3px;
   box-shadow: -1px -1px 2px rgba(255, 255, 255, 0.2) inset,
     0 -5px 2px 3px rgba(0, 0, 0, 0.5) inset, 0 2px 4px rgba(0, 0, 0, 0.5);
-  background: linear-gradient(45deg, #555, #222);
 }
  
 .black-note-pressed {
   box-shadow: -1px -1px 2px rgba(255, 255, 255, 0.2) inset,
     0 -2px 2px 3px rgba(0, 0, 0, 0.5) inset, 0 1px 2px rgba(0, 0, 0, 0.5);
-  /* background: linear-gradient(to bottom, #333, #222); */
-  background: red;
 }
  
 .key-group {

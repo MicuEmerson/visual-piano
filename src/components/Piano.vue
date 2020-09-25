@@ -6,14 +6,12 @@
 </template>
 
 <script>
-import PianoDashboard from "./PianoDashboard"
 import PianoKeyboard from "./PianoKeyboard"
 import SaveSongDialog from "./SaveSongDialog"
 import { mapState, mapActions } from 'vuex';
 
 export default {
-  components: { PianoDashboard, PianoKeyboard, SaveSongDialog },
-
+  components: { PianoKeyboard, SaveSongDialog },
   data: () => {
     return {
 

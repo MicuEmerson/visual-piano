@@ -10,6 +10,9 @@ export default {
         showKeys : false,
         showNotes: false,
         playing: false,
+        whiteNoteColor: "#1eb7eb",
+        blackNoteColor: "#f9bb2d",
+        sustain: true,
     },
 
     mutations: {
@@ -37,6 +40,15 @@ export default {
         SET_PLAYING(state, playing){
             state.playing = playing;
         },
+        SET_WHITE_NOTE_COLOR(state, color){
+            state.whiteNoteColor = color;
+        },
+        SET_BLACK_NOTE_COLOR(state, color){
+            state.blackNoteColor = color;
+        },
+        SET_SUSTAIN(state, sustain){
+            state.sustain = sustain;
+        }
     },
 
     actions: {
@@ -66,10 +78,16 @@ export default {
         stopPlaying({ commit, dispatch }){
             dispatch("canvasState/stopSong", {}, {root:true});
             commit("SET_PLAYING", false);
-        }
-    },
-    
-    getters: {
-      
+        },
+
+        whiteNoteColorChanged({ state, commit, dispatch }, color){
+            commit("SET_WHITE_NOTE_COLOR", color);
+            dispatch("canvasState/changeNoteColors", { whiteNoteColor: state.whiteNoteColor, blackNoteColor : state.blackNoteColor }, {root:true});
+        },
+
+        blackNoteColorChanged({ state, commit, dispatch }, color){
+            commit("SET_BLACK_NOTE_COLOR", color);
+            dispatch("canvasState/changeNoteColors", { whiteNoteColor: state.whiteNoteColor, blackNoteColor : state.blackNoteColor }, {root:true});
+        },
     },
 }

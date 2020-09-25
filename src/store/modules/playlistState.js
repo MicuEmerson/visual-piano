@@ -70,7 +70,11 @@ export default {
                         if(state.currentSong.fromPlaylist){
                             rootState.toneState.sampler.triggerAttackRelease(note.name, note.duration, rootState.toneState.tone.now(), note.velocity);
                         } else {
-                            rootState.toneState.sampler.triggerAttackRelease(note.name, "2n", rootState.toneState.tone.now());
+                            if(rootState.dashboardState.sustain == false){
+                                rootState.toneState.sampler.triggerAttack(note.name);
+                            } else {
+                                rootState.toneState.sampler.triggerAttackRelease(note.name, "2n", rootState.toneState.tone.now());
+                            }
                         }
                     }, rootState.canvasState.waterfallDelay));
               
@@ -106,10 +110,17 @@ export default {
                     rootState.toneState.tone.Draw.schedule(() => {
                         if(index != null){
                             commit("ADD_TIMER", new Timer(() => {
+
                                 commit("keyboardState/SET_NOTE_PRESSED", {index, forBlackNote, pressed : false}, {root:true});
+
+                                if(rootState.dashboardState.sustain == false){
+                                    rootState.toneState.sampler.triggerRelease(note.name);
+                                }
+
                                 if(lastSong && i === notes.length - 1){
                                     dispatch("stopPlaying", "");
                                 }
+
                             }, rootState.canvasState.waterfallDelay));
 
                             dispatch("canvasState/stopDrawNote", {noteName : note.name, forBlackNote}, {root:true});
