@@ -137,12 +137,20 @@
                     </div>
                 </v-col>
             </v-row>
-            <v-row>
-                <v-progress-linear v-if="isPlaying" style="position: absolute" color="#ffb200" :value="playingPercent"></v-progress-linear>
+
+            <v-row style="position: relative">
+                <v-progress-linear style="position: absolute" color="#ffb200" :value="playingPercent"> </v-progress-linear>
+            </v-row>
+
+             <v-row style="position: relative">
+                <div style="position: absolute; top: 8px; right:8px; color: white">
+                    {{ playingPercent }}:{{ playingPercent }} 
+                </div>
             </v-row>
         </v-container>
 
         <v-container text-xs-center fluid :class="dashboardState.showConfig ? 'height-auto': 'height-zero'" class="sub-top-nav">
+            
             <v-row justify="center" align="center">
                 <v-col cols="12" sm="4" md="3"> 
                     <div @click="editKeys()" class="config config-button" :style="{fontSize: fontSize + 'em', minHeight: 6 * fontSize + 'em'}">
@@ -208,9 +216,9 @@
                 <v-col cols="12" sm="4" md="3"> 
                     <div class="config" :style="{fontSize: fontSize + 'em', minHeight: 6 * fontSize + 'em'}">
                         <label>White note</label>
-                        <input style="margin-left: 1em" :value="whiteNoteColor" type="color" @change="whiteNoteColorChanged"/>
+                        <input style="margin-left: 0.5em; margin-right: 0.5em" :value="whiteNoteColor" type="color" @change="whiteNoteColorChanged"/>
                         <label>Black note</label>
-                        <input style="margin-left: 1em" :value="blackNoteColor" type="color" @change="blackNoteColorChanged"/>
+                        <input style="margin-left: 0.5em" :value="blackNoteColor" type="color" @change="blackNoteColorChanged"/>
                     </div>
                 </v-col>
             </v-row>
@@ -240,7 +248,7 @@ export default {
             speed: 50,
             octaves: [2, 4],
             whiteNoteColor: "#0000ff",
-            blackNoteColor: "#ff0000"
+            blackNoteColor: "#ff0000",
         }
     },
 
@@ -309,8 +317,8 @@ export default {
         setEndOctave(value){
             this.$store.dispatch("dashboardState/changeEndOctave", value)
         }
-    },    
-    
+    }, 
+
     computed: {
         ...mapState(['dashboardState', 'toneState', 'playlistState', 'recordingState']),
 
@@ -391,13 +399,13 @@ export default {
 .height-auto {
     overflow: hidden;
     transition: max-height 1s;
-    max-height: 290px;
+    max-height: 355px;
 }
 
 .height-zero {
     overflow: hidden;
     transition: max-height 1s;
-    max-height: 0px;
+    max-height: 0;
 }
 
 .top-nav .screen {
