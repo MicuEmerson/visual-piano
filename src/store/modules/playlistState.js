@@ -16,6 +16,7 @@ export default {
        currentSong: "",
        timers : [],
        currentSongDuration: 0,
+       isLoading : false,
     },
 
     mutations: {
@@ -24,6 +25,9 @@ export default {
        },
        SET_CURRENT_SONG_DURATION(state, val){
             state.currentSongDuration = val;
+       },
+       SET_IS_LOADING(state, val){
+           state.isLoading = val;
        },
        ADD_NEW_RECORDED_SONG(state, val){
            state.songs.unshift(val);
@@ -142,12 +146,19 @@ export default {
         },
 
         stopPlaying({dispatch, rootState, commit}, currentSong){
-            rootState.toneState.tone.Transport.stop();
-            rootState.toneState.tone.Transport.cancel();
-            dispatch("changeSong", currentSong);
-            dispatch("clearTimes");
-            commit("keyboardState/CLEAR_PRESSED_KEYS", {}, {root:true});
-            dispatch("dashboardState/stopPlaying", {}, {root:true});
+            commit("SET_IS_LOADING", true);
+            setTimeout(() => {
+                dispatch("changeSong", currentSong);
+                dispatch("clearTimes");
+                commit("keyboardState/CLEAR_PRESSED_KEYS", {}, {root:true});
+                dispatch("dashboardState/stopPlaying", {}, {root:true});
+                setTimeout(() => {
+                    rootState.toneState.tone.Transport.stop();
+                    rootState.toneState.tone.Transport.cancel();
+                    commit("SET_IS_LOADING", false);
+                }, 10)
+            }, 100);
+           
         }
     }
 }
