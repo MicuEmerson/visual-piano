@@ -36,13 +36,13 @@ export default {
                     let interval = setInterval(() => {
                         if(this.dashboardState.playing === PlayingState.PLAY) {
                             this.playingPercent = this.counter * 100 / this.playlistState.currentSongDuration;
-                            this.counter += 0.25;
+                            this.counter = this.counter + 0.25 * this.dashboardState.speed / 100;
 
                             if (this.counter >= this.playlistState.currentSongDuration) {
                                 clearInterval(interval);
                             }
                         }
-                    }, 250);
+                    }, 250 * this.dashboardState.speed / 100);
                 }, this.canvasState.waterfallDelay)
             );
         },
