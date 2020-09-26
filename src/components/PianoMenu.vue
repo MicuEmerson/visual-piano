@@ -109,16 +109,20 @@
                         </div>
 
                         <div class="button-group">
-                            <v-dialog v-model="dialog" fullscreen hide-overlay transition="dialog-bottom-transition">
+                            <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
                                     <button
+                                        @click="dialog = true"
                                         v-bind="attrs"
                                         v-on="on">
                                     <v-icon class="piano-icon">mdi-information-outline</v-icon>
                                     </button>
                                 </template>
-                                
-                                <!-- <AboutDialog :onClose="onCloseAboutDialog"></AboutDialog> -->
+                                <span>About</span>
+                            </v-tooltip>
+
+                            <v-dialog v-model="dialog" fullscreen hide-overlay transition="dialog-bottom-transition">
+                                <AboutDialog :onClose="onCloseAboutDialog"></AboutDialog>
                             </v-dialog>
 
                             <button @click="showConfig()"><v-icon class="piano-icon">{{configIcon}}</v-icon></button>
@@ -244,6 +248,10 @@ export default {
                     this.toneState.tone.Transport.start();
                 }
             }
+        },
+
+        onCloseAboutDialog() {
+            this.dialog = false;
         },
         
         whiteNoteColorChanged: function(e) {
