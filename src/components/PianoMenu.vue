@@ -53,7 +53,6 @@
                         <v-select
                             v-model="currentSongPlaylist" 
                             :items="playlistState.songs"
-                            @change="onChangeSong"
                             item-text="name"
                             :menu-props="{ auto: true, maxHeight: 50 }"
                             return-object
@@ -165,8 +164,7 @@
                             track-color="#dcdcdc"
                         ></v-slider>
                     </div>
-                </v-col>
-
+                </v-col>}
                 <v-col cols="12" sm="4" md="3"> 
                     <div class="config" :style="{fontSize: fontSize + 'em', minHeight: 6 * fontSize + 'em'}">
                         <label>Speed</label>
@@ -217,12 +215,6 @@
                 </v-col>
             </v-row>
         </v-container>
-
-        <!-- <v-overlay :value="isLoading">
-            <button @click="isLoading=false"> Close </button>
-            <v-progress-circular indeterminate>
-            </v-progress-circular>
-        </v-overlay> -->
     </div>
 </template>
 
@@ -235,7 +227,6 @@ export default {
 
     data: () => {
         return {
-            isLoading: false,
             sustainImageHover: false,
             isPlaying: false,
             playingPercent: 0,
@@ -259,15 +250,7 @@ export default {
                 this.setPlaying();
             }
         },
-
-        onChangeSong: function() {
-            this.isLoading = true;
-        },
-
-        onCloseAboutDialog: function() {
-            this.dialog = false;
-        },
-
+        
         whiteNoteColorChanged: function(e) {
             this.$store.dispatch("dashboardState/whiteNoteColorChanged", e.target.value)
         },
@@ -380,7 +363,6 @@ export default {
 </script>
 
 <style>
-
 .top-nav {
     background-color: var(--v-primary-base);
     padding: 2px 12px !important;
@@ -494,5 +476,4 @@ export default {
 .v-slider__thumb-label {
     color: var(--v-primary-base) !important;
 }
-
 </style>

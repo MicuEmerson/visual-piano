@@ -2,7 +2,9 @@
   <div id="app" data-app>
     <pianoMenu> </pianoMenu>
     <canvas style="background: url('./images/black.jpg')"> </canvas>
-    <piano>  </piano>
+    <piano> </piano>
+    <saveSongDialog> </saveSongDialog>
+    <loadingDialog> </loadingDialog>
   </div>
 </template>
 
@@ -10,10 +12,12 @@
 import PianoMenu from "./components/PianoMenu";
 import Piano from "./components/Piano";
 import CanvasMessage from "./utils/CanvasMessages"
+import SaveSongDialog from "./components/SaveSongDialog"
+import LoadingDialog from "./components/LoadingDialog"
 import { mapState, mapActions } from 'vuex';
 
 export default {
-  components : { Piano, PianoMenu },
+  components : { Piano, PianoMenu, SaveSongDialog, LoadingDialog },
  
   created(){
     window.addEventListener("resize", this.resize);
@@ -113,5 +117,4 @@ input:focus {
   background: #555;
   border-radius: 2px;
 }
-
 </style>
