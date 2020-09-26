@@ -117,7 +117,7 @@
                                     </button>
                                 </template>
                                 
-                                <AboutDialog :onClose="onCloseAboutDialog"></AboutDialog>
+                                <!-- <AboutDialog :onClose="onCloseAboutDialog"></AboutDialog> -->
                             </v-dialog>
 
                             <button @click="showConfig()"><v-icon class="piano-icon">{{configIcon}}</v-icon></button>

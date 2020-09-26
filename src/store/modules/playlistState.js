@@ -147,18 +147,16 @@ export default {
 
         stopPlaying({dispatch, rootState, commit}, currentSong){
             commit("SET_IS_LOADING", true);
+            dispatch("clearTimes");
+            commit("keyboardState/CLEAR_PRESSED_KEYS", {}, {root:true});
+            dispatch("dashboardState/stopPlaying", {}, {root:true});
+              
             setTimeout(() => {
+                rootState.toneState.tone.Transport.stop();
+                rootState.toneState.tone.Transport.cancel();
                 dispatch("changeSong", currentSong);
-                dispatch("clearTimes");
-                commit("keyboardState/CLEAR_PRESSED_KEYS", {}, {root:true});
-                dispatch("dashboardState/stopPlaying", {}, {root:true});
-                setTimeout(() => {
-                    rootState.toneState.tone.Transport.stop();
-                    rootState.toneState.tone.Transport.cancel();
-                    commit("SET_IS_LOADING", false);
-                }, 10)
-            }, 100);
-           
+                commit("SET_IS_LOADING", false);
+            }, 10)
         }
     }
 }
