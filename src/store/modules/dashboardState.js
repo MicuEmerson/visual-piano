@@ -3,8 +3,7 @@ export default {
 
     state: {
         showConfig : false,
-        startOctave: 2,
-        endOctave: 6,
+        octaves: [2, 6],
         maxEndOctave: 8,
         editKeys : false,
         showKeys : false,
@@ -13,17 +12,16 @@ export default {
         whiteNoteColor: "#1eb7eb",
         blackNoteColor: "#f9bb2d",
         sustain: true,
+        volume: 100,
+        speed: 100,
     },
 
     mutations: {
         SET_SHOW_CONFIG(state, showConfig){
             state.showConfig = showConfig;
         },
-        SET_START_OCTAVE(state, startOctave){
-            state.startOctave = startOctave;
-        },
-        SET_END_OCTAVE(state, endOctave){
-            state.endOctave = endOctave;
+        SET_OCTAVES(state, octaves){
+            state.octaves = octaves[0] > octaves[1] ? octaves.reverse() : octaves;
         },
         SET_EDIT_KEYS(state, editKeys){
             state.editKeys = editKeys;
@@ -48,20 +46,35 @@ export default {
         },
         SET_SUSTAIN(state, sustain){
             state.sustain = sustain;
+        },
+        SET_VOLUME(state, volume){
+            state.volume = volume;
+        },
+        SET_SPEED(state, speed){
+            state.speed = speed;
         }
     },
 
     actions: {
-        changeStartOctave({ commit, dispatch }, startOctave){
-            commit("SET_START_OCTAVE", startOctave);
+        changeOctaves({ commit, dispatch }, octaves){
+            commit("SET_OCTAVES", octaves);
             dispatch("keyboardState/generateNotes", {}, {root:true});
             dispatch("keyboardState/generateNotesIndexesByKey", {}, {root:true});
         }, 
 
-        changeEndOctave({ commit, dispatch }, endOctave){
-            commit("SET_END_OCTAVE", endOctave);
-            dispatch("keyboardState/generateNotes", {}, {root:true});
-            dispatch("keyboardState/generateNotesIndexesByKey", {}, {root:true});
+        changeVolume({ commit, rootState }, volume) {
+            commit("SET_VOLUME", volume);
+            if (volume === 0) {
+                rootState.toneState.sampler.volume.value = -1000;
+            }
+            else {
+                rootState.toneState.sampler.volume.value = volume * 0.3 - 30;
+            }
+        },
+
+        changeSpeed({ commit, rootState }, speed) {
+            commit("SET_SPEED", speed);
+            rootState.toneState.tone.Transport.bpm.value = speed * 1.2;
         },
 
         setPlaying({ commit, dispatch, state }){

@@ -2,7 +2,7 @@
     <div id="piano-menu" style="width: 100%">
         <v-container fluid class="top-nav">
             <v-row style="align-items: center">
-                <v-col cols="12" sm="4" class="no-default-vertical-padding"> 
+                <v-col cols="12" md="4" class="no-default-vertical-padding"> 
                     <div class="buttons-section">
                         <div class="button-group">
                             <v-icon class="piano-icon">mdi-piano</v-icon>
@@ -48,7 +48,7 @@
                     </div>
                 </v-col>
 
-                <v-col cols="12" sm="4" class="no-default-vertical-padding"> 
+                <v-col cols="12" md="4" class="no-default-vertical-padding"> 
                     <div class="screen">
                         <v-select
                             v-model="currentSongPlaylist" 
@@ -62,7 +62,7 @@
                     </div>
                 </v-col>
 
-                <v-col cols="12" sm="4" class="no-default-vertical-padding"> 
+                <v-col cols="12" md="4" class="no-default-vertical-padding"> 
                     <div class="buttons-section"> 
                         <div class="button-group">
                              <v-tooltip bottom>
@@ -117,18 +117,7 @@
                                     </button>
                                 </template>
                                 
-                                <v-card dark>
-                                    <v-card-title>
-                                        <button @click="dialog = false">
-                                            <v-icon class="piano-icon">mdi-close</v-icon>
-                                        </button>
-                                        About
-                                    </v-card-title>
-
-                                    <v-card-text>
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc sit amet commodo massa. Phasellus lacinia eros vel tristique scelerisque. Donec sodales, sem eu pharetra maximus, augue mi ultrices lorem, ut fringilla lorem nulla id nisl. Phasellus tincidunt purus tortor, sed vehicula erat sollicitudin sed. Phasellus vehicula laoreet diam vel interdum. Cras in erat orci. Phasellus imperdiet ultricies dui sed aliquam. Vivamus non accumsan lorem.
-                                    </v-card-text>
-                                </v-card>
+                                <AboutDialog :onClose="onCloseAboutDialog"></AboutDialog>
                             </v-dialog>
 
                             <button @click="showConfig()"><v-icon class="piano-icon">{{configIcon}}</v-icon></button>
@@ -136,12 +125,20 @@
                     </div>
                 </v-col>
             </v-row>
-            <v-row>
-                <v-progress-linear v-if="isPlaying" style="position: absolute" color="#ffb200" :value="playingPercent"></v-progress-linear>
+
+            <v-row style="position: relative">
+                <v-progress-linear style="position: absolute" color="#ffb200" :value="playingPercent"> </v-progress-linear>
+            </v-row>
+
+             <v-row style="position: relative">
+                <div style="position: absolute; top: 8px; right:8px; color: white">
+                    {{ playingPercent }}:{{ playingPercent }} 
+                </div>
             </v-row>
         </v-container>
 
         <v-container text-xs-center fluid :class="dashboardState.showConfig ? 'height-auto': 'height-zero'" class="sub-top-nav">
+            
             <v-row justify="center" align="center">
                 <v-col cols="12" sm="4" md="3"> 
                     <div @click="editKeys()" class="config config-button" :style="{fontSize: fontSize + 'em', minHeight: 6 * fontSize + 'em'}">
@@ -154,6 +151,8 @@
                     <div class="config" :style="{fontSize: fontSize + 'em', minHeight: 6 * fontSize + 'em'}">
                         <label>Volume</label>
                         <v-slider
+                            @change="handleVolume"
+                            :value="dashboardState.volume"
                             style="margin-left: 1em"
                             dense
                             hide-details
@@ -163,7 +162,6 @@
                             thumb-size="24"
                             color="#ffb200"
                             track-color="#dcdcdc"
-                            v-model="volume"
                         ></v-slider>
                     </div>
                 </v-col>}
@@ -171,16 +169,17 @@
                     <div class="config" :style="{fontSize: fontSize + 'em', minHeight: 6 * fontSize + 'em'}">
                         <label>Speed</label>
                         <v-slider
+                            @change="handleSpeed"
+                            :value="dashboardState.speed"
                             style="margin-left: 1em"
                             dense
                             hide-details
                             thumb-label
-                            min="0"
-                            max="100"
+                            min="30"
+                            max="170"
                             thumb-size="24"
                             color="#ffb200"
                             track-color="#dcdcdc"
-                            v-model="speed"
                         ></v-slider>
                     </div>
                 </v-col>
@@ -189,26 +188,29 @@
                     <div class="config" :style="{fontSize: fontSize + 'em', minHeight: 6 * fontSize + 'em'}">
                        <label>Octave</label>
                         <v-range-slider
+                            @change="octaveChanged"
+                            :value="dashboardState.octaves"
+                            ticks="always"
+                            tick-size="4"
                             style="margin-left: 1em"
                             dense
                             hide-details
                             thumb-label
                             min="1"
-                            max="7"
+                            :max="dashboardState.maxEndOctave"
                             thumb-size="24"
                             color="#ffb200"
                             track-color="#dcdcdc"
-                            v-model="octaves"
                         ></v-range-slider>
                     </div>
                 </v-col>
 
                 <v-col cols="12" sm="4" md="3"> 
                     <div class="config" :style="{fontSize: fontSize + 'em', minHeight: 6 * fontSize + 'em'}">
-                        <label>White note</label>
-                        <input style="margin-left: 1em" :value="dashboardState.whiteNoteColor" type="color" @change="whiteNoteColorChanged"/>
-                        <label>Black note</label>
-                        <input style="margin-left: 1em" :value="dashboardState.blackNoteColor" type="color" @change="blackNoteColorChanged"/>
+                        <label style="text-align: center">White note</label>
+                        <input style="margin-left: 0.5em; margin-right: 0.5em" :value="dashboardState.whiteNoteColor" type="color" @change="whiteNoteColorChanged"/>
+                        <label style="text-align: center">Black note</label>
+                        <input style="margin-left: 0.5em" :value="dashboardState.blackNoteColor" type="color" @change="blackNoteColorChanged"/>
                     </div>
                 </v-col>
             </v-row>
@@ -218,18 +220,17 @@
 
 <script>
 import { mapState, mapActions } from 'vuex';
+import AboutDialog from './AboutDialog';
 
 export default {
+    components: { AboutDialog },
+
     data: () => {
         return {
             sustainImageHover: false,
             isPlaying: false,
             playingPercent: 0,
-            dialog: false,
-            volume: 100,
-            speed: 50,
-            octaves: [2, 4],
-            blackNoteColor: "#f9bb2d"
+            dialog: false
         }
     },
 
@@ -249,7 +250,7 @@ export default {
                 this.setPlaying();
             }
         },
-
+        
         whiteNoteColorChanged: function(e) {
             this.$store.dispatch("dashboardState/whiteNoteColorChanged", e.target.value)
         },
@@ -284,18 +285,23 @@ export default {
         },
 
         handleSutain(){
-             this.$store.commit("dashboardState/SET_SUSTAIN", !this.dashboardState.sustain)
+            this.$store.commit("dashboardState/SET_SUSTAIN", !this.dashboardState.sustain)
         },
 
-        setStartOctave(value){
-            this.$store.dispatch("dashboardState/changeStartOctave", value)
+        handleVolume(volume){
+            this.$store.dispatch("dashboardState/changeVolume", volume)
         },
 
-        setEndOctave(value){
-            this.$store.dispatch("dashboardState/changeEndOctave", value)
-        }
-    },    
-    
+        handleSpeed(speed){
+            this.$store.dispatch("dashboardState/changeSpeed", speed)
+        },
+
+        octaveChanged: function(value) {
+            this.$store.dispatch("dashboardState/changeOctaves", Object.values(value))
+            setTimeout(() => this.$root.$emit("resize_canvas_notes"), 100);
+        },
+    }, 
+
     computed: {
         ...mapState(['dashboardState', 'toneState', 'playlistState', 'recordingState']),
 
@@ -358,14 +364,14 @@ export default {
 
 <style>
 .top-nav {
-    background-color: #111111;
+    background-color: var(--v-primary-base);
     padding: 2px 12px !important;
 }
 
 .sub-top-nav {
     display: flex;
-    background-color: #222;
-    color: gainsboro;
+    background-color: var(--v-secondary-base);
+    color: var(--v-text-base);
     position: absolute;
     z-index: 1;
     width: 100%;
@@ -375,13 +381,13 @@ export default {
 .height-auto {
     overflow: hidden;
     transition: max-height 1s;
-    max-height: 290px;
+    max-height: 355px;
 }
 
 .height-zero {
     overflow: hidden;
     transition: max-height 1s;
-    max-height: 0px;
+    max-height: 0;
 }
 
 .top-nav .screen {
@@ -400,19 +406,19 @@ export default {
 }
 
 .piano-icon {
-    color: gainsboro !important;
+    color: var(--v-text-base) !important;
     margin: 0 5px;
 }
 
 .piano-icon:hover {
-    color:#ffb200 !important;
+    color:var(--v-accent-base) !important;
 }
 
 .config {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #111111;
+    background-color: var(--v-primary-base);
     height: 100%;
     border-radius: 0.5em;
     padding: 0 2em;
@@ -423,7 +429,7 @@ export default {
 }
 
 .config-button:hover {
-    color:#ffb200;
+    color:var(--v-accent-base);
 }
 
 .sustain-button {
@@ -464,10 +470,10 @@ export default {
 }
 
 .v-icon.v-icon{
-    font-size: 2em;
+    font-size: 1.5em;
 }  
 
 .v-slider__thumb-label {
-    color: #111111 !important;
+    color: var(--v-primary-base) !important;
 }
 </style>

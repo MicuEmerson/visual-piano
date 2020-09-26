@@ -32,7 +32,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('canvasState', ['setDrawingDataForCanvas', 'resizeCanvas']),
+    ...mapActions('canvasState', ['resizeCanvas']),
 
     resize() {
       // documnet.getElementById/getElementsByClassName are took from Piano.vue and PianoKeyboard.vue because they are already rendered in resize event eventually happens.
@@ -72,7 +72,6 @@ body, html {
   width: 100%;
   margin: 0 !important;
   padding: 0 !important;
-  text-align: center;
   overflow-y: hidden !important;
 }
  
