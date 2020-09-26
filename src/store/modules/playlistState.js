@@ -15,7 +15,7 @@ export default {
         ],
        currentSong: "",
        timers : [],
-       currentSongDuration: 0,
+       currentSongDuration: 80,
        isLoading : false,
     },
 
@@ -80,6 +80,7 @@ export default {
                                 rootState.toneState.sampler.triggerAttackRelease(note.name, "2n", rootState.toneState.tone.now());
                             }
                         }
+
                     }, rootState.canvasState.waterfallDelay));
               
                 }, note.time)
