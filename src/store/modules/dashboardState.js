@@ -16,6 +16,7 @@ export default {
         sustain: true,
         volume: 100,
         speed: 100,
+        defaultSpeed: 100
     },
 
     mutations: {
@@ -90,9 +91,12 @@ export default {
             commit("SET_PLAYING", playing);
         },
 
-        stopPlaying({ commit, dispatch }){
+        stopPlaying({ commit, dispatch, state, rootState }){
             dispatch("canvasState/stopSong", {}, {root:true});
             commit("SET_PLAYING", PlayingState.STOP);
+
+            commit("SET_SPEED", state.defaultSpeed);
+            rootState.toneState.tone.Transport.bpm.value = state.defaultSpeed * 1.2;
         },
 
         whiteNoteColorChanged({ state, commit, dispatch }, color){
