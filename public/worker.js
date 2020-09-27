@@ -60,8 +60,8 @@ function handleSetWaterfall(val){
 
 function handleStopSong(){
   playingState = 3;
-  handleSetWaterfall(false);
   clearAllInterval();
+  handleSetWaterfall(false);
   context.clearRect(0, 0, canvas.width, canvas.height);
 }
 

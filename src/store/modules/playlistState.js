@@ -63,14 +63,13 @@ export default {
 
         prepareNotes({state, rootState, commit, dispatch}, {notes, lastSong}) {
             notes.forEach((note, i) => {
-
                 if(lastSong && i === notes.length - 1){
                     commit("SET_CURRENT_SONG_DURATION", note.time + note.duration);
                 }
                 
                 rootState.toneState.tone.Transport.schedule(() => {
                     commit("ADD_TIMER", new Timer(() => {
-                       
+                        
                         if(state.currentSong.fromPlaylist){
                             rootState.toneState.sampler.triggerAttackRelease(note.name, note.duration, rootState.toneState.tone.now(), note.velocity);
                         } else {
@@ -99,7 +98,7 @@ export default {
                 }
        
                 rootState.toneState.tone.Transport.schedule(time => {
-                    rootState.toneState.tone.Draw.schedule(() => {
+                    // rootState.toneState.tone.Draw.schedule(() => {
                         if(index != null){
                             commit("ADD_TIMER", new Timer(() => {
                                 commit("keyboardState/SET_NOTE_PRESSED", {index, forBlackNote, pressed : true}, {root:true});
@@ -107,11 +106,11 @@ export default {
                             
                             dispatch("canvasState/startDrawNote", {noteName : note.name, forBlackNote}, {root:true});
                         }
-                    }, time)
+                    // }, time)
                 }, note.time)
       
                 rootState.toneState.tone.Transport.schedule(time => {
-                    rootState.toneState.tone.Draw.schedule(() => {
+                    // rootState.toneState.tone.Draw.schedule(() => {
                         if(index != null){
                             commit("ADD_TIMER", new Timer(() => {
 
@@ -129,7 +128,7 @@ export default {
 
                             dispatch("canvasState/stopDrawNote", {noteName : note.name, forBlackNote}, {root:true});
                         }
-                    }, time)
+                    // }, time)
                 }, note.time + note.duration)
       
             })
@@ -150,7 +149,7 @@ export default {
             dispatch("clearTimes");
             commit("keyboardState/CLEAR_PRESSED_KEYS", {}, {root:true});
             dispatch("dashboardState/stopPlaying", {}, {root:true});
-              
+            
             setTimeout(() => {
                 rootState.toneState.tone.Transport.stop();
                 rootState.toneState.tone.Transport.cancel();
