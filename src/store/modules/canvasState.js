@@ -82,7 +82,6 @@ export default {
         },
 
         pauseOrResumeSong({state}, playing){
-            playing = playing ? 1 : 2;
             state.worker.postMessage({ messageType : CanvasMessage.PAUSE_SONG, playing});
         },
 

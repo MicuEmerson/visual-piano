@@ -58,6 +58,7 @@
                             return-object
                             hide-details
                             solo
+                            placeholder="Songs"
                         ></v-select>
                     </div>
                 </v-col>
@@ -108,16 +109,20 @@
                         </div>
 
                         <div class="button-group">
-                            <v-dialog v-model="dialog" fullscreen hide-overlay transition="dialog-bottom-transition">
+                            <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
                                     <button
+                                        @click="dialog = true"
                                         v-bind="attrs"
                                         v-on="on">
                                     <v-icon class="piano-icon">mdi-information-outline</v-icon>
                                     </button>
                                 </template>
-                                
-                                <!-- <AboutDialog :onClose="onCloseAboutDialog"></AboutDialog> -->
+                                <span>About</span>
+                            </v-tooltip>
+
+                            <v-dialog v-model="dialog" fullscreen hide-overlay transition="dialog-bottom-transition">
+                                <AboutDialog :onClose="onCloseAboutDialog"></AboutDialog>
                             </v-dialog>
 
                             <button @click="showConfig()"><v-icon class="piano-icon">{{configIcon}}</v-icon></button>
@@ -125,17 +130,10 @@
                     </div>
                 </v-col>
             </v-row>
-
-            <v-row style="position: relative">
-                <v-progress-linear style="position: absolute" color="#ffb200" :value="playingPercent"> </v-progress-linear>
-            </v-row>
-
-             <v-row style="position: relative">
-                <div style="position: absolute; top: 8px; right:8px; color: white">
-                    {{ playingPercent }}:{{ playingPercent }} 
-                </div>
-            </v-row>
         </v-container>
+        
+        <SongDurationProgressBar v-if="dashboardState.playing !== 3 || recordingState.isRecording">
+        </SongDurationProgressBar>
 
         <v-container text-xs-center fluid :class="dashboardState.showConfig ? 'height-auto': 'height-zero'" class="sub-top-nav">
             
@@ -164,7 +162,8 @@
                             track-color="#dcdcdc"
                         ></v-slider>
                     </div>
-                </v-col>}
+                </v-col>
+
                 <v-col cols="12" sm="4" md="3"> 
                     <div class="config" :style="{fontSize: fontSize + 'em', minHeight: 6 * fontSize + 'em'}">
                         <label>Speed</label>
@@ -221,15 +220,15 @@
 <script>
 import { mapState, mapActions } from 'vuex';
 import AboutDialog from './AboutDialog';
+import SongDurationProgressBar from './SongDurationProgressBar';
+import { PlayingState } from "../utils/PlayingState";
 
 export default {
-    components: { AboutDialog },
+    components: { AboutDialog, SongDurationProgressBar },
 
     data: () => {
         return {
             sustainImageHover: false,
-            isPlaying: false,
-            playingPercent: 0,
             dialog: false
         }
     },
@@ -241,14 +240,18 @@ export default {
         togglePlay() {
             if(this.playlistState.currentSong != ""){
 
-                if (this.dashboardState.playing) {
+                if (this.dashboardState.playing === PlayingState.PLAY) {
+                    this.setPlaying(PlayingState.PAUSE);
                     this.toneState.tone.Transport.pause();
                 } else {
-                    this.toneState.tone.Transport.start()
+                    this.setPlaying(PlayingState.PLAY);
+                    this.toneState.tone.Transport.start();
                 }
-
-                this.setPlaying();
             }
+        },
+
+        onCloseAboutDialog() {
+            this.dialog = false;
         },
         
         whiteNoteColorChanged: function(e) {
@@ -306,11 +309,11 @@ export default {
         ...mapState(['dashboardState', 'toneState', 'playlistState', 'recordingState']),
 
         playIcon: function() {
-            return this.dashboardState.playing ? 'mdi-pause' : 'mdi-play';
+            return this.dashboardState.playing === PlayingState.PLAY ? 'mdi-pause' : 'mdi-play';
         },
 
         playIconTooltip: function() {
-            return this.dashboardState.playing ? 'Pause' : 'Play';
+            return this.dashboardState.playing === PlayingState.PLAY ? 'Pause' : 'Play';
         },
 
         notesIcon: function() {

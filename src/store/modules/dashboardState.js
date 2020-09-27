@@ -1,3 +1,5 @@
+import { PlayingState } from "../../utils/PlayingState";
+
 export default {
     namespaced: true,
 
@@ -8,12 +10,13 @@ export default {
         editKeys : false,
         showKeys : false,
         showNotes: false,
-        playing: false,
+        playing: PlayingState.STOP,
         whiteNoteColor: "#1eb7eb",
         blackNoteColor: "#f9bb2d",
         sustain: true,
         volume: 100,
         speed: 100,
+        defaultSpeed: 100
     },
 
     mutations: {
@@ -77,20 +80,23 @@ export default {
             rootState.toneState.tone.Transport.bpm.value = speed * 1.2;
         },
 
-        setPlaying({ commit, dispatch, state }){
-            if(state.playing){
+        setPlaying({ commit, dispatch }, playing){
+            if(playing === PlayingState.PAUSE){
                 dispatch("playlistState/pauseTimers", {}, {root:true});
-            } else{
+            } else {
                 dispatch("playlistState/resumeTimers", {}, {root:true});
             }
 
-            dispatch("canvasState/pauseOrResumeSong", !state.playing, {root:true});
-            commit("SET_PLAYING", !state.playing);
+            dispatch("canvasState/pauseOrResumeSong", playing, {root:true});
+            commit("SET_PLAYING", playing);
         },
 
-        stopPlaying({ commit, dispatch }){
+        stopPlaying({ commit, dispatch, state, rootState }){
             dispatch("canvasState/stopSong", {}, {root:true});
-            commit("SET_PLAYING", false);
+            commit("SET_PLAYING", PlayingState.STOP);
+
+            commit("SET_SPEED", state.defaultSpeed);
+            rootState.toneState.tone.Transport.bpm.value = state.defaultSpeed * 1.2;
         },
 
         whiteNoteColorChanged({ state, commit, dispatch }, color){
