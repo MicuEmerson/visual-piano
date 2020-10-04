@@ -59,10 +59,14 @@ function handleSetWaterfall(val){
 }
 
 function handleStopSong(){
-  playingState = 3;
-  clearAllInterval();
-  handleSetWaterfall(false);
-  context.clearRect(0, 0, canvas.width, canvas.height);
+  // there is a case which after we handleStopSong and clear all intervals there will be another push to the interval
+  // we take care of that case with this setTimeout
+  setTimeout(() => {
+    playingState = 3;
+    clearAllInterval();
+    handleSetWaterfall(false);
+    context.clearRect(0, 0, canvas.width, canvas.height);
+  }, 100);
 }
 
 function clearAllInterval(){
