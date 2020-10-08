@@ -17,6 +17,7 @@ var dataMap = {}; // Helper map where we keep handleStartDrawnNote info like (se
                   // We need this because in the handleStopDrawnNote we use this info to clearout the setInterval from handleStartDrawnNote 
                   // and to get the final height of the note + yPosition and after we start again a setInterval with this data
 var allIntervalRefs = [];
+var allNotes = [];
 
 onmessage = function(e) {
   const {canvas, messageType, resizeData, drawNote, playing, colors} = e.data;
@@ -42,6 +43,7 @@ onmessage = function(e) {
 function handleInit(canvasData){
   canvas = canvasData;
   context = canvas.getContext("2d");
+  secventialDrawningNotes();
 }
 
 function handleResize({height, width, whiteWidth, blackWidth, array}){
@@ -59,113 +61,94 @@ function handleSetWaterfall(val){
 }
 
 function handleStopSong(){
-  // there is a case which after we handleStopSong and clear all intervals there will be another push to the interval
-  // we take care of that case with this setTimeout
+  // there is a chance to receive a draw msg after a stop msg (because lack of sync), but we take care of this case with this setTimeout 100ms
   setTimeout(() => {
     playingState = 3;
-    clearAllInterval();
+    clearAllNotes();
     handleSetWaterfall(false);
     context.clearRect(0, 0, canvas.width, canvas.height);
   }, 100);
 }
 
-function clearAllInterval(){
-  allIntervalRefs.forEach(interval => clearInterval(interval));
-  allIntervalRefs.splice(0, allIntervalRefs.length);
+function clearAllNotes(){
+  allNotes.splice(0, allNotes.length);
 }
-
 
 function handleStartDrawnNote(drawNote){
   const {noteName, forBlackNote} = drawNote;
 
-  dataMap[noteName] = {};
-  dataMap[noteName].noteHeight = 1;
-  dataMap[noteName].yPosition = waterfall ? 0 : canvas.height;
-
-  let noteSetInterval = setInterval(function() {
-
-    if(!waterfall){
-      --dataMap[noteName].yPosition;
-      ++dataMap[noteName].noteHeight;
-    }
-
-    if(waterfall && playingState === 1){
-      ++dataMap[noteName].noteHeight;
-    }
-
-    if(waterfall && playingState === 3) {
-      clearInterval(noteSetInterval);
-      context.clearRect(0, 0, canvas.width, canvas.height);
-    } else {
-      drawAnimationNote(noteName, forBlackNote, dataMap[noteName].yPosition, dataMap[noteName].noteHeight);
-    }
-
-  }, animationSpeed);
-
-  allIntervalRefs.push(noteSetInterval);
-  
-  dataMap[noteName].noteSetInterval = noteSetInterval;
+  allNotes.push({
+    noteHeight : 1,
+    yPosition : (waterfall ? 0 : canvas.height),
+    stop: false,
+    noteName,
+    forBlackNote
+  });
 }
 
 function handleStopDrawnNote(drawNote){
-  const {noteName, forBlackNote} = drawNote;
+  const {noteName} = drawNote;
 
-  clearInterval(dataMap[noteName].noteSetInterval);
-  
-  let yPosition = dataMap[noteName].yPosition;
-  let noteHeight = dataMap[noteName].noteHeight;
-
-  let noteSetInterval = setInterval(function() {
-
-    if(!waterfall){
-      --yPosition;
+  // maybe we can optimize?
+  for(let i = 0; i < allNotes.length; i++){
+    if(allNotes[i].noteName === noteName){
+      allNotes[i].stop = true;
     }
+  }
+}
 
-    if(waterfall && playingState === 1){
-        ++yPosition;
-    }
+function secventialDrawningNotes() {
+  setInterval(() => {
+      allNotes = allNotes.filter(note => {
+        if(waterfall){
+          return note.yPosition < canvas.height + note.noteHeight;
+        }
+        else {
+          return note.yPosition + note.noteHeight >= 0; 
+        }
+      });
 
-    if(waterfall && yPosition >= canvas.height + noteHeight){
-      clearInterval(noteSetInterval);
-    }
-    else if(!waterfall && yPosition + noteHeight < 0){
-      clearInterval(noteSetInterval);
-    }
-    else if(waterfall && playingState === 3) {
-      clearInterval(noteSetInterval);
-      context.clearRect(0, 0, canvas.width, canvas.height);
-    } 
-    else {
-      drawAnimationNote(noteName, forBlackNote, yPosition, noteHeight);
-    }
+      for(let i = 0; i < allNotes.length; i++){
+        if(allNotes[i].stop === false) {
 
+          if(waterfall === true && playingState === 1){
+            allNotes[i].noteHeight += 1;
+          } 
+          else if(waterfall === false){
+            allNotes[i].yPosition -= 1;
+            allNotes[i].noteHeight += 1;
+          }
+          
+        } else {
+          if(waterfall === true && playingState === 1){
+            allNotes[i].yPosition += 1
+          } else if(waterfall === false){
+            allNotes[i].yPosition -= 1;
+          }
+        }
+
+        drawAnimationNote(allNotes[i].noteName, allNotes[i].forBlackNote, allNotes[i].yPosition, allNotes[i].noteHeight);
+      }
   }, animationSpeed);
 
-  allIntervalRefs.push(noteSetInterval);
 }
 
 function drawAnimationNote(noteName, forBlackNote, yPosition, noteHeight) {
-  context.fillStyle = forBlackNote ?  noteColors.blackNoteColor : noteColors.whiteNoteColor;
+  context.fillStyle = forBlackNote ? noteColors.blackNoteColor : noteColors.whiteNoteColor;
  
   let noteWidth = forBlackNote ? blackNoteWidth : whiteNoteWidth;
-  let finalYPosition = yPosition;
+  let offsetForXPosition = Math.floor(noteWidth * 0.2 / 2);
+  let offsetForYPosition = waterfall ? 1 : -1;
 
-  if(waterfall){
-    finalYPosition -= 2;
-  } else {
-    finalYPosition += 2;
-  }
+  noteWidth = Math.floor(noteWidth * 0.8);
 
-  context.clearRect(canvasDataIndexesByNote[noteName],
-      finalYPosition,
+  context.clearRect(canvasDataIndexesByNote[noteName] + offsetForXPosition,
+      yPosition - offsetForYPosition,
       noteWidth,
       noteHeight);
-  
-  let offsetForXPosition = noteWidth * 0.2 / 2;
-  noteWidht = noteWidth * 0.8;
 
   context.fillRect(canvasDataIndexesByNote[noteName] + offsetForXPosition, 
       yPosition,
-      noteWidht,
-      noteHeight - 2);
+      noteWidth,
+      noteHeight - 1);
 }
