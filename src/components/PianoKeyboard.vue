@@ -106,7 +106,8 @@ export default {
     ...mapActions('canvasState', ['setDrawingDataForCanvas', 'initCanvas']),
 
     handleInput(value, key, index, forBlackNote){
-      this.changeInput({value, key, index, forBlackNote});
+      if(value !== '')
+        this.changeInput({value, key, index, forBlackNote});
     },
 
     whiteNoteBackground: function(pressed){

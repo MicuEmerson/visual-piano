@@ -94,7 +94,7 @@
                                 <template v-slot:activator="{ on, attrs }">
                                     <button 
                                         class="sustain-button"
-                                        @click="handleSutain()"
+                                        @click="handleSustain()"
                                         v-bind="attrs"
                                         v-on="on">
 
@@ -132,8 +132,7 @@
             </v-row>
         </v-container>
         
-        <SongDurationProgressBar v-if="dashboardState.playing !== 3 || recordingState.isRecording">
-        </SongDurationProgressBar>
+        <SongDurationProgressBar v-if="dashboardState.playing !== 3 || recordingState.isRecording"></SongDurationProgressBar>
 
         <v-container text-xs-center fluid :class="dashboardState.showConfig ? 'height-auto': 'height-zero'" class="sub-top-nav">
             
@@ -272,7 +271,12 @@ export default {
 
         editKeys(){
             this.$store.commit("dashboardState/SET_EDIT_KEYS", !this.dashboardState.editKeys);
-            this.$store.commit("dashboardState/SET_SHOW_KEYS", !this.dashboardState.showKeys);
+
+            if(this.dashboardState.editKeys  && !this.dashboardState.showKeys){
+                this.$store.commit("dashboardState/SET_SHOW_KEYS", true);
+            } else if(!this.dashboardState.editKeys) {
+                this.$store.commit("dashboardState/SET_SHOW_KEYS", false);
+            }
         },
 
         showConfig(){
@@ -287,7 +291,7 @@ export default {
             this.$store.commit("dashboardState/SET_SHOW_NOTES", !this.dashboardState.showNotes);
         },
 
-        handleSutain(){
+        handleSustain(){
             this.$store.commit("dashboardState/SET_SUSTAIN", !this.dashboardState.sustain)
         },
 

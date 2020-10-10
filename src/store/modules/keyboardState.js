@@ -57,7 +57,7 @@ export default {
           }
         },
         UPDATE_INDEX_KEY(state, { key, index }){
-            state.notesIndexesByKey[key] = index;
+          state.notesIndexesByKey[key] = index;
         }, 
         DELETE_INDEX_KEY(state, key){
           delete state.notesIndexesByKey[key];
@@ -130,7 +130,7 @@ export default {
       changeInput({ commit }, {value, key, index, forBlackNote}) {
         commit("DELETE_INDEX_KEY", key);
         commit("SET_NOTE_KEY", {value, index, forBlackNote});
-        commit("UPDATE_INDEX_KEY", {key, index})
+        commit("UPDATE_INDEX_KEY", {key:value, index})
       },
 
       generateNotes({ commit, state, rootState }) {

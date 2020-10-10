@@ -130,7 +130,12 @@ export default {
    
     editKeys(){
       this.$store.commit("dashboardState/SET_EDIT_KEYS", !this.dashboardState.editKeys);
-      this.$store.commit("dashboardState/SET_SHOW_KEYS", !this.dashboardState.showKeys);
+
+      if(this.dashboardState.editKeys  && !this.dashboardState.showKeys){
+        this.$store.commit("dashboardState/SET_SHOW_KEYS", true);
+      } else if(!this.dashboardState.editKeys) {
+        this.$store.commit("dashboardState/SET_SHOW_KEYS", false);
+      }
     },
 
     showConfig(){
