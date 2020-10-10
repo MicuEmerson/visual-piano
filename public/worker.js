@@ -13,10 +13,6 @@ var canvasDataIndexesByNote = null; // map where we keep positions of X coordona
 var whiteNoteWidth = null; 
 var blackNoteWidth = null;
 
-var dataMap = {}; // Helper map where we keep handleStartDrawnNote info like (setInterval reference, heigh of the note, yPosition of the note)
-                  // We need this because in the handleStopDrawnNote we use this info to clearout the setInterval from handleStartDrawnNote 
-                  // and to get the final height of the note + yPosition and after we start again a setInterval with this data
-var allIntervalRefs = [];
 var allNotes = [];
 
 onmessage = function(e) {
