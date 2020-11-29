@@ -1,9 +1,9 @@
-export default class CanvasMessages {
-    static INIT = "INIT";
-    static RESIZE = "RESIZE";
-    static START_DRAW_NOTE = "START_DRAW_NOTE";
-    static STOP_DRAW_NOTE = "STOP_DRAW_NOTE";
-    static PAUSE_SONG = "PAUSE_SONG";
-    static STOP_SONG = "STOP_SONG";
-    static CHANGE_COLOR = "CHANGE_COLOR";
+export const CanvasMessages = {
+    INIT : "INIT",
+    RESIZE : "RESIZE",
+    START_DRAW_NOTE : "START_DRAW_NOTE",
+    STOP_DRAW_NOTE : "STOP_DRAW_NOTE",
+    PAUSE_SONG : "PAUSE_SONG",
+    STOP_SONG : "STOP_SONG",
+    CHANGE_COLOR : "CHANGE_COLOR"
 }

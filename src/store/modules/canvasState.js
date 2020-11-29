@@ -1,4 +1,4 @@
-import CanvasMessage from "../../utils/CanvasMessages"
+import { CanvasMessages } from "../../utils/CanvasMessages"
 
 export default {
     namespaced: true,
@@ -44,7 +44,7 @@ export default {
     actions: {
         initCanvas({ commit, state }, { offscreenCanvas, workerFile }){
             commit("SET_WORKER", new Worker(workerFile));
-            state.worker.postMessage({ canvas: offscreenCanvas, messageType : CanvasMessage.INIT}, [offscreenCanvas]);
+            state.worker.postMessage({ canvas: offscreenCanvas, messageType : CanvasMessages.INIT}, [offscreenCanvas]);
         },
 
         resizeCanvas({ commit, state }, { height, width, array, whiteWidth, blackWidth, waterfallDelay}){
@@ -63,7 +63,7 @@ export default {
             commit("SET_CANVAS_WATERFALL_DELAY", waterfallDelay);
   
             state.worker.postMessage({ 
-                messageType : CanvasMessage.RESIZE, 
+                messageType : CanvasMessages.RESIZE, 
                 resizeData : {
                     height: Math.floor(height), 
                     width: Math.floor(width), 
@@ -74,23 +74,23 @@ export default {
         },
 
         startDrawNote({state}, drawNote){
-            state.worker.postMessage({ messageType : CanvasMessage.START_DRAW_NOTE, drawNote });
+            state.worker.postMessage({ messageType : CanvasMessages.START_DRAW_NOTE, drawNote });
         },
 
         stopDrawNote({state}, drawNote){
-            state.worker.postMessage({ messageType : CanvasMessage.STOP_DRAW_NOTE, drawNote });
+            state.worker.postMessage({ messageType : CanvasMessages.STOP_DRAW_NOTE, drawNote });
         },
 
         pauseOrResumeSong({state}, playing){
-            state.worker.postMessage({ messageType : CanvasMessage.PAUSE_SONG, playing});
+            state.worker.postMessage({ messageType : CanvasMessages.PAUSE_SONG, playing});
         },
 
         stopSong({state}){
-            state.worker.postMessage({ messageType : CanvasMessage.STOP_SONG, playing : 3});
+            state.worker.postMessage({ messageType : CanvasMessages.STOP_SONG, playing : 3});
         },
 
         changeNoteColors({state}, { blackNoteColor, whiteNoteColor }){
-            state.worker.postMessage({ messageType : CanvasMessage.CHANGE_COLOR, colors : { blackNoteColor, whiteNoteColor }});
+            state.worker.postMessage({ messageType : CanvasMessages.CHANGE_COLOR, colors : { blackNoteColor, whiteNoteColor }});
         }
     }
 }
