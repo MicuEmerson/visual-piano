@@ -1,21 +1,23 @@
 import { Midi } from "@tonejs/midi"
 import Timer  from "../../utils/SetTimeoutTimer"
 
+const SONGS_URL = "./songs/";
+
 export default {
     namespaced: true,
 
     state: {
        songs:[
            {name : "Beethoven - For Elise", fromPlaylist: true },
-           {name : "Bach - Prelude in C Major", fromPlaylist: true },
-           {name : "Chopin - Grande Valse Brillante", fromPlaylist: true },
-           {name : "Mozart - Sonata No. 8", fromPlaylist: true },
+        //    {name : "Bach - Prelude in C Major", fromPlaylist: true },
+        //    {name : "Chopin - Grande Valse Brillante", fromPlaylist: true },
+        //    {name : "Mozart - Sonata No. 8", fromPlaylist: true },
            {name : "Schubert - Six Moments Musicaux", fromPlaylist: true},
            {name : "Sinding - Rustle of Spring", fromPlaylist: true },
         ],
        currentSong: "",
        timers : [],
-       currentSongDuration: 80,
+       currentSongDuration: 0,
        isLoading : false,
     },
 
@@ -137,7 +139,7 @@ export default {
 
         prepareSong({state, dispatch}){
             if(state.currentSong.fromPlaylist){
-                Midi.fromUrl("/audio/" + state.currentSong.name + ".mid").then(midi => {
+                Midi.fromUrl(SONGS_URL + state.currentSong.name + ".mid").then(midi => {
                     midi.tracks.forEach((track, i) => dispatch("prepareNotes", {notes : track.notes, lastSong : midi.tracks.length == i + 1}));
                 });  
             } else {

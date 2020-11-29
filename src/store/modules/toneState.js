@@ -1,6 +1,6 @@
 import * as Tone from 'tone'
 
-const SAMPLE_BASE_URL = "./pianoNotes/";
+const SAMPLE_BASE_URL = "./notes/";
 
 export default {
     namespaced: true,
