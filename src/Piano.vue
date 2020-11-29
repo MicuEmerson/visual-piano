@@ -1,22 +1,22 @@
 <template>
-  <div id="app" data-app>
+  <div id="piano" data-app>
     <PianoMenu> </PianoMenu>
     <canvas style="background: url('./canvas_black_background.jpg')"> </canvas>
-    <Piano> </Piano>
+    <PianoKeyboard> </PianoKeyboard>
     <SaveSongDialog> </SaveSongDialog>
     <LoadingDialog> </LoadingDialog>
   </div>
 </template>
 
 <script>
-import PianoMenu from "./components/PianoMenu";
-import Piano from "./components/Piano";
+import PianoMenu from "./components/piano/PianoMenu";
+import PianoKeyboard from "./components/piano/PianoKeyboard";
 import SaveSongDialog from "./components/dialogs/SaveSongDialog"
 import LoadingDialog from "./components/dialogs/LoadingDialog"
 import { mapState, mapActions } from 'vuex';
 
 export default {
-  components : { Piano, PianoMenu, SaveSongDialog, LoadingDialog },
+  components : { PianoMenu, PianoKeyboard, SaveSongDialog, LoadingDialog },
   
   created(){
     window.addEventListener("resize", this.resize);
@@ -73,7 +73,7 @@ body, html {
   overflow-y: hidden;
 }
  
-#app {
+#piano {
   height: 100%;
   width: 100%;
   display: flex;

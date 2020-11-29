@@ -13,7 +13,7 @@ export default {
         playing: PlayingState.STOP,
         whiteNoteColor: "#1eb7eb",
         blackNoteColor: "#f9bb2d",
-        sustain: true,
+        sustain: false,
         volume: 100,
         speed: 100,
         defaultSpeed: 100

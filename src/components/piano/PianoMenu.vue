@@ -218,9 +218,9 @@
 
 <script>
 import { mapState, mapActions } from 'vuex';
-import AboutDialog from './dialogs/AboutDialog';
-import SongDurationProgressBar from './SongDurationProgressBar';
-import { PlayingState } from "../utils/PlayingState";
+import AboutDialog from '../dialogs/AboutDialog';
+import SongDurationProgressBar from '../SongDurationProgressBar';
+import { PlayingState } from "../../utils/PlayingState";
 
 export default {
     components: { AboutDialog, SongDurationProgressBar },
@@ -352,7 +352,7 @@ export default {
                         'sustain-off-hover' :
                         'sustain-off' 
 
-            return require('../assets/' + imageName + '.png');
+            return require('@/assets/' + imageName + '.png');
         },
 
         currentSongPlaylist: {

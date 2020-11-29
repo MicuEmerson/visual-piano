@@ -1,55 +1,57 @@
 <template>
-    <div class="piano-keyboard">
+    <div id="piano-container">
+      <div class="piano-keyboard">
 
-        <div v-for="(noteObject, index) in keyboardState.notes" :key="index"
-          class="white-note" :class="[noteObject.pressed ? 'white-note-pressed' : '']"
-          :style="{width: keyboardState.whiteNoteWidthSize + '%', background: whiteNoteBackground(noteObject.pressed)}" :data-note="noteObject.note"
-          @mousedown="playNoteMouse({index, forBlackNote : false})" @mouseup="removePressedKeyMouse({index, forBlackNote : false})"
-          @mouseover="playNoteHover({index, forBlackNote : false})" @mouseleave="removePressedKey({index, forBlackNote : false})">
-            
-          <div v-if="noteObject.blackNote" 
-            class="black-note" :class="[noteObject.blackNote.pressed ? 'black-note-pressed' : '']" 
-            :style="{background: blackNoteBackground(noteObject.blackNote.pressed)}" :data-note="noteObject.blackNote.note"
-            @mousedown.stop="playNoteMouse({index, forBlackNote : true})" @mouseup.stop="removePressedKeyMouse({index, forBlackNote : true})"
-            @mouseover.stop="playNoteHover({index, forBlackNote : true})" @mouseleave.stop="removePressedKey({index, forBlackNote : true})">
+          <div v-for="(noteObject, index) in keyboardState.notes" :key="index"
+            class="white-note" :class="[noteObject.pressed ? 'white-note-pressed' : '']"
+            :style="{width: keyboardState.whiteNoteWidthSize + '%', background: whiteNoteBackground(noteObject.pressed)}" :data-note="noteObject.note"
+            @mousedown="playNoteMouse({index, forBlackNote : false})" @mouseup="removePressedKeyMouse({index, forBlackNote : false})"
+            @mouseover="playNoteHover({index, forBlackNote : false})" @mouseleave="removePressedKey({index, forBlackNote : false})">
+              
+            <div v-if="noteObject.blackNote" 
+              class="black-note" :class="[noteObject.blackNote.pressed ? 'black-note-pressed' : '']" 
+              :style="{background: blackNoteBackground(noteObject.blackNote.pressed)}" :data-note="noteObject.blackNote.note"
+              @mousedown.stop="playNoteMouse({index, forBlackNote : true})" @mouseup.stop="removePressedKeyMouse({index, forBlackNote : true})"
+              @mouseover.stop="playNoteHover({index, forBlackNote : true})" @mouseleave.stop="removePressedKey({index, forBlackNote : true})">
 
-            <div class="key-group">
-                <template v-if="menuState.showKeys">
-                  <input :disabled="menuState.editKeys !== true" class="key-input key-input-on-black-note"
-                  :value="noteObject.blackNote.key"
-                  @input="handleInput($event.target.value, noteObject.blackNote.key, index, true)"/>
-                </template>
+              <div class="key-group">
+                  <template v-if="menuState.showKeys">
+                    <input :disabled="menuState.editKeys !== true" class="key-input key-input-on-black-note"
+                    :value="noteObject.blackNote.key"
+                    @input="handleInput($event.target.value, noteObject.blackNote.key, index, true)"/>
+                  </template>
 
-                <template v-if="menuState.showNotes">
-                  <div class="key-text key-text-on-black-note">
-                      {{noteObject.blackNote.note}}
-                  </div>
-                </template>
+                  <template v-if="menuState.showNotes">
+                    <div class="key-text key-text-on-black-note">
+                        {{noteObject.blackNote.note}}
+                    </div>
+                  </template>
+              </div>
+
+            </div> 
+
+            <div class="key-group"> 
+              <template v-if="menuState.showKeys" >
+                <input :disabled="menuState.editKeys !== true" class="key-input"
+                  :value="noteObject.key"
+                  @input="handleInput($event.target.value, noteObject.key, index, false)"/>
+              </template>
+
+              <template v-if="menuState.showNotes">
+                <div class="key-text">
+                  {{noteObject.note}}
+                </div>
+              </template>
             </div>
 
-          </div> 
-
-          <div class="key-group"> 
-            <template v-if="menuState.showKeys" >
-              <input :disabled="menuState.editKeys !== true" class="key-input"
-                :value="noteObject.key"
-                @input="handleInput($event.target.value, noteObject.key, index, false)"/>
-            </template>
-
-            <template v-if="menuState.showNotes">
-              <div class="key-text">
-                {{noteObject.note}}
-              </div>
-            </template>
           </div>
-
-        </div>
+      </div>
     </div>
 </template>
 
 <script>
 import { mapState, mapActions } from "vuex";
-import CanvasMessage from "../utils/CanvasMessages"
+import CanvasMessage from "../../utils/CanvasMessages"
 
 export default {
   
@@ -67,6 +69,8 @@ export default {
   },
 
   created() {
+    this.createSampler();
+    this.createRecorder();    
     this.generateNotes();
     this.generateNotesIndexesByKey();
 
@@ -100,6 +104,10 @@ export default {
   },
 
   methods: {
+    ...mapActions('toneState', ['createSampler']),
+
+    ...mapActions('recordingState', ['createRecorder']),
+
     ...mapActions('keyboardState', ['generateNotes', 'generateNotesIndexesByKey', 'generateCanvasIndexesByNote',
      'playNote', 'playNoteMouse', 'playNoteHover', 'removePressedKey', 'removePressedKeyMouse', 'changeInput']),
 
@@ -126,6 +134,12 @@ export default {
 </script>
 
 <style>
+
+#piano-container {
+  width: 100%;
+  background-color: black;
+}
+
 .piano-keyboard {
   position: relative;
   height: 14vw; /* set height according to width size */
@@ -215,4 +229,5 @@ export default {
   background-color: rgb(60, 60, 60);
   border: 1px solid rgb(80, 80, 80);
 }
+
 </style>

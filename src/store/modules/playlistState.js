@@ -8,7 +8,7 @@ export default {
 
     state: {
        songs:[
-           {name : "Beethoven - For Elise", fromPlaylist: true },
+           {name : "Beethoven - Fur Elise", fromPlaylist: true },
         //    {name : "Bach - Prelude in C Major", fromPlaylist: true },
         //    {name : "Chopin - Grande Valse Brillante", fromPlaylist: true },
         //    {name : "Mozart - Sonata No. 8", fromPlaylist: true },

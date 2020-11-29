@@ -1,7 +1,7 @@
 <template>
     <div style="position: relative">
         <v-progress-linear v-if="!recordingState.isRecording" style="position: absolute" color="#ffb200" :value="playingPercent"> </v-progress-linear>
-        <div style="position: absolute; top: 8px; right:8px; color: white">
+        <div style="position: absolute; top: 8px; right: 8px; color: white">
             {{ currentTime }} 
         </div>
     </div>
