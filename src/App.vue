@@ -1,7 +1,7 @@
 <template>
   <div id="app" data-app>
     <PianoMenu> </PianoMenu>
-    <canvas style="background: url('./images/black.jpg')"> </canvas>
+    <canvas style="background: url('./canvas_black_background.jpg')"> </canvas>
     <Piano> </Piano>
     <SaveSongDialog> </SaveSongDialog>
     <LoadingDialog> </LoadingDialog>
@@ -17,13 +17,10 @@ import { mapState, mapActions } from 'vuex';
 
 export default {
   components : { Piano, PianoMenu, SaveSongDialog, LoadingDialog },
- 
+  
   created(){
     window.addEventListener("resize", this.resize);
-
-    this.$root.$on("resize_canvas_notes", ()  => {
-      this.resize();
-    });
+    this.$root.$on("resize_canvas_notes", this.resize);
   },
 
   destroyed() {
@@ -55,7 +52,6 @@ export default {
 
       this.resizeCanvas({height, width, array, whiteWidth, blackWidth, waterfallDelay});
     },
-
   },
 }
 </script>
@@ -72,9 +68,9 @@ export default {
 body, html {
   height: 100%;
   width: 100%;
-  margin: 0 !important;
-  padding: 0 !important;
-  overflow-y: hidden !important;
+  margin: 0;
+  padding: 0;
+  overflow-y: hidden;
 }
  
 #app {
