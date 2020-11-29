@@ -73,7 +73,7 @@ export default {
                         if(state.currentSong.fromPlaylist){
                             rootState.toneState.sampler.triggerAttackRelease(note.name, note.duration, rootState.toneState.tone.now(), note.velocity);
                         } else {
-                            if(rootState.dashboardState.sustain == false){
+                            if(rootState.menuState.sustain == false){
                                 rootState.toneState.sampler.triggerAttack(note.name);
                             } else {
                                 rootState.toneState.sampler.triggerAttackRelease(note.name, "2n", rootState.toneState.tone.now());
@@ -117,7 +117,7 @@ export default {
 
                                 commit("keyboardState/SET_NOTE_PRESSED", {index, forBlackNote, pressed : false}, {root:true});
 
-                                if(rootState.dashboardState.sustain == false){
+                                if(rootState.menuState.sustain == false){
                                     rootState.toneState.sampler.triggerRelease(note.name);
                                 }
 
@@ -149,7 +149,7 @@ export default {
             commit("SET_IS_LOADING", true);
             dispatch("clearTimes");
             commit("keyboardState/CLEAR_PRESSED_KEYS", {}, {root:true});
-            dispatch("dashboardState/stopPlaying", {}, {root:true});
+            dispatch("menuState/stopPlaying", {}, {root:true});
             
             setTimeout(() => {
                 rootState.toneState.tone.Transport.stop();

@@ -75,9 +75,9 @@ export default {
     actions: {
       playNote({ commit, state, rootState, dispatch}, { index, forBlackNote }) {
         const currentNote = forBlackNote ? state.notes[index].blackNote : state.notes[index];
-        if(!currentNote.pressed && !rootState.dashboardState.editKeys) {
+        if(!currentNote.pressed && !rootState.menuState.editKeys) {
 
-          if(rootState.dashboardState.sustain == false){
+          if(rootState.menuState.sustain == false){
             rootState.toneState.sampler.triggerAttack(currentNote.note);
           } else {
             rootState.toneState.sampler.triggerAttackRelease(currentNote.note, "2n");
@@ -108,7 +108,7 @@ export default {
         const currentNote = forBlackNote ? state.notes[index].blackNote : state.notes[index];
         if(currentNote.pressed === true){
 
-          if(rootState.dashboardState.sustain == false){
+          if(rootState.menuState.sustain == false){
             rootState.toneState.sampler.triggerRelease(currentNote.note);
           }
 
@@ -137,8 +137,8 @@ export default {
         commit("CLEAR_NOTES_ARRAY");
         let keyIndex = 0;
         let noteIndex = 0; // we always start with note C
-        const startOctave = rootState.dashboardState.octaves[0];
-        const endOctave = rootState.dashboardState.octaves[1];
+        const startOctave = rootState.menuState.octaves[0];
+        const endOctave = rootState.menuState.octaves[1];
 
         for(let octave = startOctave; octave <= endOctave; octave++) {
   

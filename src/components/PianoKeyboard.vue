@@ -14,13 +14,13 @@
             @mouseover.stop="playNoteHover({index, forBlackNote : true})" @mouseleave.stop="removePressedKey({index, forBlackNote : true})">
 
             <div class="key-group">
-                <template v-if="dashboardState.showKeys">
-                  <input :disabled="dashboardState.editKeys !== true" class="key-input key-input-on-black-note"
+                <template v-if="menuState.showKeys">
+                  <input :disabled="menuState.editKeys !== true" class="key-input key-input-on-black-note"
                   :value="noteObject.blackNote.key"
                   @input="handleInput($event.target.value, noteObject.blackNote.key, index, true)"/>
                 </template>
 
-                <template v-if="dashboardState.showNotes">
+                <template v-if="menuState.showNotes">
                   <div class="key-text key-text-on-black-note">
                       {{noteObject.blackNote.note}}
                   </div>
@@ -30,13 +30,13 @@
           </div> 
 
           <div class="key-group"> 
-            <template v-if="dashboardState.showKeys" >
-              <input :disabled="dashboardState.editKeys !== true" class="key-input"
+            <template v-if="menuState.showKeys" >
+              <input :disabled="menuState.editKeys !== true" class="key-input"
                 :value="noteObject.key"
                 @input="handleInput($event.target.value, noteObject.key, index, false)"/>
             </template>
 
-            <template v-if="dashboardState.showNotes">
+            <template v-if="menuState.showNotes">
               <div class="key-text">
                 {{noteObject.note}}
               </div>
@@ -111,16 +111,16 @@ export default {
     },
 
     whiteNoteBackground: function(pressed){
-      return pressed ? this.dashboardState.whiteNoteColor : 'linear-gradient(to bottom, #eee 0%, #fff 100%)';
+      return pressed ? this.menuState.whiteNoteColor : 'linear-gradient(to bottom, #eee 0%, #fff 100%)';
     },
     
     blackNoteBackground: function(pressed){
-      return pressed ? this.dashboardState.blackNoteColor : 'linear-gradient(45deg, #555, #222)';
+      return pressed ? this.menuState.blackNoteColor : 'linear-gradient(45deg, #555, #222)';
     }
   },
 
   computed: {
-    ...mapState(['keyboardState', 'dashboardState', 'recordingState', 'canvasState']),
+    ...mapState(['keyboardState', 'menuState', 'recordingState', 'canvasState']),
   }
 }
 </script>

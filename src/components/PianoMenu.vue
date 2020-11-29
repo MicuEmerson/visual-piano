@@ -132,14 +132,14 @@
             </v-row>
         </v-container>
         
-        <SongDurationProgressBar v-if="dashboardState.playing !== 3 || recordingState.isRecording"></SongDurationProgressBar>
+        <SongDurationProgressBar v-if="menuState.playing !== 3 || recordingState.isRecording"></SongDurationProgressBar>
 
-        <v-container text-xs-center fluid :class="dashboardState.showConfig ? 'height-auto': 'height-zero'" class="sub-top-nav">
+        <v-container text-xs-center fluid :class="menuState.showConfig ? 'height-auto': 'height-zero'" class="sub-top-nav">
             
             <v-row justify="center" align="center">
                 <v-col cols="12" sm="4" md="3"> 
                     <div @click="editKeys()" class="config config-button" :style="{fontSize: fontSize + 'em', minHeight: 6 * fontSize + 'em'}">
-                        <template v-if="!dashboardState.editKeys">Edit Keys</template>
+                        <template v-if="!menuState.editKeys">Edit Keys</template>
                         <template v-else>Save Keys</template>
                     </div>
                 </v-col>
@@ -149,7 +149,7 @@
                         <label>Volume</label>
                         <v-slider
                             @change="handleVolume"
-                            :value="dashboardState.volume"
+                            :value="menuState.volume"
                             style="margin-left: 1em"
                             dense
                             hide-details
@@ -168,7 +168,7 @@
                         <label>Speed</label>
                         <v-slider
                             @change="handleSpeed"
-                            :value="dashboardState.speed"
+                            :value="menuState.speed"
                             style="margin-left: 1em"
                             dense
                             hide-details
@@ -187,7 +187,7 @@
                        <label>Octave</label>
                         <v-range-slider
                             @change="octaveChanged"
-                            :value="dashboardState.octaves"
+                            :value="menuState.octaves"
                             ticks="always"
                             tick-size="4"
                             style="margin-left: 1em"
@@ -195,7 +195,7 @@
                             hide-details
                             thumb-label
                             min="1"
-                            :max="dashboardState.maxEndOctave"
+                            :max="menuState.maxEndOctave"
                             thumb-size="24"
                             color="#ffb200"
                             track-color="#dcdcdc"
@@ -206,9 +206,9 @@
                 <v-col cols="12" sm="4" md="3"> 
                     <div class="config" :style="{fontSize: fontSize + 'em', minHeight: 6 * fontSize + 'em'}">
                         <label style="text-align: center">White note</label>
-                        <input style="margin-left: 0.5em; margin-right: 0.5em" :value="dashboardState.whiteNoteColor" type="color" @change="whiteNoteColorChanged"/>
+                        <input style="margin-left: 0.5em; margin-right: 0.5em" :value="menuState.whiteNoteColor" type="color" @change="whiteNoteColorChanged"/>
                         <label style="text-align: center">Black note</label>
-                        <input style="margin-left: 0.5em" :value="dashboardState.blackNoteColor" type="color" @change="blackNoteColorChanged"/>
+                        <input style="margin-left: 0.5em" :value="menuState.blackNoteColor" type="color" @change="blackNoteColorChanged"/>
                     </div>
                 </v-col>
             </v-row>
@@ -233,13 +233,13 @@ export default {
     },
 
     methods:{
-        ...mapActions("dashboardState", ["setPlaying"]),
+        ...mapActions("menuState", ["setPlaying"]),
         ...mapActions('recordingState', ['startRecording', 'stopRecording']),
 
         togglePlay() {
             if(this.playlistState.currentSong != ""){
 
-                if (this.dashboardState.playing === PlayingState.PLAY) {
+                if (this.menuState.playing === PlayingState.PLAY) {
                     this.setPlaying(PlayingState.PAUSE);
                     this.toneState.tone.Transport.pause();
                 } else {
@@ -254,11 +254,11 @@ export default {
         },
         
         whiteNoteColorChanged: function(e) {
-            this.$store.dispatch("dashboardState/whiteNoteColorChanged", e.target.value)
+            this.$store.dispatch("menuState/whiteNoteColorChanged", e.target.value)
         },
 
         blackNoteColorChanged: function(e) {
-            this.$store.dispatch("dashboardState/blackNoteColorChanged", e.target.value)
+            this.$store.dispatch("menuState/blackNoteColorChanged", e.target.value)
         },
 
         stopPlaying() {
@@ -270,66 +270,66 @@ export default {
         },
 
         editKeys(){
-            this.$store.commit("dashboardState/SET_EDIT_KEYS", !this.dashboardState.editKeys);
+            this.$store.commit("menuState/SET_EDIT_KEYS", !this.menuState.editKeys);
 
-            if(this.dashboardState.editKeys  && !this.dashboardState.showKeys){
-                this.$store.commit("dashboardState/SET_SHOW_KEYS", true);
-            } else if(!this.dashboardState.editKeys) {
-                this.$store.commit("dashboardState/SET_SHOW_KEYS", false);
+            if(this.menuState.editKeys  && !this.menuState.showKeys){
+                this.$store.commit("menuState/SET_SHOW_KEYS", true);
+            } else if(!this.menuState.editKeys) {
+                this.$store.commit("menuState/SET_SHOW_KEYS", false);
             }
         },
 
         showConfig(){
-            this.$store.commit("dashboardState/SET_SHOW_CONFIG", !this.dashboardState.showConfig);
+            this.$store.commit("menuState/SET_SHOW_CONFIG", !this.menuState.showConfig);
         },
 
         showKeys(){
-            this.$store.commit("dashboardState/SET_SHOW_KEYS", !this.dashboardState.showKeys);
+            this.$store.commit("menuState/SET_SHOW_KEYS", !this.menuState.showKeys);
         },
 
         showNotes(){
-            this.$store.commit("dashboardState/SET_SHOW_NOTES", !this.dashboardState.showNotes);
+            this.$store.commit("menuState/SET_SHOW_NOTES", !this.menuState.showNotes);
         },
 
         handleSustain(){
-            this.$store.commit("dashboardState/SET_SUSTAIN", !this.dashboardState.sustain)
+            this.$store.commit("menuState/SET_SUSTAIN", !this.menuState.sustain)
         },
 
         handleVolume(volume){
-            this.$store.dispatch("dashboardState/changeVolume", volume)
+            this.$store.dispatch("menuState/changeVolume", volume)
         },
 
         handleSpeed(speed){
-            this.$store.dispatch("dashboardState/changeSpeed", speed)
+            this.$store.dispatch("menuState/changeSpeed", speed)
         },
 
         octaveChanged: function(value) {
-            this.$store.dispatch("dashboardState/changeOctaves", Object.values(value))
+            this.$store.dispatch("menuState/changeOctaves", Object.values(value))
             setTimeout(() => this.$root.$emit("resize_canvas_notes"), 100);
         },
     }, 
 
     computed: {
-        ...mapState(['dashboardState', 'toneState', 'playlistState', 'recordingState']),
+        ...mapState(['menuState', 'toneState', 'playlistState', 'recordingState']),
 
         playIcon: function() {
-            return this.dashboardState.playing === PlayingState.PLAY ? 'mdi-pause' : 'mdi-play';
+            return this.menuState.playing === PlayingState.PLAY ? 'mdi-pause' : 'mdi-play';
         },
 
         playIconTooltip: function() {
-            return this.dashboardState.playing === PlayingState.PLAY ? 'Pause' : 'Play';
+            return this.menuState.playing === PlayingState.PLAY ? 'Pause' : 'Play';
         },
 
         notesIcon: function() {
-            return this.dashboardState.showNotes ? 'mdi-music-note-off' : 'mdi-music-note';
+            return this.menuState.showNotes ? 'mdi-music-note-off' : 'mdi-music-note';
         },
 
         keyboardIcon: function() {
-            return this.dashboardState.showKeys ? 'mdi-keyboard-off-outline' : 'mdi-keyboard-outline';
+            return this.menuState.showKeys ? 'mdi-keyboard-off-outline' : 'mdi-keyboard-outline';
         },
 
         configIcon: function() {
-            return this.dashboardState.showConfig ? 'mdi-chevron-up' : 'mdi-chevron-down'
+            return this.menuState.showConfig ? 'mdi-chevron-up' : 'mdi-chevron-down'
         },
 
         recordLight: function() {
@@ -344,7 +344,7 @@ export default {
         },
 
         getSustainImage: function() {
-            const imageName = this.dashboardState.sustain ? 
+            const imageName = this.menuState.sustain ? 
                     this.sustainImageHover ? 
                         'sustain-on-hover' :
                         'sustain-on' :
@@ -360,8 +360,8 @@ export default {
                 return this.playlistState.currentSong;
             },
             set (value){
-                // this.$store.dispatch("dashboardState/changeStartOctave", 0);
-                // this.$store.dispatch("dashboardState/changeEndOctave", this.dashboardState.maxEndOctave);
+                // this.$store.dispatch("menuState/changeStartOctave", 0);
+                // this.$store.dispatch("menuState/changeEndOctave", this.menuState.maxEndOctave);
                 this.$store.dispatch("playlistState/stopPlaying", value);
             }
         }

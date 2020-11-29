@@ -34,15 +34,15 @@ export default {
             this.$store.commit("playlistState/ADD_TIMER", 
                 new Timer(() => {
                     let interval = setInterval(() => {
-                        if(this.dashboardState.playing === PlayingState.PLAY) {
+                        if(this.menuState.playing === PlayingState.PLAY) {
                             this.playingPercent = this.counter * 100 / this.playlistState.currentSongDuration;
-                            this.counter = this.counter + 0.25 * this.dashboardState.speed / 100;
+                            this.counter = this.counter + 0.25 * this.menuState.speed / 100;
 
                             if (this.counter >= this.playlistState.currentSongDuration) {
                                 clearInterval(interval);
                             }
                         }
-                    }, 250 * this.dashboardState.speed / 100);
+                    }, 250 * this.menuState.speed / 100);
                 }, this.canvasState.waterfallDelay)
             );
         },
@@ -59,7 +59,7 @@ export default {
     },
 
     computed: {
-        ...mapState([ 'playlistState', 'canvasState', 'dashboardState', 'recordingState' ]),
+        ...mapState([ 'playlistState', 'canvasState', 'menuState', 'recordingState' ]),
         
         currentTime: function() {
             const counterFloor = Math.floor(this.counter);
