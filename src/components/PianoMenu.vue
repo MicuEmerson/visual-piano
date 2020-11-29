@@ -218,7 +218,7 @@
 
 <script>
 import { mapState, mapActions } from 'vuex';
-import AboutDialog from './AboutDialog';
+import AboutDialog from './dialogs/AboutDialog';
 import SongDurationProgressBar from './SongDurationProgressBar';
 import { PlayingState } from "../utils/PlayingState";
 

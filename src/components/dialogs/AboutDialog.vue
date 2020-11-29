@@ -46,7 +46,7 @@ export default {
     color: var(--v-text-base);
 }
 
-.v-icon.v-icon{
+.v-icon.v-icon {
     font-size: 1.5em;
 }  
 

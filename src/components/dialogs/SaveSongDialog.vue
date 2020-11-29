@@ -43,23 +43,17 @@ export default {
     },
 
     handleSave(){
-      //TODO validate empty name;
-      if(this.songName === "") this.songName = "default name";
+      if(this.songName === "") 
+        this.songName = "default name";
 
       this.saveSong(this.songName);
 
       this.songName = "";
-
     }
   },
 
   computed: {
     ...mapState(['recordingState'])
   }
-  
 }
 </script>
-
-<style>
- 
-</style>

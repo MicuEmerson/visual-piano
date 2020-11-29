@@ -1,19 +1,18 @@
 <template>
   <div id="app" data-app>
-    <pianoMenu> </pianoMenu>
+    <PianoMenu> </PianoMenu>
     <canvas style="background: url('./images/black.jpg')"> </canvas>
-    <piano> </piano>
-    <saveSongDialog> </saveSongDialog>
-    <loadingDialog> </loadingDialog>
+    <Piano> </Piano>
+    <SaveSongDialog> </SaveSongDialog>
+    <LoadingDialog> </LoadingDialog>
   </div>
 </template>
 
 <script>
 import PianoMenu from "./components/PianoMenu";
 import Piano from "./components/Piano";
-import CanvasMessage from "./utils/CanvasMessages"
-import SaveSongDialog from "./components/SaveSongDialog"
-import LoadingDialog from "./components/LoadingDialog"
+import SaveSongDialog from "./components/dialogs/SaveSongDialog"
+import LoadingDialog from "./components/dialogs/LoadingDialog"
 import { mapState, mapActions } from 'vuex';
 
 export default {
@@ -34,8 +33,11 @@ export default {
   methods: {
     ...mapActions('canvasState', ['resizeCanvas']),
 
+    /** 
+     * document.getElementById/getElementsByClassName are took from Piano.vue and 
+     * PianoKeyboard.vue because they are already rendered in resize when event eventually happens
+    **/
     resize() {
-      // documnet.getElementById/getElementsByClassName are took from Piano.vue and PianoKeyboard.vue because they are already rendered in resize event eventually happens.
       const pianoContainerDimensions = document.getElementById("piano-container").getBoundingClientRect();
       const pianoMenuDimensions = document.getElementById("piano-menu").getBoundingClientRect();
 
@@ -96,23 +98,19 @@ input:focus {
   outline: 0;
 } 
 
-/* width */
 ::-webkit-scrollbar {
   width: 5px;
 }
 
-/* Track */
 ::-webkit-scrollbar-track {
   background: #f1f1f1;
 }
 
-/* Handle */
 ::-webkit-scrollbar-thumb {
   background: #888;
   border-radius: 2px;
 }
 
-/* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
   border-radius: 2px;
