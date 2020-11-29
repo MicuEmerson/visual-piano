@@ -1,11 +1,13 @@
+import * as Tone from 'tone'
+
 const SAMPLE_BASE_URL = "./pianoNotes/";
 
 export default {
     namespaced: true,
 
     state: {
-        sampler: { type: window.Tone.Sampler, default: {} },
-        tone : window.Tone,
+        sampler: { type: Tone.Sampler, default: {} },
+        tone : Tone,
 
         samples: [
             ["C0", "C#0", "D0", "D#0", "E0", "F0", "F#0", "G0", "G#0", "A0", "A#0", "B0"],
@@ -40,6 +42,4 @@ export default {
             state.sampler.connect(dest);
         }
     }
-    
-    
 }
