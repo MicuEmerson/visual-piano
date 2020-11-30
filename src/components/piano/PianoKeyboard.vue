@@ -50,11 +50,10 @@
 import { mapState, mapActions } from "vuex";
 import { keyboardState, toneState, recordingState, canvasState, menuState } from "@/store/consts/states.js";
 import { initCanvas, createSampler, createRecorder, generateNotes , generateNotesIndexesByKey,
-  playNote, playNoteMouse, playNoteHover, removePressedKey,
-  removePressedKeyMouse, changeInput } from "@/store/consts/actions.js"
+  playNote, playNoteMouse, playNoteHover, removePressedKey, removePressedKeyMouse, changeInput } from "@/store/consts/actions.js"
 import { SET_MOUSE_PRESSED } from "@/store/consts/mutations.js";
 
-const WORKER_FILE_PATH = "/worker.js"
+const WORKER_FILE_PATH = "./worker.js";
 
 export default {
   

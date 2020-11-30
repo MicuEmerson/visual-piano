@@ -2,17 +2,11 @@ var canvas = null;
 var context = null;
 var animationSpeed = 10 // the animation speed in ms
 var playingState = 3 // 1 = play, 2 = pause , 3 = stop
-var waterfall = false // variable to indicate the animation, from top to bottom (waterfall) = true,  or from bottom to top = false
-var noteColors = {
-  whiteNoteColor: "#1eb7eb",
-  blackNoteColor: "#f9bb2d"
-}
-
-var canvasDataIndexesByNote = null; // map where we keep positions of X coordonates for every note 
-                                    // ex:(key = noteName (C4, C#3, etc), value = x positon of that note in the screen);
+var waterfall = false // variable to indicate the animation direction, top to bottom or bottom to top
+var noteColors = { whiteNoteColor: "#1eb7eb", blackNoteColor: "#f9bb2d" }
+var canvasDataIndexesByNote = null; // map where we keep positions of X coordonates for every note, ex:(key = noteName (C4, C#3, etc), value = x positon of that note in the screen);
 var whiteNoteWidth = null; 
 var blackNoteWidth = null;
-
 var allNotes = [];
 
 onmessage = function(e) {
@@ -57,7 +51,6 @@ function handleSetWaterfall(val){
 }
 
 function handleStopSong(){
-  // there is a chance to receive a draw msg after a stop msg (because lack of sync), but we take care of this case with this setTimeout 100ms
   setTimeout(() => {
     playingState = 3;
     clearAllNotes();
@@ -85,7 +78,6 @@ function handleStartDrawnNote(drawNote){
 function handleStopDrawnNote(drawNote){
   const {noteName} = drawNote;
 
-  // maybe we can optimize?
   for(let i = 0; i < allNotes.length; i++){
     if(allNotes[i].noteName === noteName){
       allNotes[i].stop = true;
