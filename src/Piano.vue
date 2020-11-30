@@ -14,6 +14,8 @@ import PianoKeyboard from "./components/piano/PianoKeyboard";
 import SaveSongDialog from "./components/dialogs/SaveSongDialog"
 import LoadingDialog from "./components/dialogs/LoadingDialog"
 import { mapState, mapActions } from 'vuex';
+import { canvasState } from "@/store/consts/states.js";
+import { resizeCanvas } from "@/store/consts/actions.js"
 
 export default {
   components : { PianoMenu, PianoKeyboard, SaveSongDialog, LoadingDialog },
@@ -28,11 +30,11 @@ export default {
   },
 
   methods: {
-    ...mapActions('canvasState', ['resizeCanvas']),
+    ...mapActions(canvasState, [resizeCanvas]),
 
     /** 
-     * document.getElementById/getElementsByClassName are took from Piano.vue and 
-     * PianoKeyboard.vue because they are already rendered in resize when event eventually happens
+     * document.getElementById/getElementsByClassName are took from PianoKeyboard.vue  
+     * because they are already rendered in resize when event eventually happens
     **/
     resize() {
       const pianoContainerDimensions = document.getElementById("piano-container").getBoundingClientRect();

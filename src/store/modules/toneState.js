@@ -1,4 +1,6 @@
 import * as Tone from 'tone'
+import { CREATE_SAMPLER } from "@/store/consts/mutations.js";
+import { createSampler, connectSampler,} from "@/store/consts/actions.js";
 
 const SAMPLE_BASE_URL = "./notes/";
 
@@ -21,7 +23,7 @@ export default {
     },
 
     mutations: {
-        CREATE_SAMPLER(state, SAMPLE_MAP) {
+        [CREATE_SAMPLER](state, SAMPLE_MAP) {
             state.sampler = new state.tone.Sampler({
                 urls: SAMPLE_MAP,
                 baseUrl: SAMPLE_BASE_URL
@@ -30,15 +32,15 @@ export default {
     },
 
     actions: {
-        createSampler({ commit, state }){
+        [createSampler]({ commit, state }){
             const SAMPLE_MAP = state.samples.flat().reduce((acc, val) => {
                 acc[val] = `${val.replace("#", "s")}.mp3`;
                 return acc;
             }, {});
             
-            commit("CREATE_SAMPLER", SAMPLE_MAP);
+            commit(CREATE_SAMPLER, SAMPLE_MAP);
         },
-        connectSampler({state}, dest){
+        [connectSampler]({state}, dest){
             state.sampler.connect(dest);
         }
     }

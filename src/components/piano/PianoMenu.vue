@@ -221,6 +221,10 @@ import { mapState, mapActions } from 'vuex';
 import AboutDialog from '../dialogs/AboutDialog';
 import SongDurationProgressBar from '../SongDurationProgressBar';
 import { PlayingState } from "../../utils/PlayingState";
+import { keyboardState, toneState, recordingState, canvasState, menuState, playlistState } from "@/store/consts/states.js";
+import { setPlaying, startRecording, stopRecording, whiteNoteColorChanged,
+    blackNoteColorChanged, stopPlaying, changeVolume, changeSpeed, changeOctaves} from "@/store/consts/actions.js"
+import { SET_EDIT_KEYS, SET_SHOW_KEYS, SET_SHOW_CONFIG, SET_SHOW_NOTES, SET_SUSTAIN} from "@/store/consts/mutations.js";
 
 export default {
     components: { AboutDialog, SongDurationProgressBar },
@@ -233,8 +237,8 @@ export default {
     },
 
     methods:{
-        ...mapActions("menuState", ["setPlaying"]),
-        ...mapActions('recordingState', ['startRecording', 'stopRecording']),
+        ...mapActions(menuState, [setPlaying]),
+        ...mapActions(recordingState, [startRecording, stopRecording]),
 
         togglePlay() {
             if(this.playlistState.currentSong != ""){
@@ -254,15 +258,15 @@ export default {
         },
         
         whiteNoteColorChanged: function(e) {
-            this.$store.dispatch("menuState/whiteNoteColorChanged", e.target.value)
+            this.$store.dispatch(menuState + "/" + whiteNoteColorChanged, e.target.value)
         },
 
         blackNoteColorChanged: function(e) {
-            this.$store.dispatch("menuState/blackNoteColorChanged", e.target.value)
+            this.$store.dispatch(menuState + "/" + blackNoteColorChanged, e.target.value)
         },
 
         stopPlaying() {
-            this.$store.dispatch("playlistState/stopPlaying", "");
+            this.$store.dispatch(playlistState + "/" + stopPlaying, "");
         },
 
         handleRecording(){
@@ -270,47 +274,47 @@ export default {
         },
 
         editKeys(){
-            this.$store.commit("menuState/SET_EDIT_KEYS", !this.menuState.editKeys);
+            this.$store.commit(menuState + "/" + SET_EDIT_KEYS, !this.menuState.editKeys);
 
             if(this.menuState.editKeys  && !this.menuState.showKeys){
-                this.$store.commit("menuState/SET_SHOW_KEYS", true);
+                this.$store.commit(menuState + "/" + SET_SHOW_KEYS, true);
             } else if(!this.menuState.editKeys) {
-                this.$store.commit("menuState/SET_SHOW_KEYS", false);
+                this.$store.commit(menuState + "/" + SET_SHOW_KEYS, false);
             }
         },
 
         showConfig(){
-            this.$store.commit("menuState/SET_SHOW_CONFIG", !this.menuState.showConfig);
+            this.$store.commit(menuState + "/" + SET_SHOW_CONFIG, !this.menuState.showConfig);
         },
 
         showKeys(){
-            this.$store.commit("menuState/SET_SHOW_KEYS", !this.menuState.showKeys);
+            this.$store.commit(menuState + "/" + SET_SHOW_KEYS, !this.menuState.showKeys);
         },
 
         showNotes(){
-            this.$store.commit("menuState/SET_SHOW_NOTES", !this.menuState.showNotes);
+            this.$store.commit(menuState + "/" + SET_SHOW_NOTES, !this.menuState.showNotes);
         },
 
         handleSustain(){
-            this.$store.commit("menuState/SET_SUSTAIN", !this.menuState.sustain)
+            this.$store.commit(menuState + "/" + SET_SUSTAIN, !this.menuState.sustain)
         },
 
         handleVolume(volume){
-            this.$store.dispatch("menuState/changeVolume", volume)
+            this.$store.dispatch(menuState + "/" + changeVolume, volume)
         },
 
         handleSpeed(speed){
-            this.$store.dispatch("menuState/changeSpeed", speed)
+            this.$store.dispatch(menuState + "/" + changeSpeed, speed)
         },
 
         octaveChanged: function(value) {
-            this.$store.dispatch("menuState/changeOctaves", Object.values(value))
+            this.$store.dispatch(menuState + "/" + changeOctaves, Object.values(value))
             setTimeout(() => this.$root.$emit("resize_canvas_notes"), 100);
         },
     }, 
 
     computed: {
-        ...mapState(['menuState', 'toneState', 'playlistState', 'recordingState']),
+        ...mapState([menuState, toneState, playlistState, recordingState]),
 
         playIcon: function() {
             return this.menuState.playing === PlayingState.PLAY ? 'mdi-pause' : 'mdi-play';
@@ -360,9 +364,7 @@ export default {
                 return this.playlistState.currentSong;
             },
             set (value){
-                // this.$store.dispatch("menuState/changeStartOctave", 0);
-                // this.$store.dispatch("menuState/changeEndOctave", this.menuState.maxEndOctave);
-                this.$store.dispatch("playlistState/stopPlaying", value);
+                this.$store.dispatch(playlistState + "/" + stopPlaying, value);
             }
         }
     }

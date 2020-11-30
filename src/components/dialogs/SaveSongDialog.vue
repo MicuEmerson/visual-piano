@@ -27,6 +27,8 @@
 
 <script>
 import { mapState, mapActions } from 'vuex';
+import { recordingState } from "@/store/consts/states.js";
+import { SET_SAVE_RECORDING_DIALOG } from "@/store/consts/mutations.js";
 
 export default {
   data: () => {
@@ -36,14 +38,14 @@ export default {
   },
 
   methods: {
-    ...mapActions('recordingState', ['saveSong']),
+    ...mapActions(recordingState, ['saveSong']),
 
     handleCancel(){
-      this.$store.commit("recordingState/SET_SAVE_RECORDING_DIALOG", false);
+      this.$store.commit(recordingState + "/" + SET_SAVE_RECORDING_DIALOG, false);
     },
 
     handleSave(){
-      if(this.songName === "") 
+      if(this.songName === "")
         this.songName = "default name";
 
       this.saveSong(this.songName);
@@ -53,7 +55,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['recordingState'])
+    ...mapState([recordingState])
   }
 }
 </script>

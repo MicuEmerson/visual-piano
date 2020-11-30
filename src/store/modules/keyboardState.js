@@ -1,3 +1,30 @@
+import { canvasState, recordingState } from "@/store/consts/states.js";
+import { CLEAR_NOTES_ARRAY, 
+  CLEAR_NOTES_INDICES_ARRAY,
+  SET_WHITE_NOTE_WIDTH_SIZE,
+  SET_NOTE_PRESSED,
+  SET_MOUSE_PRESSED,
+  SET_NOTE_KEY,
+  ADD_NOTE,
+  ADD_NEW_KEY_INDEX,
+  UPDATE_INDEX_KEY,
+  DELETE_INDEX_KEY,
+  CLEAR_PRESSED_KEYS,
+  ADD_RECORD_MAP,
+  ADD_RECORD_MIDI
+} from "@/store/consts/mutations.js";
+import { playNote, 
+  playNoteMouse,
+  playNoteHover,
+  removePressedKey,
+  removePressedKeyMouse,
+  changeInput,
+  generateNotes,
+  generateNotesIndexesByKey,
+  startDrawNote,
+  stopDrawNote
+} from "@/store/consts/actions.js";
+
 export default {
     namespaced: true,
 
@@ -20,49 +47,49 @@ export default {
     },
 
     mutations: {
-        CLEAR_NOTES_ARRAY(state){
+        [CLEAR_NOTES_ARRAY](state){
             state.notes.length = 0;
         },
-        CLEAR_NOTES_INDICES_ARRAY(state){
+        [CLEAR_NOTES_INDICES_ARRAY](state){
             state.notesIndexesByKey.length = 0;
         },
-        SET_WHITE_NOTE_WIDTH_SIZE(state, size){
+        [SET_WHITE_NOTE_WIDTH_SIZE](state, size){
           state.whiteNoteWidthSize = size;
         },
-        SET_NOTE_PRESSED(state, { index, forBlackNote, pressed }){
+        [SET_NOTE_PRESSED](state, { index, forBlackNote, pressed }){
           if(forBlackNote){
             state.notes[index].blackNote.pressed = pressed;
           } else {
             state.notes[index].pressed = pressed;
           }
         },
-        SET_MOUSE_PRESSED(state, value){
+        [SET_MOUSE_PRESSED](state, value){
           state.isMousePressed = value;
         },
-        SET_NOTE_KEY(state, { value, index, forBlackNote }){
+        [SET_NOTE_KEY](state, { value, index, forBlackNote }){
           if(forBlackNote){
             state.notes[index].blackNote.key = value;
           } else {
             state.notes[index].key = value;
           }
         },
-        ADD_NOTE(state, note){
+        [ADD_NOTE](state, note){
             state.notes.push(note);
         },
-        ADD_NEW_KEY_INDEX(state, { index, forBlackNote }){
+        [ADD_NEW_KEY_INDEX](state, { index, forBlackNote }){
           if(forBlackNote){
             state.notesIndexesByKey[state.notes[index].blackNote.key] = index;
           } else {
             state.notesIndexesByKey[state.notes[index].key] = index;
           }
         },
-        UPDATE_INDEX_KEY(state, { key, index }){
+        [UPDATE_INDEX_KEY](state, { key, index }){
           state.notesIndexesByKey[key] = index;
         }, 
-        DELETE_INDEX_KEY(state, key){
+        [DELETE_INDEX_KEY](state, key){
           delete state.notesIndexesByKey[key];
         },
-        CLEAR_PRESSED_KEYS(state) {
+        [CLEAR_PRESSED_KEYS](state) {
           for(let note of state.notes) {
             note.pressed = false;
             if(note.blackNote){
@@ -73,7 +100,7 @@ export default {
     },
 
     actions: {
-      playNote({ commit, state, rootState, dispatch}, { index, forBlackNote }) {
+      [playNote]({ commit, state, rootState, dispatch}, { index, forBlackNote }) {
         const currentNote = forBlackNote ? state.notes[index].blackNote : state.notes[index];
         if(!currentNote.pressed && !rootState.menuState.editKeys) {
 
@@ -83,28 +110,28 @@ export default {
             rootState.toneState.sampler.triggerAttackRelease(currentNote.note, "2n");
           }
 
-          commit("SET_NOTE_PRESSED", { index, forBlackNote, pressed : true });
+          commit(SET_NOTE_PRESSED, { index, forBlackNote, pressed : true });
 
           if(rootState.recordingState.isRecording){
-            commit("recordingState/ADD_RECORD_MAP", currentNote.note, {root:true});
+            commit(recordingState + "/" + ADD_RECORD_MAP, currentNote.note, {root:true});
           }
 
-          dispatch("canvasState/startDrawNote", {noteName: currentNote.note, forBlackNote}, {root:true});
+          dispatch(canvasState + "/" + startDrawNote, {noteName: currentNote.note, forBlackNote}, {root:true});
         }
       },
 
-      playNoteMouse({ commit, dispatch }, { index, forBlackNote }) {
-        commit("SET_MOUSE_PRESSED", true);
-        dispatch("playNote", { index, forBlackNote });
+      [playNoteMouse]({ commit, dispatch }, { index, forBlackNote }) {
+        commit(SET_MOUSE_PRESSED, true);
+        dispatch(playNote, { index, forBlackNote });
       },
   
-      playNoteHover({ state, dispatch }, { index, forBlackNote }) {
+      [playNoteHover]({ state, dispatch }, { index, forBlackNote }) {
         if(state.isMousePressed){ 
-          dispatch("playNote", { index, forBlackNote });
+          dispatch(playNote, { index, forBlackNote });
         }
       },
 
-      removePressedKey({ state, commit, rootState, dispatch }, { index, forBlackNote }) {
+      [removePressedKey]({ state, commit, rootState, dispatch }, { index, forBlackNote }) {
         const currentNote = forBlackNote ? state.notes[index].blackNote : state.notes[index];
         if(currentNote.pressed === true){
 
@@ -112,31 +139,31 @@ export default {
             rootState.toneState.sampler.triggerRelease(currentNote.note);
           }
 
-          commit("SET_NOTE_PRESSED", { index, forBlackNote, pressed : false });
+          commit(SET_NOTE_PRESSED, { index, forBlackNote, pressed : false });
 
           if(rootState.recordingState.isRecording){
-            commit("recordingState/ADD_RECORD_MIDI", currentNote.note, {root:true});
+            commit(recordingState + "/" + ADD_RECORD_MIDI, currentNote.note, {root:true});
           }
 
-          dispatch("canvasState/stopDrawNote", {noteName: currentNote.note, forBlackNote}, {root:true});
+          dispatch(canvasState + "/" + stopDrawNote, {noteName: currentNote.note, forBlackNote}, {root:true});
         }
       },
 
-      removePressedKeyMouse({ commit, dispatch }, { index, forBlackNote }) {
-        commit("SET_MOUSE_PRESSED", false);
-        dispatch("removePressedKey", { index, forBlackNote });
+      [removePressedKeyMouse]({ commit, dispatch }, { index, forBlackNote }) {
+        commit(SET_MOUSE_PRESSED, false);
+        dispatch(removePressedKey, { index, forBlackNote });
       },
 
-      changeInput({ commit }, {value, key, index, forBlackNote}) {
-        commit("DELETE_INDEX_KEY", key);
-        commit("SET_NOTE_KEY", {value, index, forBlackNote});
-        commit("UPDATE_INDEX_KEY", {key:value, index})
+      [changeInput]({ commit }, {value, key, index, forBlackNote}) {
+        commit(DELETE_INDEX_KEY, key);
+        commit(SET_NOTE_KEY, {value, index, forBlackNote});
+        commit(UPDATE_INDEX_KEY, {key:value, index})
       },
 
-      generateNotes({ commit, state, rootState }) {
-        commit("CLEAR_NOTES_ARRAY");
+      [generateNotes]({ commit, state, rootState }) {
+        commit(CLEAR_NOTES_ARRAY);
         let keyIndex = 0;
-        let noteIndex = 0; // we always start with note C
+        let noteIndex = 0;
         const startOctave = rootState.menuState.octaves[0];
         const endOctave = rootState.menuState.octaves[1];
 
@@ -161,7 +188,7 @@ export default {
                 newNote["blackNote"] = blackNote;
               }
             
-              commit("ADD_NOTE", newNote);
+              commit(ADD_NOTE, newNote);
   
               if(octave === endOctave && currentNote === 'B'){ // we always end with note B
                 break;
@@ -172,19 +199,19 @@ export default {
             noteIndex = 0;
         }
   
-        commit("SET_WHITE_NOTE_WIDTH_SIZE", 100 / state.notes.length);
+        commit(SET_WHITE_NOTE_WIDTH_SIZE, 100 / state.notes.length);
       },
 
-      generateNotesIndexesByKey({ commit, state }) {
-          commit("CLEAR_NOTES_INDICES_ARRAY");
+      [generateNotesIndexesByKey]({ commit, state }) {
+          commit(CLEAR_NOTES_INDICES_ARRAY);
           
           for(let index = 0; index < state.notes.length; index++){
             let forBlackNote = false;  
-            commit("ADD_NEW_KEY_INDEX", { index, forBlackNote });
+            commit(ADD_NEW_KEY_INDEX, { index, forBlackNote });
     
             if(state.notes[index].blackNote != undefined){
               forBlackNote = true;
-              commit("ADD_NEW_KEY_INDEX", { index, forBlackNote });
+              commit(ADD_NEW_KEY_INDEX, { index, forBlackNote });
             } 
           }
       },

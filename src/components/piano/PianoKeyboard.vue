@@ -1,7 +1,6 @@
 <template>
     <div id="piano-container">
       <div class="piano-keyboard">
-
           <div v-for="(noteObject, index) in keyboardState.notes" :key="index"
             class="white-note" :class="[noteObject.pressed ? 'white-note-pressed' : '']"
             :style="{width: keyboardState.whiteNoteWidthSize + '%', background: whiteNoteBackground(noteObject.pressed)}" :data-note="noteObject.note"
@@ -27,7 +26,6 @@
                     </div>
                   </template>
               </div>
-
             </div> 
 
             <div class="key-group"> 
@@ -43,7 +41,6 @@
                 </div>
               </template>
             </div>
-
           </div>
       </div>
     </div>
@@ -51,7 +48,13 @@
 
 <script>
 import { mapState, mapActions } from "vuex";
-import CanvasMessage from "../../utils/CanvasMessages"
+import { keyboardState, toneState, recordingState, canvasState, menuState } from "@/store/consts/states.js";
+import { initCanvas, createSampler, createRecorder, generateNotes , generateNotesIndexesByKey,
+  playNote, playNoteMouse, playNoteHover, removePressedKey,
+  removePressedKeyMouse, changeInput } from "@/store/consts/actions.js"
+import { SET_MOUSE_PRESSED } from "@/store/consts/mutations.js";
+
+const WORKER_FILE_PATH = "/worker.js"
 
 export default {
   
@@ -63,7 +66,7 @@ export default {
     canvas.width = Math.floor(pianoContainerDimensions.width);
 
     const offscreenCanvas = canvas.transferControlToOffscreen();
-    this.initCanvas({offscreenCanvas, workerFile : "./worker.js"});
+    this.initCanvas({offscreenCanvas, workerFile : WORKER_FILE_PATH});
 
     this.$root.$emit("resize_canvas_notes");
   },
@@ -93,7 +96,7 @@ export default {
     });
 
     window.onmouseup = () => {
-       this.$store.commit("keyboardState/SET_MOUSE_PRESSED", false);
+       this.$store.commit(keyboardState + "/" + SET_MOUSE_PRESSED, false);
     }
   },
 
@@ -104,14 +107,14 @@ export default {
   },
 
   methods: {
-    ...mapActions('toneState', ['createSampler']),
+    ...mapActions(toneState, [createSampler]),
 
-    ...mapActions('recordingState', ['createRecorder']),
+    ...mapActions(recordingState, [createRecorder]),
 
-    ...mapActions('keyboardState', ['generateNotes', 'generateNotesIndexesByKey', 'generateCanvasIndexesByNote',
-     'playNote', 'playNoteMouse', 'playNoteHover', 'removePressedKey', 'removePressedKeyMouse', 'changeInput']),
+    ...mapActions(keyboardState, [generateNotes, generateNotesIndexesByKey,
+     playNote, playNoteMouse, playNoteHover, removePressedKey, removePressedKeyMouse, changeInput]),
 
-    ...mapActions('canvasState', ['setDrawingDataForCanvas', 'initCanvas']),
+    ...mapActions(canvasState, [initCanvas]),
 
     handleInput(value, key, index, forBlackNote){
       if(value !== '')
@@ -128,7 +131,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['keyboardState', 'menuState', 'recordingState', 'canvasState']),
+    ...mapState([keyboardState, menuState, recordingState, canvasState]),
   }
 }
 </script>
@@ -142,7 +145,7 @@ export default {
 
 .piano-keyboard {
   position: relative;
-  height: 14vw; /* set height according to width size */
+  height: 14vw;
   width: 100%;
 }
  

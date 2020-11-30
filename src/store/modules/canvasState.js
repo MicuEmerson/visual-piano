@@ -1,66 +1,43 @@
 import { CanvasMessages } from "../../utils/CanvasMessages"
+import { PlayingState } from "../../utils/PlayingState"
+import { SET_WORKER, SET_CANVAS_WATERFALL_DELAY } from "@/store/consts/mutations.js"
+import { initCanvas, resizeCanvas, startDrawNote, stopDrawNote, pauseOrResumeSong, stopSong, changeNoteColors } from "@/store/consts/actions.js"
 
 export default {
     namespaced: true,
 
     state: {
       worker: {}, // where offscreencanvas is draw
-      canvasDataIndexesByNote: {},  // Here we have a map where the key is a note name (ex: C4, E#4, etc) 
-                                    // And value is a pair (x, width)
-                                    // x position in the browser of that note
-                                    // width for overlapping notes (ex: when C4 and C#4 are pressed simultaneous when we need to prevent the overlapping color)
-      canvasWhiteNoteWidth : 0,
-      canvasBlackNoteWidth: 0,
       waterfallDelay: 0,
     },
 
     mutations: {
-        SET_CANVAS_WHITE_NOTE_WIDTH(state, size){
-            state.canvasWhiteNoteWidth = size;
-        },
-        SET_CANVAS_BLACK_NOTE_WIDTH(state, size){
-            state.canvasBlackNoteWidth = size;
-        },
-        SET_WORKER(state, worker){
+        [SET_WORKER](state, worker){
             state.worker = worker;
         },
-        SET_CANVAS_HEIGHT(state, size){
-            state.windowHeight = size;
-        },
-        SET_CANVAS_WIDTH(state, size){
-            state.windowWidth = size;
-        },
-        SET_CANVAS_WATERFALL_DELAY(state, delay){
+        [SET_CANVAS_WATERFALL_DELAY](state, delay){
             state.waterfallDelay = delay;
-        },
-        CLEAR_CANVAS_INDICES_ARRAY(state){
-            state.canvasDataIndexesByNote.length = 0;
-        },
-        ADD_CANVAS_NOTE_INDEX(state, {key, value}){
-            state.canvasDataIndexesByNote[key] = value;
         },
     },
 
     actions: {
-        initCanvas({ commit, state }, { offscreenCanvas, workerFile }){
-            commit("SET_WORKER", new Worker(workerFile));
+        [initCanvas]({ commit, state }, { offscreenCanvas, workerFile }){
+            commit(SET_WORKER, new Worker(workerFile));
             state.worker.postMessage({ canvas: offscreenCanvas, messageType : CanvasMessages.INIT}, [offscreenCanvas]);
         },
 
-        resizeCanvas({ commit, state }, { height, width, array, whiteWidth, blackWidth, waterfallDelay}){
-            commit("SET_CANVAS_HEIGHT", height);
-            commit("SET_CANVAS_WIDTH", width);
-            commit("CLEAR_CANVAS_INDICES_ARRAY");
-
+        [resizeCanvas]({ commit, state }, { height, width, array, whiteWidth, blackWidth, waterfallDelay }){
+            /**
+             * Here we have a create a map where the key is a note name (ex: C4, E#4, etc) and value is the x position of in the screen of that note (horizontal axis)
+            **/
+            let canvasDataIndexesByNote = {}
             for(let index = 0; index < array.length; index++){
                 const key = array[index].getAttribute("data-note");
                 const value = Math.floor(array[index].getBoundingClientRect().x);
-                commit("ADD_CANVAS_NOTE_INDEX", { key, value })
+                canvasDataIndexesByNote[key] = value;
             }
   
-            commit("SET_CANVAS_WHITE_NOTE_WIDTH", whiteWidth);
-            commit("SET_CANVAS_BLACK_NOTE_WIDTH", blackWidth);
-            commit("SET_CANVAS_WATERFALL_DELAY", waterfallDelay);
+            commit(SET_CANVAS_WATERFALL_DELAY, waterfallDelay);
   
             state.worker.postMessage({ 
                 messageType : CanvasMessages.RESIZE, 
@@ -69,27 +46,28 @@ export default {
                     width: Math.floor(width), 
                     whiteWidth : Math.floor(whiteWidth), 
                     blackWidth: Math.floor(blackWidth), 
-                    array : state.canvasDataIndexesByNote 
-                }});
+                    array : canvasDataIndexesByNote 
+                }
+            });
         },
 
-        startDrawNote({state}, drawNote){
+        [startDrawNote]({state}, drawNote){
             state.worker.postMessage({ messageType : CanvasMessages.START_DRAW_NOTE, drawNote });
         },
 
-        stopDrawNote({state}, drawNote){
+        [stopDrawNote]({state}, drawNote){
             state.worker.postMessage({ messageType : CanvasMessages.STOP_DRAW_NOTE, drawNote });
         },
 
-        pauseOrResumeSong({state}, playing){
-            state.worker.postMessage({ messageType : CanvasMessages.PAUSE_SONG, playing});
+        [pauseOrResumeSong]({state}, playing){
+            state.worker.postMessage({ messageType : CanvasMessages.PAUSE_SONG, playing });
         },
 
-        stopSong({state}){
-            state.worker.postMessage({ messageType : CanvasMessages.STOP_SONG, playing : 3});
+        [stopSong]({state}){
+            state.worker.postMessage({ messageType : CanvasMessages.STOP_SONG, playing : PlayingState.STOP });
         },
 
-        changeNoteColors({state}, { blackNoteColor, whiteNoteColor }){
+        [changeNoteColors]({state}, { blackNoteColor, whiteNoteColor }){
             state.worker.postMessage({ messageType : CanvasMessages.CHANGE_COLOR, colors : { blackNoteColor, whiteNoteColor }});
         }
     }

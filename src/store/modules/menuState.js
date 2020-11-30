@@ -1,4 +1,33 @@
 import { PlayingState } from "../../utils/PlayingState";
+import { playlistState, canvasState, keyboardState } from "@/store/consts/states.js";
+import { SET_SHOW_CONFIG, 
+    SET_OCTAVES,
+    SET_EDIT_KEYS,
+    SET_SHOW_KEYS,
+    SET_SHOW_NOTES,
+    SET_IS_MOUSE_PRESSED,
+    SET_PLAYING,
+    SET_WHITE_NOTE_COLOR,
+    SET_BLACK_NOTE_COLOR,
+    SET_SUSTAIN,
+    SET_VOLUME,
+    SET_SPEED
+  } from "@/store/consts/mutations.js";
+import { changeOctaves, 
+    changeVolume,
+    changeSpeed,
+    setPlaying,
+    stopPlaying,
+    whiteNoteColorChanged,
+    blackNoteColorChanged,
+    generateNotes,
+    generateNotesIndexesByKey,
+    pauseTimers,
+    resumeTimers,
+    pauseOrResumeSong,
+    stopSong,
+    changeNoteColors
+  } from "@/store/consts/actions.js";
 
 export default {
     namespaced: true,
@@ -20,53 +49,53 @@ export default {
     },
 
     mutations: {
-        SET_SHOW_CONFIG(state, showConfig){
+        [SET_SHOW_CONFIG](state, showConfig){
             state.showConfig = showConfig;
         },
-        SET_OCTAVES(state, octaves){
+        [SET_OCTAVES](state, octaves){
             state.octaves = octaves[0] > octaves[1] ? octaves.reverse() : octaves;
         },
-        SET_EDIT_KEYS(state, editKeys){
+        [SET_EDIT_KEYS](state, editKeys){
             state.editKeys = editKeys;
         },
-        SET_SHOW_KEYS(state, showKeys){
+        [SET_SHOW_KEYS](state, showKeys){
             state.showKeys = showKeys;
         },
-        SET_SHOW_NOTES(state, showNotes){
+        [SET_SHOW_NOTES](state, showNotes){
             state.showNotes = showNotes;
         },
-        SET_IS_MOUSE_PRESSED(state, isMousePressed){
+        [SET_IS_MOUSE_PRESSED](state, isMousePressed){
             state.isMousePressed = isMousePressed;
         },
-        SET_PLAYING(state, playing){
+        [SET_PLAYING](state, playing){
             state.playing = playing;
         },
-        SET_WHITE_NOTE_COLOR(state, color){
+        [SET_WHITE_NOTE_COLOR](state, color){
             state.whiteNoteColor = color;
         },
-        SET_BLACK_NOTE_COLOR(state, color){
+        [SET_BLACK_NOTE_COLOR](state, color){
             state.blackNoteColor = color;
         },
-        SET_SUSTAIN(state, sustain){
+        [SET_SUSTAIN](state, sustain){
             state.sustain = sustain;
         },
-        SET_VOLUME(state, volume){
+        [SET_VOLUME](state, volume){
             state.volume = volume;
         },
-        SET_SPEED(state, speed){
+        [SET_SPEED](state, speed){
             state.speed = speed;
         }
     },
 
     actions: {
-        changeOctaves({ commit, dispatch }, octaves){
-            commit("SET_OCTAVES", octaves);
-            dispatch("keyboardState/generateNotes", {}, {root:true});
-            dispatch("keyboardState/generateNotesIndexesByKey", {}, {root:true});
+        [changeOctaves]({ commit, dispatch }, octaves){
+            commit(SET_OCTAVES, octaves);
+            dispatch(keyboardState + "/" + generateNotes, {}, {root:true});
+            dispatch(keyboardState + "/" + generateNotesIndexesByKey, {}, {root:true});
         }, 
 
-        changeVolume({ commit, rootState }, volume) {
-            commit("SET_VOLUME", volume);
+        [changeVolume]({ commit, rootState }, volume) {
+            commit(SET_VOLUME, volume);
             if (volume === 0) {
                 rootState.toneState.sampler.volume.value = -1000;
             }
@@ -75,38 +104,38 @@ export default {
             }
         },
 
-        changeSpeed({ commit, rootState }, speed) {
-            commit("SET_SPEED", speed);
+        [changeSpeed]({ commit, rootState }, speed) {
+            commit(SET_SPEED, speed);
             rootState.toneState.tone.Transport.bpm.value = speed * 1.2;
         },
 
-        setPlaying({ commit, dispatch }, playing){
+        [setPlaying]({ commit, dispatch }, playing){
             if(playing === PlayingState.PAUSE){
-                dispatch("playlistState/pauseTimers", {}, {root:true});
+                dispatch(playlistState + "/" + pauseTimers, {}, {root:true});
             } else {
-                dispatch("playlistState/resumeTimers", {}, {root:true});
+                dispatch(playlistState + "/" + resumeTimers, {}, {root:true});
             }
 
-            dispatch("canvasState/pauseOrResumeSong", playing, {root:true});
-            commit("SET_PLAYING", playing);
+            dispatch(canvasState + "/" + pauseOrResumeSong, playing, {root:true});
+            commit(SET_PLAYING, playing);
         },
 
-        stopPlaying({ commit, dispatch, state, rootState }){
-            dispatch("canvasState/stopSong", {}, {root:true});
-            commit("SET_PLAYING", PlayingState.STOP);
+        [stopPlaying]({ commit, dispatch, state, rootState }){
+            dispatch(canvasState + "/" + stopSong, {}, {root:true});
+            commit(SET_PLAYING, PlayingState.STOP);
 
-            commit("SET_SPEED", state.defaultSpeed);
+            commit(SET_SPEED, state.defaultSpeed);
             rootState.toneState.tone.Transport.bpm.value = state.defaultSpeed * 1.2;
         },
 
-        whiteNoteColorChanged({ state, commit, dispatch }, color){
-            commit("SET_WHITE_NOTE_COLOR", color);
-            dispatch("canvasState/changeNoteColors", { whiteNoteColor: state.whiteNoteColor, blackNoteColor : state.blackNoteColor }, {root:true});
+        [whiteNoteColorChanged]({ state, commit, dispatch }, color){
+            commit(SET_WHITE_NOTE_COLOR, color);
+            dispatch(canvasState + "/" + changeNoteColors, { whiteNoteColor: state.whiteNoteColor, blackNoteColor : state.blackNoteColor }, {root:true});
         },
 
-        blackNoteColorChanged({ state, commit, dispatch }, color){
-            commit("SET_BLACK_NOTE_COLOR", color);
-            dispatch("canvasState/changeNoteColors", { whiteNoteColor: state.whiteNoteColor, blackNoteColor : state.blackNoteColor }, {root:true});
+        [blackNoteColorChanged]({ state, commit, dispatch }, color){
+            commit(SET_BLACK_NOTE_COLOR, color);
+            dispatch(canvasState + "/" + changeNoteColors, { whiteNoteColor: state.whiteNoteColor, blackNoteColor : state.blackNoteColor }, {root:true});
         },
     },
 }

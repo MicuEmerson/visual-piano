@@ -11,6 +11,8 @@
 import { mapState } from 'vuex';
 import { PlayingState } from '../utils/PlayingState';
 import Timer  from "../utils/SetTimeoutTimer"
+import { recordingState, canvasState, menuState, playlistState } from "@/store/consts/states.js";
+import { ADD_TIMER } from "@/store/consts/mutations.js";
 
 export default {
     data: () => {
@@ -31,7 +33,7 @@ export default {
 
     methods: {
         handlePlaySong() {
-            this.$store.commit("playlistState/ADD_TIMER", 
+            this.$store.commit(playlistState + "/" + ADD_TIMER, 
                 new Timer(() => {
                     let interval = setInterval(() => {
                         if(this.menuState.playing === PlayingState.PLAY) {
@@ -59,7 +61,7 @@ export default {
     },
 
     computed: {
-        ...mapState([ 'playlistState', 'canvasState', 'menuState', 'recordingState' ]),
+        ...mapState([playlistState, canvasState, menuState, recordingState]),
         
         currentTime: function() {
             const counterFloor = Math.floor(this.counter);

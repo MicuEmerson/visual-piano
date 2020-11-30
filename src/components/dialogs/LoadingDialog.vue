@@ -7,10 +7,11 @@
 
 <script>
 import { mapState } from 'vuex';
+import { playlistState } from "@/store/consts/states.js";
 
 export default {
   computed: {
-    ...mapState(['playlistState'])
+    ...mapState([playlistState])
   }
 }
 </script>

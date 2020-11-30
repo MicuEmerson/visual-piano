@@ -19,5 +19,4 @@ export default new Vuex.Store({
     playlistState,
     canvasState
   },
-  state: {},
 })
