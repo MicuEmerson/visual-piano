@@ -3,7 +3,7 @@
 ![Screenshot](https://github.com/MicuEmerson/piano-app/blob/develop/visual-piano.jpg)
 <h1 style="text-align:center"> <a href="https://micuemerson.github.io/piano-app"> Try it out! </a> </h1>
 <h2>Description</h2>
-Visual piano is a hobby project made in my spare time. 
+Visual piano is a project made in my spare time. 
 <h3> Technologies used: </h3>
   <ul>
     <li> <a href="https://vuejs.org/">Vue</a> as the main js framework</li>
